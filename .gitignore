@@ -1,0 +1,28 @@
+# Maven generated file
+target
+**.versionsBackup
+**.releaseBackup
+**release.properties
+
+# Intellij generated files
+**.iml
+**.idea
+
+# Temp files
+**~
+\#*
+tmp.*
+
+# Latex generated files
+**.aux
+**.pdf
+**.bbl
+**.blg
+**.log
+**.out
+**.gz
+**.swp
+**latexmk
+**auto/
+
+
