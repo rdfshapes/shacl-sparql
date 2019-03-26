@@ -4,21 +4,26 @@ import com.google.common.collect.ImmutableSet;
 import org.eclipse.rdf4j.query.BindingSet;
 import util.ImmutableCollectors;
 
-import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RulePattern {
     private final Atom head;
     private final ImmutableSet<Atom> atoms;
+    private final ImmutableSet<String> variables;
 
     // If a value for each variable is produced (by a solution mapping), then the rule pattern can be instantiated.
     // note that it may be the case that these variables do not appear in the the body of the rule (because there is no constraint to propagate on these values, they only need to exist)
 //    private final ImmutableSet<String> variables;
 
-    public RulePattern(Atom head, ImmutableSet<Atom> atoms) {
+    public RulePattern(Atom head, ImmutableSet<Atom> body) {
         this.head = head;
-        this.atoms = atoms;
-//        this.variables = variables;
+        this.atoms = body;
+        this.variables = Stream.concat(
+                Stream.of(head.getArg()),
+                body.stream()
+                        .map(a -> a.getArg())
+        ).collect(ImmutableCollectors.toSet());
     }
 
     public Atom getHead() {
@@ -36,7 +41,7 @@ public class RulePattern {
     @Override
     public String toString() {
         return head + ": - " +
-                getAtomString();
+                getBodyString();
 //                getNegAtomsString() + ", " +
 //                getVariablesString();
     }
@@ -57,7 +62,7 @@ public class RulePattern {
 //                ")";
 //    }
 
-    private String getAtomString() {
+    private String getBodyString() {
         if (atoms.isEmpty()) {
             return "pos: ()";
         }
@@ -86,5 +91,6 @@ public class RulePattern {
     }
 
     public ImmutableSet<String> getVariables() {
+        return variables;
     }
 }

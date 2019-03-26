@@ -1,7 +1,6 @@
 package eval;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import core.Atom;
 import core.Query;
@@ -20,7 +19,7 @@ import util.ImmutableCollectors;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Validator {
+class Validator {
 
     static Logger log = LoggerFactory.getLogger(Validator.class);
 
@@ -29,16 +28,10 @@ public class Validator {
     private final Optional<Shape> targetShape;
 
 
-    public Validator(SPARQLEndpoint endpoint, Schema schema) {
+    Validator(SPARQLEndpoint endpoint, Schema schema) {
         this.endpoint = endpoint;
         this.schema = schema;
         targetShape = Optional.empty();
-    }
-
-    public Validator(SPARQLEndpoint endpoint, Schema schema, Shape targetShape) {
-        this.endpoint = endpoint;
-        this.schema = schema;
-        this.targetShape = Optional.of(targetShape);
     }
 
     public void validate() {
@@ -109,7 +102,7 @@ public class Validator {
                 .map(a -> schema.getShape(a.getPredicate()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .filter(s -> !state.visitedShapes.contains(s))
+                .filter(s -> !state.visitedShapes.contains(s.getName()))
                 .collect(ImmutableCollectors.toSet());
     }
 
@@ -124,7 +117,7 @@ public class Validator {
         if (freshAtoms.isEmpty()) {
             return inferredAtoms;
         }
-        freshAtoms.forEach(a -> state.assignment.add(a));
+        state.assignment.addAll(freshAtoms);
         freshAtoms.forEach(a -> state.ruleMap.remove(a));
         inferredAtoms.addAll(freshAtoms);
         return saturate(state, inferredAtoms);
@@ -182,8 +175,8 @@ public class Validator {
         RuleMap retainedRules = new RuleMap();
         return state.ruleMap.entrySet().stream()
                 .map(e -> applyRules(e.getKey(), e.getValue(), state, retainedRules))
-                .filter(o -> o.isPresent())
-                .map(o -> o.get())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(ImmutableCollectors.toList());
     }
 
@@ -200,8 +193,8 @@ public class Validator {
         if(state.assignment.containsAll(body)){
             return true;
         }
-        if(!body.stream()
-                .anyMatch(a -> state.assignment.contains(a.getNegation()))){
+        if(body.stream()
+                .noneMatch(a -> state.assignment.contains(a.getNegation()))){
             retainedRules.addRule(head, body);
         }
         return false;
@@ -243,26 +236,27 @@ public class Validator {
     private void evalDisjunct(EvalState state, ConstraintConjunction d, Shape s) {
 //        ImmutableSet<RulePattern> rulepatterns =
 //                Stream.of(
-//                        s.getRulePatterns().stream(),
-//                        d.getRulePatterns().stream()
+//                        s.getRulePattern().stream(),
+//                        d.getRulePattern().stream()
 //                ).flatMap(st -> st)
 //                        .collect(ImmutableCollectors.toSet());
 
-        evalQuery(state, d.getMinQuery());
+        evalQuery(state, d.getMinQuery(), s);
         d.getMaxQueries()
-                .forEach(q -> evalQuery(state, q));
+                .forEach(q -> evalQuery(state, q, s));
 
     }
 
-    private void evalQuery(EvalState state, Query q) {
+    private void evalQuery(EvalState state, Query q, Shape s) {
         QueryEvaluation eval = endpoint.runQuery(q.getId(), q.getSparql());
         eval.getBindingSets().forEach(
-                b -> evalBindingSet(state, b, q.getRulePatterns())
+                b -> evalBindingSet(state, b, q.getRulePattern(), s.getRulePatterns())
         );
     }
 
-    private void evalBindingSet(EvalState state, BindingSet bs, ImmutableSet<RulePattern> rulePatterns) {
-        rulePatterns.forEach(p -> evalBindingSet(state, bs, p));
+    private void evalBindingSet(EvalState state, BindingSet bs, RulePattern queryRP, ImmutableSet<RulePattern> shapeRPs) {
+        evalBindingSet(state, bs, queryRP);
+        shapeRPs.forEach(p -> evalBindingSet(state, bs, p));
 
     }
 

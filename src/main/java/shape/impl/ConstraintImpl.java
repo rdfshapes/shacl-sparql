@@ -94,14 +94,8 @@ public class ConstraintImpl implements Constraint {
 
 
     @Override
-    public RulePattern computeRulePattern() {
-        this.rulePattern = new RulePattern(
-                new Atom(
-                        id,
-                        VariableGenerator.getFocusNodeVar(),
-                        isPos
-                ),
-                shapeRef.isPresent() ?
+    public ImmutableSet<Atom> computeRulePatternBody() {
+              return shapeRef.isPresent() ?
                         variables.stream()
                                 .map(v -> new Atom(
                                         shapeRef.get(),
@@ -109,15 +103,11 @@ public class ConstraintImpl implements Constraint {
                                         isPos
                                 ))
                                 .collect(ImmutableCollectors.toSet()) :
-                        ImmutableSet.of(),
-                ImmutableSet.of(),
-                variables
-        );
-        return rulePattern;
+                      ImmutableSet.of();
     }
 
     @Override
-    public RulePattern getRulePattern() {
+    public RulePattern getRulePatternBody() {
         return rulePattern;
     }
 }

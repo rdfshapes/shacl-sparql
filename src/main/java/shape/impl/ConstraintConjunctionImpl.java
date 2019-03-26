@@ -1,22 +1,15 @@
 package shape.impl;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import core.Atom;
 import core.Query;
-import core.RulePattern;
-import core.global.VariableGenerator;
-import preprocess.SPARQLGenerator;
+import preprocess.QueryGenerator;
 import shape.Constraint;
 import shape.ConstraintConjunction;
 import shape.Schema;
-import shape.Shape;
 import util.ImmutableCollectors;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 
 public class ConstraintConjunctionImpl implements ConstraintConjunction {
 
@@ -54,23 +47,23 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
         return maxQueries;
     }
 
-    @Override
-    public void computeRulePatterns(Schema s) {
-        minConstraints.forEach(Constraint::computeRulePattern);
-        maxConstraints.forEach(Constraint::computeRulePattern);
-
-        String focusNodeVar = VariableGenerator.getFocusNodeVar();
-        this.rulePattern = new RulePattern(
-                new Atom(id, focusNodeVar, true),
-                minConstraints.stream()
-                        .map(c -> c.getRulePattern().getHead())
-                        .collect(ImmutableCollectors.toSet()),
-                maxConstraints.stream()
-                        .map(c -> c.getRulePattern().getHead())
-                        .collect(ImmutableCollectors.toSet()),
-                ImmutableSet.of(focusNodeVar)
-        );
-    }
+//    @Override
+//    public void computeRulePatterns(Schema s) {
+//        minConstraints.forEach(Constraint::computeRulePatternBody);
+//        maxConstraints.forEach(Constraint::computeRulePatternBody);
+//
+//        String focusNodeVar = VariableGenerator.getFocusNodeVar();
+//        this.rulePattern = new RulePattern(
+//                new Atom(id, focusNodeVar, true),
+//                minConstraints.stream()
+//                        .map(c -> c.getRulePatternBody().getHead())
+//                        .collect(ImmutableCollectors.toSet()),
+//                maxConstraints.stream()
+//                        .map(c -> c.getRulePatternBody().getHead())
+//                        .collect(ImmutableCollectors.toSet()),
+//                ImmutableSet.of(focusNodeVar)
+//        );
+//    }
 
 //    @Override
 //    public ImmutableSet<String> getLocalViolationVars() {
@@ -101,16 +94,17 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 //                ));
 
         // Build a unique set of triples (+ filter) for all min constraints
-        this.minQuery = SPARQLGenerator.generateQuery(this.id + "_pos", minConstraints, schema, graphName);
+        this.minQuery = QueryGenerator.generateQuery(this.id + "_pos", minConstraints, schema, graphName, this.id);
 
         // Build one set of triples (+ filter) for each max constraint
         AtomicInteger i = new AtomicInteger(0);
         this.maxQueries = maxConstraints.stream()
-                .map(c -> SPARQLGenerator.generateQuery(
+                .map(c -> QueryGenerator.generateQuery(
                         this.id + "_max_" + i.incrementAndGet(),
                         ImmutableSet.of(c),
                         schema,
-                        graphName
+                        graphName,
+                        this.id
                 ))
                 .collect(ImmutableCollectors.toSet());
     }
@@ -118,18 +112,18 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 
 
 //    @Override
-//    public ImmutableSet<RulePattern> getRulePatterns() {
+//    public ImmutableSet<RulePattern> getRulePattern() {
 //        return Stream.of(
 //                Stream.of(this.rulePattern),
 //                minConstraints.stream()
-//                        .map(Constraint::getRulePattern),
+//                        .map(Constraint::getRulePatternBody),
 //                maxConstraints.stream()
-//                        .map(Constraint::getRulePattern)
+//                        .map(Constraint::getRulePatternBody)
 //        ).flatMap(s -> s)
 //                .collect(ImmutableCollectors.toSet());
 //    }
 
-//    private String generateQueryString(SPARQLGenerator validationClause, ImmutableList<SPARQLGenerator> violationClauses, Optional<String> graph) {
+//    private String generateQueryString(QueryGenerator validationClause, ImmutableList<QueryGenerator> violationClauses, Optional<String> graph) {
 //        return SPARQLPrefixHandler.getPrexixString() +
 //                "SELECT * WHERE{" +
 //                (graph.isPresent() ?
@@ -147,20 +141,20 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 //                "\n}";
 //    }
 
-//    private String getViolationClausesSparql(ImmutableList<SPARQLGenerator> violationClauses) {
+//    private String getViolationClausesSparql(ImmutableList<QueryGenerator> violationClauses) {
 //        return violationClauses.stream()
 //                .map(this::getViolationClauseSparql)
 //                .collect(Collectors.joining("\n"));
 //    }
 //
-//    private String getViolationClauseSparql(SPARQLGenerator c) {
+//    private String getViolationClauseSparql(QueryGenerator c) {
 //        return "\nOPTIONAL {" +
 //                "\n" +
 //                c.getSparql()
 //                + "}";
 //    }
 
-//    private ImmutableMap<String, Atom> generateRule(SPARQLGenerator validationClause) {
+//    private ImmutableMap<String, Atom> generateRule(QueryGenerator validationClause) {
 //        return validationClause.ruleBody.stream()
 //                .collect(ImmutableCollectors.toMap(
 //                        Atom::getArg,
@@ -168,7 +162,7 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 //                ));
 //    }
 
-//    private ImmutableList<ImmutableMap<String, Atom>> generateViolationRules(ImmutableList<SPARQLGenerator> violationClauses) {
+//    private ImmutableList<ImmutableMap<String, Atom>> generateViolationRules(ImmutableList<QueryGenerator> violationClauses) {
 //        return violationClauses.stream()
 //                .map(this::generateRule)
 //                .collect(ImmutableCollectors.toList());

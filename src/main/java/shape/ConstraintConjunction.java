@@ -15,5 +15,5 @@ public interface ConstraintConjunction {
     ImmutableSet<Query> getMaxQueries();
 
 //    void computeRulePatterns(Schema s);
-//    ImmutableSet<RulePattern> getRulePatterns();
+//    ImmutableSet<RulePattern> getRulePattern();
 }

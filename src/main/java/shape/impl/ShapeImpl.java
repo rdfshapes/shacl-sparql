@@ -17,13 +17,11 @@ public class ShapeImpl implements Shape {
     private final Optional<String> targetQuery;
     private final ImmutableSet<ConstraintConjunction> disjuncts;
     private final ImmutableSet<RulePattern> rulePatterns;
-//    private final RulePattern violationPattern;
 
     public ShapeImpl(String name, Optional<String> targetQuery, ImmutableSet<ConstraintConjunction> disjuncts) {
         this.name = name;
         this.targetQuery = targetQuery;
         this.disjuncts = disjuncts;
-//        violationPattern = computeViolationPattern();
         rulePatterns = computeRulePatterns();
     }
 
@@ -35,28 +33,10 @@ public class ShapeImpl implements Shape {
                 .map(p -> new Atom(p, focusNodeVar, true))
                 .map(a -> new RulePattern(
                         head,
-                        ImmutableSet.of(a),
-                        ImmutableSet.of(a.getNegation()),
-//                        disjuncts.stream()
-//                                .map(ConstraintConjunction::getId)
-//                                .map(p -> new Atom(p, focusNodeVar, false))
-//                                .collect(ImmutableCollectors.toSet()),
-                        ImmutableSet.of(focusNodeVar)))
+                        ImmutableSet.of(a)
+                ))
                 .collect(ImmutableCollectors.toSet());
     }
-
-//    private RulePattern computeViolationPattern() {
-//        String focusNodeVar = VariableGenerator.getFocusNodeVar();
-//               return new RulePattern(
-//                       new Atom(name, focusNodeVar, false),
-//                       ImmutableSet.of(),
-//                        disjuncts.stream()
-//                                .map(ConstraintConjunction::getId)
-//                                .map(p -> new Atom(p, focusNodeVar, false))
-//                                .collect(ImmutableCollectors.toSet()),
-//                       ImmutableSet.of(focusNodeVar)
-//                );
-//    }
 
     public String getName() {
         return name;

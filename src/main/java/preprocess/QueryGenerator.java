@@ -9,53 +9,50 @@ import core.global.SPARQLPrefixHandler;
 import core.global.VariableGenerator;
 import shape.Constraint;
 import shape.Schema;
+import util.ImmutableCollectors;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SPARQLGenerator {
+public class QueryGenerator {
 
-    public static Query generateQuery(String id, ImmutableSet<Constraint> constraints, Schema schema, Optional<String> graph) {
+    public static Query generateQuery(String id, ImmutableSet<Constraint> constraints, Schema schema, Optional<String> graph, String disjunctId) {
+        if(constraints.size() > 1 && constraints
+                .stream().anyMatch(c -> c.getMax().isPresent())){
+            throw new RuntimeException("Only one max constraint per query is allowed");
+        }
+        RulePattern rp = computeRulePattern(constraints, disjunctId);
+
         QueryBuilder builder = new QueryBuilder(id, graph);
-        constraints.forEach(c -> buildClause(builder, c, schema));
-        return builder.buildQuery();
+        constraints.forEach(c -> builder.buildClause(c));
+
+        return builder.buildQuery(rp);
     }
 
-    private static void buildClause(QueryBuilder builder, Constraint c, Schema schema) {
-
-        if (c.getValue().isPresent()) {
-            builder.addTriple(c.getPath(), c.getValue().get());
-            return;
-        }
-
-        ImmutableSet<String> variables = c.getVariables();
-        variables.forEach(v -> builder.addTriple(c.getPath(), "?" + v));
-
-        if (c.getDatatype().isPresent()) {
-            variables.forEach(v -> builder.addDatatypeFilter(v, c.getDatatype().get(), c.isPos()));
-        }
-        if (c.getShapeRef().isPresent()) {
-            variables.forEach(v -> builder.addRuleAtom(v, c.getShapeRef().get(), c.isPos(), schema));
-        }
-        if (variables.size() > 1) {
-            builder.addCardinalityFilter(variables);
-        }
+    private static RulePattern computeRulePattern(ImmutableSet<Constraint> constraints, String disjunctId) {
+        return new RulePattern(
+                new Atom(
+                        disjunctId,
+                        VariableGenerator.getFocusNodeVar(),
+                        !constraints.iterator().next().getMax().isPresent()
+                ),
+                constraints.stream()
+                .flatMap(c -> c.computeRulePatternBody().stream())
+                .collect(ImmutableCollectors.toSet())
+        );
     }
 
 
     private static class QueryBuilder {
-        Set<Atom> ruleBody;
         List<String> filters;
         List<String> triples;
         Set<String> variables;
-        Set<Constraint> constraints;
         private final String id;
         private final Optional<String> graph;
 
         public QueryBuilder(String id, Optional<String> graph) {
             this.id = id;
             this.graph = graph;
-            this.ruleBody = new HashSet<>();
             this.filters = new ArrayList<>();
             this.triples = new ArrayList<>();
         }
@@ -86,16 +83,14 @@ public class SPARQLGenerator {
             return "datatype(?" + variable + ") = " + datatype;
         }
 
-        void addRuleAtom(String v, String s, boolean idPos, Schema schema) {
-            ruleBody.add(new Atom(s, v, idPos));
-        }
+//        void addRuleAtom(String v, String s, boolean idPos, Schema schema) {
+//            ruleBody.add(new Atom(s, v, idPos));
+//        }
 
         String getSparql() {
             return SPARQLPrefixHandler.getPrexixString() +
                     "SELECT * WHERE{" +
-                    (graph.isPresent() ?
-                            "\nGRAPH " + graph.get() + "{" :
-                            ""
+                    (graph.map(s -> "\nGRAPH " + s + "{").orElse("")
                     ) +
                     "\n\n" +
                     getTriplePatterns() +
@@ -140,14 +135,31 @@ public class SPARQLGenerator {
             }
         }
 
-        public ImmutableSet<RulePattern> computeRulePatterns() {
+        private void buildClause(Constraint c) {
 
+            if (c.getValue().isPresent()) {
+                addTriple(c.getPath(), c.getValue().get());
+                return;
+            }
+
+            ImmutableSet<String> variables = c.getVariables();
+            variables.forEach(v -> addTriple(c.getPath(), "?" + v));
+
+            if (c.getDatatype().isPresent()) {
+                variables.forEach(v -> addDatatypeFilter(v, c.getDatatype().get(), c.isPos()));
+            }
+//            if (c.getShapeRef().isPresent()) {
+//                variables.forEach(v -> addRuleAtom(v, c.getShapeRef().get(), c.isPos(), schema));
+//            }
+            if (variables.size() > 1) {
+                addCardinalityFilter(variables);
+            }
         }
 
-        public Query buildQuery() {
+        Query buildQuery(RulePattern rulePattern) {
             return new Query(
                     id,
-                    computeRulePatterns(),
+                    rulePattern,
                     getSparql()
             );
         }

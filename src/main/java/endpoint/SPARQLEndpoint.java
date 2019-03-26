@@ -2,16 +2,16 @@ package endpoint;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.eclipse.rdf4j.query.*;
+import core.Query;
+import org.eclipse.rdf4j.query.QueryLanguage;
+import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
-import org.eclipse.rdf4j.repository.RepositoryException;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.ImmutableCollectors;
 
-import java.time.Duration;
 import java.time.Instant;
 
 public class SPARQLEndpoint {
@@ -32,7 +32,7 @@ public class SPARQLEndpoint {
 
         try (RepositoryConnection conn = repo.getConnection()) {
             evals = queries.stream()
-                    .map(q -> runQuery(conn, q.getId(), q.getSparqlString()))
+                    .map(q -> runQuery(conn, q.getId(), q.getSparql()))
                     .collect(ImmutableCollectors.toList());
         }
         repo.shutDown();

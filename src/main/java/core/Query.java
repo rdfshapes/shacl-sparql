@@ -4,19 +4,19 @@ import com.google.common.collect.ImmutableSet;
 
 public class Query {
 
-    private final ImmutableSet<RulePattern> rulePatterns;
+    private final RulePattern rulePattern;
     private final String sparql;
     private final String id;
 
 
-    public Query(String id, ImmutableSet<RulePattern> rulePattern, String sparql) {
-        this.rulePatterns = rulePattern;
+    public Query(String id, RulePattern rulePattern, String sparql) {
+        this.rulePattern = rulePattern;
         this.sparql = sparql;
         this.id = id;
     }
 
-    public ImmutableSet<RulePattern> getRulePatterns() {
-        return rulePatterns;
+    public RulePattern getRulePattern() {
+        return rulePattern;
     }
 
     public String getSparql() {
@@ -24,5 +24,6 @@ public class Query {
     }
 
     public String getId() {
+        return id;
     }
 }

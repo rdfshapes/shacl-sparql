@@ -2,6 +2,7 @@ package shape;
 
 
 import com.google.common.collect.ImmutableSet;
+import core.Atom;
 import core.RulePattern;
 
 import java.util.Optional;
@@ -18,6 +19,6 @@ public interface Constraint {
 
         ImmutableSet<String> getVariables();
 
-        RulePattern computeRulePattern();
-        RulePattern getRulePattern();
+        ImmutableSet<Atom> computeRulePatternBody();
+        RulePattern getRulePatternBody();
 }

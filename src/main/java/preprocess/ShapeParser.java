@@ -41,12 +41,12 @@ public class ShapeParser {
         ).stream()
                 .map(f-> parse(Paths.get(f.getAbsolutePath())))
                 .collect(ImmutableCollectors.toMap(
-                        s -> s.getName(),
+                        Shape::getName,
                         s -> s
                 )));
     }
 
-    public static Shape parse(Path path) {
+    private static Shape parse(Path path) {
         Optional<String> targetQuery = Optional.empty();
         try {
             JsonObject obj = new JsonParser().parse(new FileReader(path.toFile())).getAsJsonObject();
@@ -72,7 +72,7 @@ public class ShapeParser {
     private static ImmutableSet<ConstraintConjunction> parseConstraints(String shapeName, JsonArray array) {
         AtomicInteger i = new AtomicInteger(0);
         return StreamUt.toStream(array.iterator()).sequential()
-                .map(a -> a.getAsJsonArray())
+                .map(JsonElement::getAsJsonArray)
                 .map(a -> parseDisjunct(a, shapeName+"_d"+i.incrementAndGet()))
                 .collect(ImmutableCollectors.toSet());
     }
@@ -80,7 +80,7 @@ public class ShapeParser {
     private static ConstraintConjunction parseDisjunct(JsonArray array, String id) {
         AtomicInteger i = new AtomicInteger(0);
         Map<Boolean, List<Constraint>> part = StreamUt.toStream(array.iterator())
-                .map(a -> a.getAsJsonObject())
+                .map(JsonElement::getAsJsonObject)
                 .map(a -> parseConstraint(a, id+"_c"+i.incrementAndGet()))
                 // Duplicate the constraints that have both min and max
                 .flatMap(ShapeParser::duplicate)
