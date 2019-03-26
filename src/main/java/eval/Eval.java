@@ -3,10 +3,11 @@ package eval;
 import endpoint.SPARQLEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import preprocess.ShapeParser;
 import shape.Schema;
 import shape.Shape;
-import preprocess.ShapeParser;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -33,13 +34,20 @@ public class Eval {
 //        parseArguments(args);
         readHardCodedArguments();
         schema.getShapes().forEach(s -> s.computeConstraintQueries(schema, graph));
-        Validator validator = new Validator(endpoint, schema);
-
-        Instant start = Instant.now();
-        validator.validate();
-        Instant finish = Instant.now();
-        long elapsed = Duration.between(start, finish).toMillis();
-        System.out.println("Total execution time: "+elapsed);
+        try {
+            Validator validator = new Validator(
+                    endpoint,
+                    schema,
+                    Paths.get(outputDir.toString(), "validation.log").toFile()
+            );
+            Instant start = Instant.now();
+            validator.validate();
+            Instant finish = Instant.now();
+            long elapsed = Duration.between(start, finish).toMillis();
+            System.out.println("Total execution time: " + elapsed);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void parseArguments(String[] args) {
@@ -70,9 +78,9 @@ public class Eval {
 
     private static void readHardCodedArguments() {
         String cwd = System.getProperty("user.dir");
-        String resourceDir = cwd + "/../tests";
-//        endpoint = new SPARQLEndpoint("http://obdalin.inf.unibz.it:8890/sparql");
-        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
+        String resourceDir = Paths.get(cwd, "tests").toString();
+        endpoint = new SPARQLEndpoint("http://obdalin.inf.unibz.it:8890/sparql");
+//        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
         graph = Optional.of("<dbpedia-person.org>");
         graph = Optional.empty();
         schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/light"));

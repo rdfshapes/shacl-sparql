@@ -1,5 +1,6 @@
 package shape.impl;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import core.Query;
 import preprocess.QueryGenerator;
@@ -10,26 +11,29 @@ import util.ImmutableCollectors;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class ConstraintConjunctionImpl implements ConstraintConjunction {
 
     private final String id;
-    private final ImmutableSet<Constraint> minConstraints;
-    private final ImmutableSet<Constraint> maxConstraints;
+    private final ImmutableList<Constraint> minConstraints;
+    private final ImmutableList<Constraint> maxConstraints;
+    private final String minQueryPredicate;
+    private final ImmutableList<String> maxQueryPredicates;
 
-    //    private RulePattern rulePattern;
-    //    private ImmutableSet<String> localViolationVars;
-//    private ImmutableSet<String> distantViolationVars;
-//    private ImmutableMap<String, Atom> validationRule;
-//    private ImmutableList<ImmutableMap<String, Atom>> violationRules;
     private Query minQuery;
     private ImmutableSet<Query> maxQueries;
 
 
-    public ConstraintConjunctionImpl(String id, ImmutableSet<Constraint> minConstraints, ImmutableSet<Constraint> maxConstraints) {
+    public ConstraintConjunctionImpl(String id, ImmutableList<Constraint> minConstraints, ImmutableList<Constraint> maxConstraints) {
         this.id = id;
         this.minConstraints = minConstraints;
         this.maxConstraints = maxConstraints;
+        minQueryPredicate = id + "_pos";
+        maxQueryPredicates = IntStream.range(1, maxConstraints.size()).boxed()
+                .map(i -> id + "_max_" + i)
+                .collect(ImmutableCollectors.toList());
     }
 
     @Override
@@ -45,6 +49,14 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
     @Override
     public ImmutableSet<Query> getMaxQueries() {
         return maxQueries;
+    }
+
+    @Override
+    public Stream<String> getPredicates() {
+            return Stream.of(
+                    Stream.of(id, minQueryPredicate),
+                    maxQueryPredicates.stream()
+            ).flatMap(s -> s);
     }
 
 //    @Override
@@ -85,7 +97,7 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 //        return violationRules;
 //    }
 
-    public void computeQueries(Schema schema, Optional<String> graphName) {
+    public void computeQueries(Optional<String> graphName) {
 
         // Split constraints into min constraints and max constraints
 //        Map<Boolean, List<Constraint>> part = constraints.stream()
@@ -94,17 +106,15 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 //                ));
 
         // Build a unique set of triples (+ filter) for all min constraints
-        this.minQuery = QueryGenerator.generateQuery(this.id + "_pos", minConstraints, schema, graphName, this.id);
+        this.minQuery = QueryGenerator.generateQuery(this.minQueryPredicate, minConstraints, graphName);
 
         // Build one set of triples (+ filter) for each max constraint
         AtomicInteger i = new AtomicInteger(0);
         this.maxQueries = maxConstraints.stream()
                 .map(c -> QueryGenerator.generateQuery(
-                        this.id + "_max_" + i.incrementAndGet(),
-                        ImmutableSet.of(c),
-                        schema,
-                        graphName,
-                        this.id
+                        maxQueryPredicates.get(i.incrementAndGet()),
+                        ImmutableList.of(c),
+                        graphName
                 ))
                 .collect(ImmutableCollectors.toSet());
     }
@@ -174,9 +184,8 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 //        return variables.stream()
 //                .collect(ImmutableCollectors.toMap(
 //                        v -> v,
-//                        v -> new Atom(shape.getName(), v, isPos)
+//                        v -> new Atom(shape.getId(), v, isPos)
 //                ));
 //    }
-
 }
 

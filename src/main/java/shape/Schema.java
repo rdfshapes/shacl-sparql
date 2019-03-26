@@ -9,4 +9,6 @@ public interface Schema {
     Optional<Shape> getShape(String name);
 
     ImmutableSet<Shape> getShapes();
+
+    ImmutableSet<String> getShapeNames();
 }

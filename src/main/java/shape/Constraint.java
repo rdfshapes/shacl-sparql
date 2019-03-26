@@ -20,5 +20,4 @@ public interface Constraint {
         ImmutableSet<String> getVariables();
 
         ImmutableSet<Atom> computeRulePatternBody();
-        RulePattern getRulePatternBody();
 }

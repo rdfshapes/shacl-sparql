@@ -105,9 +105,4 @@ public class ConstraintImpl implements Constraint {
                                 .collect(ImmutableCollectors.toSet()) :
                       ImmutableSet.of();
     }
-
-    @Override
-    public RulePattern getRulePatternBody() {
-        return rulePattern;
-    }
 }

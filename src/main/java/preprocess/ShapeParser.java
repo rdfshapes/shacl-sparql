@@ -1,5 +1,6 @@
 package preprocess;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -32,18 +33,25 @@ import java.util.stream.Stream;
 
 public class ShapeParser {
 
-    public static Schema parseSchema(Path dir){
-
-      return new SchemaImpl(FileUtils.listFiles(
+    public static Schema parseSchema(Path dir) {
+        ImmutableSet<Shape> shapes = FileUtils.listFiles(
                 dir.toFile(),
                 new String[]{"json"},
                 false
         ).stream()
-                .map(f-> parse(Paths.get(f.getAbsolutePath())))
-                .collect(ImmutableCollectors.toMap(
-                        Shape::getName,
-                        s -> s
-                )));
+                .map(f -> parse(Paths.get(f.getAbsolutePath())))
+                .collect(ImmutableCollectors.toSet());
+
+        return new SchemaImpl(
+                shapes.stream()
+                        .collect(ImmutableCollectors.toMap(
+                                s -> s.getId(),
+                                s -> s
+                        )),
+                shapes.stream()
+                        .flatMap(s -> s.computePredicateSet().stream())
+                        .collect(ImmutableCollectors.toSet())
+        );
     }
 
     private static Shape parse(Path path) {
@@ -51,11 +59,11 @@ public class ShapeParser {
         try {
             JsonObject obj = new JsonParser().parse(new FileReader(path.toFile())).getAsJsonObject();
             JsonElement targetDef = obj.get("targetDef");
-            if(targetDef != null){
-             JsonElement query = targetDef.getAsJsonObject().get("query");
-             if(query != null){
-                 targetQuery = Optional.of(SPARQLPrefixHandler.getPrexixString()+query.getAsString());
-             }
+            if (targetDef != null) {
+                JsonElement query = targetDef.getAsJsonObject().get("query");
+                if (query != null) {
+                    targetQuery = Optional.of(SPARQLPrefixHandler.getPrexixString() + query.getAsString());
+                }
             }
             String name = obj.get("name").getAsString();
             return new ShapeImpl(
@@ -64,7 +72,7 @@ public class ShapeParser {
                     parseConstraints(name, obj.get("constraintDef").getAsJsonObject().get("conjunctions").getAsJsonArray())
             );
 
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -73,7 +81,7 @@ public class ShapeParser {
         AtomicInteger i = new AtomicInteger(0);
         return StreamUt.toStream(array.iterator()).sequential()
                 .map(JsonElement::getAsJsonArray)
-                .map(a -> parseDisjunct(a, shapeName+"_d"+i.incrementAndGet()))
+                .map(a -> parseDisjunct(a, shapeName + "_d" + i.incrementAndGet()))
                 .collect(ImmutableCollectors.toSet());
     }
 
@@ -81,7 +89,7 @@ public class ShapeParser {
         AtomicInteger i = new AtomicInteger(0);
         Map<Boolean, List<Constraint>> part = StreamUt.toStream(array.iterator())
                 .map(JsonElement::getAsJsonObject)
-                .map(a -> parseConstraint(a, id+"_c"+i.incrementAndGet()))
+                .map(a -> parseConstraint(a, id + "_c" + i.incrementAndGet()))
                 // Duplicate the constraints that have both min and max
                 .flatMap(ShapeParser::duplicate)
                 .collect(Collectors.partitioningBy(
@@ -89,16 +97,16 @@ public class ShapeParser {
                 ));
         return new ConstraintConjunctionImpl(
                 id,
-                ImmutableSet.copyOf(part.get(true)),
-                ImmutableSet.copyOf(part.get(false))
+                ImmutableList.copyOf(part.get(true)),
+                ImmutableList.copyOf(part.get(false))
         );
     }
 
     private static Stream<Constraint> duplicate(Constraint c) {
         return (c.getMin().isPresent()) && (c.getMax().isPresent()) ?
                 Stream.of(
-                        new ConstraintImpl(c.getId()+"_1", c.getPath(), c.getMin(), Optional.empty(), c.getDatatype(), c.getValue(), c.getShapeRef(), c.isPos()),
-                        new ConstraintImpl(c.getId()+"_2", c.getPath(), Optional.empty(), c.getMax(), c.getDatatype(), c.getValue(), c.getShapeRef(), c.isPos())
+                        new ConstraintImpl(c.getId() + "_1", c.getPath(), c.getMin(), Optional.empty(), c.getDatatype(), c.getValue(), c.getShapeRef(), c.isPos()),
+                        new ConstraintImpl(c.getId() + "_2", c.getPath(), Optional.empty(), c.getMax(), c.getDatatype(), c.getValue(), c.getShapeRef(), c.isPos())
                 ) :
                 Stream.of(c);
     }
@@ -114,23 +122,23 @@ public class ShapeParser {
         return new ConstraintImpl(
                 id,
                 obj.get("path").getAsString(),
-                (min == null)?
-                        Optional.empty():
+                (min == null) ?
+                        Optional.empty() :
                         Optional.of(min.getAsInt()),
-                (max == null)?
-                        Optional.empty():
+                (max == null) ?
+                        Optional.empty() :
                         Optional.of(max.getAsInt()),
-                (datatype == null)?
-                        Optional.empty():
+                (datatype == null) ?
+                        Optional.empty() :
                         Optional.of(datatype.getAsString()),
-                (value == null)?
-                        Optional.empty():
+                (value == null) ?
+                        Optional.empty() :
                         Optional.of(value.getAsString()),
-                (shapeRef == null)?
-                        Optional.empty():
+                (shapeRef == null) ?
+                        Optional.empty() :
                         Optional.of(shapeRef.getAsString()),
-                (negated == null)?
-                        true:
+                (negated == null) ?
+                        true :
                         !negated.getAsBoolean()
         );
     }

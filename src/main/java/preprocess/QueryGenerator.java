@@ -8,20 +8,22 @@ import core.RulePattern;
 import core.global.SPARQLPrefixHandler;
 import core.global.VariableGenerator;
 import shape.Constraint;
-import shape.Schema;
 import util.ImmutableCollectors;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class QueryGenerator {
 
-    public static Query generateQuery(String id, ImmutableSet<Constraint> constraints, Schema schema, Optional<String> graph, String disjunctId) {
+    public static Query generateQuery(String id, ImmutableList<Constraint> constraints, Optional<String> graph) {
         if(constraints.size() > 1 && constraints
                 .stream().anyMatch(c -> c.getMax().isPresent())){
             throw new RuntimeException("Only one max constraint per query is allowed");
         }
-        RulePattern rp = computeRulePattern(constraints, disjunctId);
+        RulePattern rp = computeRulePattern(constraints, id);
 
         QueryBuilder builder = new QueryBuilder(id, graph);
         constraints.forEach(c -> builder.buildClause(c));
@@ -29,10 +31,10 @@ public class QueryGenerator {
         return builder.buildQuery(rp);
     }
 
-    private static RulePattern computeRulePattern(ImmutableSet<Constraint> constraints, String disjunctId) {
+    private static RulePattern computeRulePattern(ImmutableList<Constraint> constraints, String id) {
         return new RulePattern(
                 new Atom(
-                        disjunctId,
+                        id,
                         VariableGenerator.getFocusNodeVar(),
                         !constraints.iterator().next().getMax().isPresent()
                 ),

@@ -10,9 +10,11 @@ import java.util.Optional;
 public class SchemaImpl implements Schema {
 
     private final ImmutableMap<String, Shape> shapeMap;
+    private final ImmutableSet<String> shapeNames;
 
-    public SchemaImpl(ImmutableMap<String, Shape> shapeMap) {
+    public SchemaImpl(ImmutableMap<String, Shape> shapeMap, ImmutableSet<String> shapeNames) {
         this.shapeMap = shapeMap;
+        this.shapeNames = shapeNames;
     }
 
     @Override
@@ -26,5 +28,10 @@ public class SchemaImpl implements Schema {
     @Override
     public ImmutableSet<Shape> getShapes() {
         return ImmutableSet.copyOf(shapeMap.values());
+    }
+
+    @Override
+    public ImmutableSet<String> getShapeNames() {
+        return shapeNames;
     }
 }

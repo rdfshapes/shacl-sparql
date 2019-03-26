@@ -64,12 +64,11 @@ public class RulePattern {
 
     private String getBodyString() {
         if (atoms.isEmpty()) {
-            return "pos: ()";
+            return "";
         }
-        return "pos(" + atoms.stream()
+        return atoms.stream()
                 .map(Atom::toString)
-                .collect(Collectors.joining(", ")) +
-                ")";
+                .collect(Collectors.joining(", "));
     }
 
     public Atom instantiateAtom(Atom a, BindingSet bs) {

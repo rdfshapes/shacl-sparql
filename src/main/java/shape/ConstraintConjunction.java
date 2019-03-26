@@ -1,19 +1,17 @@
 package shape;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import core.Query;
-import core.RulePattern;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public interface ConstraintConjunction {
 
     String getId();
-    void computeQueries(Schema schema, Optional<String> graph);
+    void computeQueries(Optional<String> graph);
     Query getMinQuery();
     ImmutableSet<Query> getMaxQueries();
 
-//    void computeRulePatterns(Schema s);
-//    ImmutableSet<RulePattern> getRulePattern();
+    Stream<String> getPredicates();
 }

@@ -16,25 +16,29 @@ import shape.Schema;
 import shape.Shape;
 import util.ImmutableCollectors;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 class Validator {
 
-    static Logger log = LoggerFactory.getLogger(Validator.class);
-
     private final SPARQLEndpoint endpoint;
     private final Schema schema;
     private final Optional<Shape> targetShape;
+    private final BufferedWriter writer;
 
 
-    Validator(SPARQLEndpoint endpoint, Schema schema) {
+    Validator(SPARQLEndpoint endpoint, Schema schema, File outputFile) throws IOException {
         this.endpoint = endpoint;
         this.schema = schema;
         targetShape = Optional.empty();
+        writer = new BufferedWriter(new FileWriter(outputFile));
     }
 
-    public void validate() {
+    public void validate() throws IOException {
         validate(
                 0,
                 new EvalState(
@@ -45,6 +49,7 @@ class Validator {
                 ),
                 extractInitialFocusShapes()
         );
+        writer.close();
     }
 
     private ImmutableList<Atom> extractTargetAtoms() {
@@ -59,11 +64,11 @@ class Validator {
 
     private ImmutableList<Atom> extractTargetAtoms(Shape shape) {
         return endpoint.runQuery(
-                shape.getName(),
+                shape.getId(),
                 shape.getTargetQuery().get()
         ).getBindingSets().stream()
                 .map(b -> b.getBinding("x").getValue().stringValue())
-                .map(i -> new Atom(shape.getName(), i, true))
+                .map(i -> new Atom(shape.getId(), i, true))
                 .collect(ImmutableCollectors.toList());
     }
 
@@ -79,7 +84,7 @@ class Validator {
     private void validate(int depth, EvalState state, ImmutableSet<Shape> focusShapes) {
 
         // termination condition 1: all shapes have been visited
-        if (state.visitedShapes.size() == schema.getShapes().size()) {
+        if (state.visitedShapes.size() == schema.getShapeNames().size()) {
             return;
         }
         // termination condition 2: all targets are validated/violated
@@ -102,7 +107,7 @@ class Validator {
                 .map(a -> schema.getShape(a.getPredicate()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .filter(s -> !state.visitedShapes.contains(s.getName()))
+                .filter(s -> !state.visitedShapes.contains(s.getId()))
                 .collect(ImmutableCollectors.toSet());
     }
 
@@ -111,14 +116,14 @@ class Validator {
 
     private Set<Atom> saturate(EvalState state, Set<Atom> inferredAtoms) {
 
-        negateUnMatchableHeads(state);
+        Set<Atom> freshAtoms = negateUnMatchableHeads(state);
 //        filterRules(state);
-        List<Atom> freshAtoms = applyRules(state);
+        freshAtoms.addAll(applyRules(state));
         if (freshAtoms.isEmpty()) {
             return inferredAtoms;
         }
-        state.assignment.addAll(freshAtoms);
-        freshAtoms.forEach(a -> state.ruleMap.remove(a));
+//        state.assignment.addAll(freshAtoms);
+//        freshAtoms.forEach(a -> state.ruleMap.remove(a));
         inferredAtoms.addAll(freshAtoms);
         return saturate(state, inferredAtoms);
     }
@@ -171,13 +176,16 @@ class Validator {
 //    }
 
 
-    private List<Atom> applyRules(EvalState state) {
+    private ImmutableList<Atom> applyRules(EvalState state) {
         RuleMap retainedRules = new RuleMap();
-        return state.ruleMap.entrySet().stream()
+        ImmutableList<Atom> freshAtoms = state.ruleMap.entrySet().stream()
                 .map(e -> applyRules(e.getKey(), e.getValue(), state, retainedRules))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(ImmutableCollectors.toList());
+        state.ruleMap = retainedRules;
+        state.assignment.addAll(freshAtoms);
+        return freshAtoms;
     }
 
     private Optional<Atom> applyRules(Atom head, Set<ImmutableSet<Atom>> bodies, EvalState state, RuleMap retainedRules) {
@@ -219,8 +227,7 @@ class Validator {
 
     private void evalShape(EvalState state, Shape s) {
         s.getDisjuncts().forEach(d -> evalDisjunct(state, d, s));
-        s.getDisjuncts().forEach(d -> state.visitedShapes.add(d.getId()));
-        state.visitedShapes.add(s.getName());
+        state.visitedShapes.addAll(s.getPredicates());
 
         Set<Atom> freshAtoms = saturate(state, new HashSet<>());
 
@@ -270,17 +277,19 @@ class Validator {
         }
     }
 
-    private void negateUnMatchableHeads(EvalState state) {
+    private Set<Atom> negateUnMatchableHeads(EvalState state) {
         Set<Atom> ruleHeads = state.ruleMap.keySet();
 
-        ImmutableSet<Atom> unmatchableAtoms = state.ruleMap.getAllBodyAtoms()
+//        Set<Atom> dbg = state.ruleMap.getAllBodyAtoms().collect(Collectors.toSet());
+        Set<Atom> negatedUnmatchableAtoms = state.ruleMap.getAllBodyAtoms()
                 .filter(a -> state.visitedShapes.contains(a.getPredicate()))
-                .filter(a -> !ruleHeads.contains(a))
-                .collect(ImmutableCollectors.toSet());
+                .filter(a -> !ruleHeads.contains(a) && !state.assignment.contains(a))
+                .map(a -> a.getNegation())
+                .collect(Collectors.toSet());
 
         //state.ruleMap = dropUnmatchableNegatedAtoms(state, unmatchableAtoms);
-        unmatchableAtoms.forEach(a -> state.assignment.add(a.getNegation()));
-
+        state.assignment.addAll(negatedUnmatchableAtoms);
+        return negatedUnmatchableAtoms;
     }
 
 //    private RuleMap dropUnmatchableNegatedAtoms(EvalState state, ImmutableSet<Atom> unmatchableAtoms) {
@@ -351,7 +360,7 @@ class Validator {
 //    }
 //
 //    private void instantiateShapeValidationPatterns(EvalState state, String focusNode, Shape s) {
-//        Atom head = new Atom(s.getName(), focusNode, true);
+//        Atom head = new Atom(s.getId(), focusNode, true);
 //        s.getDisjuncts().stream()
 //                .map(ConstraintConjunction::getId)
 //                .map(p -> new Atom(p, focusNode, true))
@@ -366,7 +375,7 @@ class Validator {
 //                                .map(a -> a.getId())
 //                                .map(p -> new Atom(p, focusNode, true))
 //                                .collect(ImmutableCollectors.toSet()),
-//                        new Atom(s.getName(), focusNode, false)
+//                        new Atom(s.getId(), focusNode, false)
 //                ));
 //    }
 
