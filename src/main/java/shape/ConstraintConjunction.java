@@ -12,7 +12,7 @@ public interface ConstraintConjunction {
     String getId();
     void computeQueries(Schema schema, Optional<String> graph);
     Query getMinQuery();
-    ImmutableList<Query> getMaxQueries();
+    ImmutableSet<Query> getMaxQueries();
 
 //    void computeRulePatterns(Schema s);
 //    ImmutableSet<RulePattern> getRulePatterns();

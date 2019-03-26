@@ -2,7 +2,6 @@ package shape;
 
 
 import com.google.common.collect.ImmutableSet;
-import core.RuleBody;
 import core.RulePattern;
 
 import java.util.Optional;

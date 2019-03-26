@@ -1,4 +1,4 @@
-package shape;
+package preprocess;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonArray;
@@ -7,6 +7,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import core.global.SPARQLPrefixHandler;
 import org.apache.commons.io.FileUtils;
+import shape.Constraint;
+import shape.ConstraintConjunction;
+import shape.Schema;
+import shape.Shape;
 import shape.impl.ConstraintConjunctionImpl;
 import shape.impl.ConstraintImpl;
 import shape.impl.SchemaImpl;
@@ -14,7 +18,6 @@ import shape.impl.ShapeImpl;
 import util.ImmutableCollectors;
 import util.StreamUt;
 
-import javax.swing.text.html.Option;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;

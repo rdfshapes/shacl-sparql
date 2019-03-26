@@ -2,7 +2,6 @@ package shape.impl;
 
 import com.google.common.collect.ImmutableSet;
 import core.Atom;
-import core.RuleBody;
 import core.RulePattern;
 import core.global.VariableGenerator;
 import shape.Constraint;

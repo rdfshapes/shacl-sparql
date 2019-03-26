@@ -1,10 +1,10 @@
 package eval;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import core.Atom;
 import core.Query;
-import core.RuleBody;
 import core.RulePattern;
 import core.global.RuleMap;
 import endpoint.QueryEvaluation;
@@ -118,7 +118,7 @@ public class Validator {
 
     private Set<Atom> saturate(EvalState state, Set<Atom> inferredAtoms) {
 
-        discard(state);
+        negateUnMatchableHeads(state);
 //        filterRules(state);
         List<Atom> freshAtoms = applyRules(state);
         if (freshAtoms.isEmpty()) {
@@ -130,44 +130,44 @@ public class Validator {
         return saturate(state, inferredAtoms);
     }
 
-    private void filterRules(EvalState state) {
-        boolean modified = discardViolatedRules(state);
-        if (modified) {
-            filterRules(state);
-        }
-    }
-
-    private boolean discardViolatedRules(EvalState state) {
-        boolean modified = false;
-        RuleMap updatedRuleMap = new RuleMap();
-        for (Map.Entry<Atom, Set<RuleBody>> e : state.ruleMap.entrySet()) {
-            if (discardRuleBodies(e.getKey(), e.getValue(), state, updatedRuleMap)) {
-                modified = true;
-            }
-        }
-        state.ruleMap = updatedRuleMap;
-        return modified;
-    }
-
-    private boolean discardRuleBodies(Atom head, Set<RuleBody> ruleBodies, EvalState state, RuleMap updatedRuleMap) {
-        Set<RuleBody> remainingRuleBodies = ruleBodies.stream()
-                .filter(s -> s.getNegatedAtoms().isEmpty()
-                        || s.getNegatedAtoms().stream()
-                        .noneMatch(a -> state.assignment.contains(a)))
-                .collect(ImmutableCollectors.toSet());
-
-        if (!remainingRuleBodies.isEmpty()) {
-            updatedRuleMap.addRuleSet(head, remainingRuleBodies);
-        }
-        if (remainingRuleBodies.size() == ruleBodies.size()) {
-            return false;
-        }
-        return true;
-    }
+//    private void filterRules(EvalState state) {
+//        boolean modified = discardViolatedRules(state);
+//        if (modified) {
+//            filterRules(state);
+//        }
+//    }
+//
+//    private boolean discardViolatedRules(EvalState state) {
+//        boolean modified = false;
+//        RuleMap updatedRuleMap = new RuleMap();
+//        for (Map.Entry<Atom, Set<ImmutableSet<Atom>>> e : state.ruleMap.entrySet()) {
+//            if (discardRuleBodies(e.getKey(), e.getValue(), state, updatedRuleMap)) {
+//                modified = true;
+//            }
+//        }
+//        state.ruleMap = updatedRuleMap;
+//        return modified;
+//    }
+//
+//    private boolean discardRuleBodies(Atom head, Set<RuleBody> ruleBodies, EvalState state, RuleMap updatedRuleMap) {
+//        Set<RuleBody> remainingRuleBodies = ruleBodies.stream()
+//                .filter(s -> s.getNegatedAtoms().isEmpty()
+//                        || s.getNegatedAtoms().stream()
+//                        .noneMatch(a -> state.assignment.contains(a)))
+//                .collect(ImmutableCollectors.toSet());
+//
+//        if (!remainingRuleBodies.isEmpty()) {
+//            updatedRuleMap.addRuleSet(head, remainingRuleBodies);
+//        }
+//        if (remainingRuleBodies.size() == ruleBodies.size()) {
+//            return false;
+//        }
+//        return true;
+//    }
 
 //    private Optional<RuleBody> discardRuleBodies(Atom head, Set<RuleBody> ruleBodies, Assignment assignment){
 //        return ruleBodies.stream()
-//                .allMatch(b -> assignment.getPositiveAtoms().contains(b.getNegatedAtoms())?
+//                .allMatch(b -> assignment.getAtoms().contains(b.getNegatedAtoms())?
 //                        Optional.of(head),
 //
 //
@@ -179,18 +179,32 @@ public class Validator {
 
 
     private List<Atom> applyRules(EvalState state) {
+        RuleMap retainedRules = new RuleMap();
         return state.ruleMap.entrySet().stream()
-                .map(e -> applyRuleBodies(e.getKey(), e.getValue(), state))
+                .map(e -> applyRules(e.getKey(), e.getValue(), state, retainedRules))
                 .filter(o -> o.isPresent())
                 .map(o -> o.get())
                 .collect(ImmutableCollectors.toList());
     }
 
-    private Optional<Atom> applyRuleBodies(Atom head, Set<RuleBody> rbs, EvalState state) {
-        return rbs.stream()
-                .anyMatch(rb -> state.assignment.containsAll(rb.getPositiveAtoms())) ?
-                Optional.of(head) :
-                Optional.empty();
+    private Optional<Atom> applyRules(Atom head, Set<ImmutableSet<Atom>> bodies, EvalState state, RuleMap retainedRules) {
+        if(bodies.stream()
+                .anyMatch(b -> applyRule(head, b, state, retainedRules))){
+            state.assignment.add(head);
+            return Optional.of(head);
+        }
+        return Optional.empty();
+    }
+
+    private boolean applyRule(Atom head, ImmutableSet<Atom> body, EvalState state, RuleMap retainedRules) {
+        if(state.assignment.containsAll(body)){
+            return true;
+        }
+        if(!body.stream()
+                .anyMatch(a -> state.assignment.contains(a.getNegation()))){
+            retainedRules.addRule(head, body);
+        }
+        return false;
     }
 
 
@@ -262,40 +276,38 @@ public class Validator {
         }
     }
 
-    private void discard(EvalState state) {
+    private void negateUnMatchableHeads(EvalState state) {
         Set<Atom> ruleHeads = state.ruleMap.keySet();
-
 
         ImmutableSet<Atom> unmatchableAtoms = state.ruleMap.getAllBodyAtoms()
                 .filter(a -> state.visitedShapes.contains(a.getPredicate()))
                 .filter(a -> !ruleHeads.contains(a))
                 .collect(ImmutableCollectors.toSet());
 
-
-        state.ruleMap = dropUnmatchableNegatedAtoms(state, unmatchableAtoms);
-        unmatchableAtoms.forEach(a -> state.ruleMap.addRule(a, new RuleBody(ImmutableSet.of(), ImmutableSet.of())));
+        //state.ruleMap = dropUnmatchableNegatedAtoms(state, unmatchableAtoms);
+        unmatchableAtoms.forEach(a -> state.assignment.add(a.getNegation()));
 
     }
 
-    private RuleMap dropUnmatchableNegatedAtoms(EvalState state, ImmutableSet<Atom> unmatchableAtoms) {
-        RuleMap ruleMap = new RuleMap();
-        for (Map.Entry<Atom, Set<RuleBody>> e : state.ruleMap.entrySet()) {
-            Set<RuleBody> updateRuleBodies = e.getValue().stream()
-                    .map(rb -> dropUnmatchableNegatedAtoms(rb, unmatchableAtoms))
-                    .collect(ImmutableCollectors.toSet());
-            ruleMap.addRuleSet(e.getKey(), updateRuleBodies);
-        }
-        return ruleMap;
-    }
+//    private RuleMap dropUnmatchableNegatedAtoms(EvalState state, ImmutableSet<Atom> unmatchableAtoms) {
+//        RuleMap ruleMap = new RuleMap();
+//        for (Map.Entry<Atom, Set<RuleBody>> e : state.ruleMap.entrySet()) {
+//            Set<RuleBody> updateRuleBodies = e.getValue().stream()
+//                    .map(rb -> dropUnmatchableNegatedAtoms(rb, unmatchableAtoms))
+//                    .collect(ImmutableCollectors.toSet());
+//            ruleMap.addRuleSet(e.getKey(), updateRuleBodies);
+//        }
+//        return ruleMap;
+//    }
 
-    private RuleBody dropUnmatchableNegatedAtoms(RuleBody rb, ImmutableSet<Atom> unmatchableAtoms) {
-        return new RuleBody(
-                rb.getPositiveAtoms(),
-                rb.getNegatedAtoms().stream()
-                        .filter(a -> !unmatchableAtoms.contains(a))
-                .collect(ImmutableCollectors.toSet())
-        );
-    }
+//    private RuleBody dropUnmatchableNegatedAtoms(RuleBody rb, ImmutableSet<Atom> unmatchableAtoms) {
+//        return new RuleBody(
+//                rb.getPositiveAtoms(),
+//                rb.getNegatedAtoms().stream()
+//                        .filter(a -> !unmatchableAtoms.contains(a))
+//                .collect(ImmutableCollectors.toSet())
+//        );
+//    }
 
 //    private void evalBindingSet(EvalState state, BindingSet bindingSet, ConstraintConjunction c, Shape s) {
 //        String focusNode = bindingSet.getBinding(c.getLocalNodeVar()).getValue().stringValue();

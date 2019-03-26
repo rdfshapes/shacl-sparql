@@ -4,69 +4,64 @@ import com.google.common.collect.ImmutableSet;
 import org.eclipse.rdf4j.query.BindingSet;
 import util.ImmutableCollectors;
 
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class RulePattern {
     private final Atom head;
-    private final ImmutableSet<Atom> positiveAtoms;
-    private final ImmutableSet<Atom> negatedAtoms;
+    private final ImmutableSet<Atom> atoms;
 
     // If a value for each variable is produced (by a solution mapping), then the rule pattern can be instantiated.
     // note that it may be the case that these variables do not appear in the the body of the rule (because there is no constraint to propagate on these values, they only need to exist)
-    private final ImmutableSet<String> variables;
+//    private final ImmutableSet<String> variables;
 
-    public RulePattern(Atom head, ImmutableSet<Atom> positiveAtoms, ImmutableSet<Atom> negatedAtoms, ImmutableSet<String> variables) {
+    public RulePattern(Atom head, ImmutableSet<Atom> atoms) {
         this.head = head;
-        this.positiveAtoms = positiveAtoms;
-        this.negatedAtoms = negatedAtoms;
-        this.variables = variables;
+        this.atoms = atoms;
+//        this.variables = variables;
     }
 
     public Atom getHead() {
         return head;
     }
 
-    public ImmutableSet<String> getVariables() {
-        return variables;
-    }
+//    public ImmutableSet<String> getVariables() {
+//        return variables;
+//    }
 
-    public ImmutableSet<Atom> getPositiveAtoms() {
-        return positiveAtoms;
-    }
-
-    public ImmutableSet<Atom> getNegatedAtoms() {
-        return negatedAtoms;
+    public ImmutableSet<Atom> getAtoms() {
+        return atoms;
     }
 
     @Override
     public String toString() {
         return head + ": - " +
-                getPosAtomsString() + ", " +
-                getNegAtomsString() + ", " +
-                getVariablesString();
+                getAtomString();
+//                getNegAtomsString() + ", " +
+//                getVariablesString();
     }
 
-    private String getVariablesString() {
-        return "var: (" + variables.stream()
-                .collect(Collectors.joining(", "))
-                + ")";
-    }
+//    private String getVariablesString() {
+//        return "var: (" + variables.stream()
+//                .collect(Collectors.joining(", "))
+//                + ")";
+//    }
 
-    private String getNegAtomsString() {
-        if (negatedAtoms.isEmpty()) {
-            return "neg: ()";
-        }
-        return "neg:(" + negatedAtoms.stream()
-                .map(Atom::toString)
-                .collect(Collectors.joining(", ")) +
-                ")";
-    }
+//    private String getNegAtomsString() {
+//        if (negatedAtoms.isEmpty()) {
+//            return "neg: ()";
+//        }
+//        return "neg:(" + negatedAtoms.stream()
+//                .map(Atom::toString)
+//                .collect(Collectors.joining(", ")) +
+//                ")";
+//    }
 
-    private String getPosAtomsString() {
-        if (positiveAtoms.isEmpty()) {
+    private String getAtomString() {
+        if (atoms.isEmpty()) {
             return "pos: ()";
         }
-        return "pos(" + positiveAtoms.stream()
+        return "pos(" + atoms.stream()
                 .map(Atom::toString)
                 .collect(Collectors.joining(", ")) +
                 ")";
@@ -81,14 +76,15 @@ public class RulePattern {
 
     }
 
-    public RuleBody instantiateBody(BindingSet bs) {
-        return new RuleBody(
-                this.positiveAtoms.stream()
+    public ImmutableSet<Atom> instantiateBody(BindingSet bs) {
+                return atoms.stream()
                         .map(a -> instantiateAtom(a, bs))
-                        .collect(ImmutableCollectors.toSet()),
-                this.negatedAtoms.stream()
-                        .map(a -> instantiateAtom(a, bs))
-                        .collect(ImmutableCollectors.toSet())
-        );
+                        .collect(ImmutableCollectors.toSet());
+//                this.negatedAtoms.stream()
+//                        .map(a -> instantiateAtom(a, bs))
+//                        .collect(ImmutableCollectors.toSet())
+    }
+
+    public ImmutableSet<String> getVariables() {
     }
 }

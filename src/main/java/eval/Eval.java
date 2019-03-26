@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import shape.Schema;
 import shape.Shape;
-import shape.ShapeParser;
+import preprocess.ShapeParser;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

@@ -1,41 +1,39 @@
 package core.global;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import core.Atom;
-import core.RuleBody;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class RuleMap {
 
-    private final Map<Atom, Set<RuleBody>> map;
+    private final Map<Atom, Set<ImmutableSet<Atom>>> map;
 
     public RuleMap() {
         this.map = new HashMap<>();
     }
 
-    public RuleMap(Map<Atom, Set<RuleBody>> map) {
+    public RuleMap(Map<Atom, Set<ImmutableSet<Atom>>> map) {
         this.map = map;
     }
 
-    public Set<RuleBody> getRuleSet(Atom atom){
+    public Set<ImmutableSet<Atom>> getRuleSet(Atom atom){
         return map.get(atom);
     }
 
-    public void addRule(Atom head, RuleBody body){
-        Set<RuleBody> bodies = map.get(head);
+    public void addRule(Atom head, ImmutableSet<Atom> body){
+        Set<ImmutableSet<Atom>> bodies = map.get(head);
         if(bodies == null){
-            map.put(head, Sets.newHashSet(body));
+            Set<ImmutableSet<Atom>> s = new HashSet<>();
+            s.add(body);
+            map.put(head, s);
         }else {
             bodies.add(body);
         }
     }
 
-    public void addRuleSet(Atom head, Set<RuleBody> body){
+    public void addRuleSet(Atom head, Set<ImmutableSet<Atom>> body){
             map.put(head, body);
     }
 
@@ -58,7 +56,7 @@ public class RuleMap {
         map.remove(a);
     }
 
-    public void replace(Atom head, Set<RuleBody> bodies){
+    public void replace(Atom head, Set<ImmutableSet<Atom>> bodies){
         map.replace(head, bodies);
     }
 
@@ -66,16 +64,16 @@ public class RuleMap {
     public Stream<Atom> getAllBodyAtoms(){
         return map.values().stream()
                 .flatMap(s -> s.stream())
-                .flatMap(r -> r.getPositiveAndNegatedAtoms().stream());
+                .flatMap(s -> s.stream());
     }
 
-    public Set<Map.Entry<Atom, Set<RuleBody>>> entrySet(){
+    public Set<Map.Entry<Atom, Set<ImmutableSet<Atom>>>> entrySet(){
         return map.entrySet();
     }
     public Set<Atom> keySet(){
         return map.keySet();
     }
-    public Collection<Set<RuleBody>> values(){
+    public Collection<Set<ImmutableSet<Atom>>> values(){
         return map.values();
     }
 }

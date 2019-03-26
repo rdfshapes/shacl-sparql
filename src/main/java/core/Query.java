@@ -6,11 +6,13 @@ public class Query {
 
     private final ImmutableSet<RulePattern> rulePatterns;
     private final String sparql;
+    private final String id;
 
 
-    public Query(ImmutableSet<RulePattern> rulePattern, String sparql) {
+    public Query(String id, ImmutableSet<RulePattern> rulePattern, String sparql) {
         this.rulePatterns = rulePattern;
         this.sparql = sparql;
+        this.id = id;
     }
 
     public ImmutableSet<RulePattern> getRulePatterns() {
