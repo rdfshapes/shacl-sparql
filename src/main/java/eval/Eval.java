@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import preprocess.ShapeParser;
 import shape.Schema;
 import shape.Shape;
+import util.Output;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -38,7 +39,7 @@ public class Eval {
             Validator validator = new Validator(
                     endpoint,
                     schema,
-                    Paths.get(outputDir.toString(), "validation.log").toFile()
+                    new Output(Paths.get(outputDir.toString(), "validation.log").toFile())
             );
             Instant start = Instant.now();
             validator.validate();
@@ -80,10 +81,11 @@ public class Eval {
         String cwd = System.getProperty("user.dir");
         String resourceDir = Paths.get(cwd, "tests").toString();
         endpoint = new SPARQLEndpoint("http://obdalin.inf.unibz.it:8890/sparql");
-        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
+//        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
 //        graph = Optional.of("<dbpedia-person.org>");
         graph = Optional.empty();
-        schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/light"));
+//        schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/light"));
+        schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/2"));
         outputDir = Paths.get(resourceDir, "output");
         targetShape = Optional.empty();
         //targetShape = Optional.of(schema.getShape("JapaneseMovieRec").get());

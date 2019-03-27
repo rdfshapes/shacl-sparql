@@ -31,7 +31,7 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
         this.minConstraints = minConstraints;
         this.maxConstraints = maxConstraints;
         minQueryPredicate = id + "_pos";
-        maxQueryPredicates = IntStream.range(1, maxConstraints.size()).boxed()
+        maxQueryPredicates = IntStream.range(1, maxConstraints.size()+1).boxed()
                 .map(i -> id + "_max_" + i)
                 .collect(ImmutableCollectors.toList());
     }
@@ -112,7 +112,7 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
         AtomicInteger i = new AtomicInteger(0);
         this.maxQueries = maxConstraints.stream()
                 .map(c -> QueryGenerator.generateQuery(
-                        maxQueryPredicates.get(i.incrementAndGet()),
+                        maxQueryPredicates.get(i.getAndIncrement()),
                         ImmutableList.of(c),
                         graphName
                 ))
