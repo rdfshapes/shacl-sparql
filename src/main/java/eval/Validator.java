@@ -25,13 +25,15 @@ class Validator {
     private final Schema schema;
     private final Optional<Shape> targetShape;
     private final Output output;
+    private int maxRuleNumber;
 
 
-    Validator(SPARQLEndpoint endpoint, Schema schema, Output output) throws IOException {
+    Validator(SPARQLEndpoint endpoint, Schema schema, Output output) {
         this.endpoint = endpoint;
         this.schema = schema;
         targetShape = Optional.empty();
         this.output = output;
+        this.maxRuleNumber = 0;
     }
 
     public void validate() throws IOException {
@@ -45,6 +47,7 @@ class Validator {
                 ),
                 extractInitialFocusShapes()
         );
+        output.write("\nMaximal number or rules in memory: "+maxRuleNumber);
         output.close();
     }
 
@@ -159,12 +162,13 @@ class Validator {
     private void evalShape(EvalState state, Shape s) {
         output.start("evaluating queries for shape " + s.getId());
         s.getDisjuncts().forEach(d -> evalDisjunct(state, d, s));
-        output.elapsed();
         state.visitedShapes.addAll(s.getPredicates());
+        saveRuleNumber(state);
 
         output.start("saturation ...");
         Set<Atom> freshAtoms = saturate(state, new HashSet<>());
         output.elapsed();
+        saveRuleNumber(state);
 
         // partitions target atoms into atoms that have just been validated, and remaining ones
         Map<Boolean, List<Atom>> part1 = state.remainingTargetAtoms.stream()
@@ -182,6 +186,14 @@ class Validator {
 
     }
 
+    private void saveRuleNumber(EvalState state) {
+        int ruleNumber = state.ruleMap.getRuleNumber();
+        output.write("Number of rules "+ ruleNumber);
+        maxRuleNumber = ruleNumber > maxRuleNumber?
+                ruleNumber:
+                maxRuleNumber;
+    }
+
 
     private void evalDisjunct(EvalState state, ConstraintConjunction d, Shape s) {
         evalQuery(state, d.getMinQuery(), s);
@@ -191,7 +203,7 @@ class Validator {
     }
 
     private void evalQuery(EvalState state, Query q, Shape s) {
-        output.start("Evaluating query "+q.getSparql());
+        output.start("Evaluating query\n"+q.getSparql());
         QueryEvaluation eval = endpoint.runQuery(q.getId(), q.getSparql());
         output.elapsed();
         output.write("Number of solution mappings: "+eval.getBindingSets().size());

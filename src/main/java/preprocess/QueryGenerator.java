@@ -18,14 +18,14 @@ import java.util.stream.Collectors;
 
 public class QueryGenerator {
 
-    public static Query generateQuery(String id, ImmutableList<Constraint> constraints, Optional<String> graph) {
+    public static Query generateQuery(String id, ImmutableList<Constraint> constraints, Optional<String> graph, Optional<String> subquery) {
         if(constraints.size() > 1 && constraints
                 .stream().anyMatch(c -> c.getMax().isPresent())){
             throw new RuntimeException("Only one max constraint per query is allowed");
         }
         RulePattern rp = computeRulePattern(constraints, id);
 
-        QueryBuilder builder = new QueryBuilder(id, graph);
+        QueryBuilder builder = new QueryBuilder(id, graph, subquery);
         constraints.forEach(c -> builder.buildClause(c));
 
         return builder.buildQuery(rp);
@@ -44,22 +44,23 @@ public class QueryGenerator {
         );
     }
 
-
+    // mutable
     private static class QueryBuilder {
         List<String> filters;
         List<String> triples;
         Set<String> variables;
         private final String id;
+        private final Optional<String> subQuery;
         private final Optional<String> graph;
 
-        public QueryBuilder(String id, Optional<String> graph) {
+        public QueryBuilder(String id, Optional<String> graph, Optional<String> subquery) {
             this.id = id;
             this.graph = graph;
             this.filters = new ArrayList<>();
             this.triples = new ArrayList<>();
+            subQuery = subquery;
         }
 
-        // mutable
         void addTriple(String path, String object) {
             triples.add(
                     "?" + VariableGenerator.getFocusNodeVar() + " " +
@@ -97,6 +98,10 @@ public class QueryGenerator {
                     "\n\n" +
                     getTriplePatterns() +
                     "\n" +
+                    (subQuery.isPresent() ?
+                            "{\n"+subQuery.get()+"\n}\n" :
+                            ""
+                    ) +
                     (graph.isPresent() ?
                             "\n}" :
                             ""
@@ -150,9 +155,7 @@ public class QueryGenerator {
             if (c.getDatatype().isPresent()) {
                 variables.forEach(v -> addDatatypeFilter(v, c.getDatatype().get(), c.isPos()));
             }
-//            if (c.getShapeRef().isPresent()) {
-//                variables.forEach(v -> addRuleAtom(v, c.getShapeRef().get(), c.isPos(), schema));
-//            }
+
             if (variables.size() > 1) {
                 addCardinalityFilter(variables);
             }

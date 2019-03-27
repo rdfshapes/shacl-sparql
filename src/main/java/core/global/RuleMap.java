@@ -9,9 +9,11 @@ import java.util.stream.Stream;
 public class RuleMap {
 
     private final Map<Atom, Set<ImmutableSet<Atom>>> map;
+    private int ruleNumber;
 
     public RuleMap() {
         this.map = new HashMap<>();
+        this.ruleNumber = 0;
     }
 
     public RuleMap(Map<Atom, Set<ImmutableSet<Atom>>> map) {
@@ -28,8 +30,11 @@ public class RuleMap {
             Set<ImmutableSet<Atom>> s = new HashSet<>();
             s.add(body);
             map.put(head, s);
+            ruleNumber++;
         }else {
-            bodies.add(body);
+            if(bodies.add(body)){
+                ruleNumber++;
+            }
         }
     }
 
@@ -75,5 +80,9 @@ public class RuleMap {
     }
     public Collection<Set<ImmutableSet<Atom>>> values(){
         return map.values();
+    }
+
+    public int getRuleNumber() {
+        return ruleNumber;
     }
 }

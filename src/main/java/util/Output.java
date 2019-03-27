@@ -32,7 +32,7 @@ public class Output {
     public void write(String s) {
         try {
             writer.write(s + "\n");
-            writer.flush();
+//            writer.flush();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -45,7 +45,7 @@ public class Output {
             writer.write("\n"+formatter.format(instant)+ ":\n");
             previous = instant.toEpochMilli();
             writer.write(s + "\n");
-            writer.flush();
+//            writer.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -56,7 +56,7 @@ public class Output {
         long epoch = Instant.now().toEpochMilli();
         try {
             writer.write("elapsed: " +(epoch - previous)+" ms\n");
-            writer.flush();
+//            writer.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

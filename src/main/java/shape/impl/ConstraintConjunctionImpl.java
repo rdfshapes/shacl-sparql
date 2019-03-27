@@ -106,7 +106,7 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 //                ));
 
         // Build a unique set of triples (+ filter) for all min constraints
-        this.minQuery = QueryGenerator.generateQuery(this.minQueryPredicate, minConstraints, graphName);
+        this.minQuery = QueryGenerator.generateQuery(this.minQueryPredicate, minConstraints, graphName, Optional.empty());
 
         // Build one set of triples (+ filter) for each max constraint
         AtomicInteger i = new AtomicInteger(0);
@@ -114,11 +114,17 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
                 .map(c -> QueryGenerator.generateQuery(
                         maxQueryPredicates.get(i.getAndIncrement()),
                         ImmutableList.of(c),
-                        graphName
+                        graphName,
+                        getSubQuery(c.getMax().get(), minQuery)
                 ))
                 .collect(ImmutableCollectors.toSet());
     }
 
+    private Optional<String> getSubQuery(Integer card, Query minQuery) {
+        return card>0?
+                Optional.of(minQuery.asSubQuery()):
+                Optional.empty();
+    }
 
 
 //    @Override

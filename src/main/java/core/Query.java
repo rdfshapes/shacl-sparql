@@ -2,6 +2,9 @@ package core;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class Query {
 
     private final RulePattern rulePattern;
@@ -25,5 +28,12 @@ public class Query {
 
     public String getId() {
         return id;
+    }
+
+    public String asSubQuery(){
+        return Arrays.stream(sparql.split("\n"))
+                .filter(l -> !l.contains("PREFIX"))
+                .collect(Collectors.joining("\n"))
+                .replace("SELECT *", "SELECT distinct(?x)");
     }
 }
