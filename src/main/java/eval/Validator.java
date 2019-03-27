@@ -16,6 +16,8 @@ import util.ImmutableCollectors;
 import util.Output;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,19 +26,24 @@ class Validator {
     private final SPARQLEndpoint endpoint;
     private final Schema schema;
     private final Optional<Shape> targetShape;
-    private final Output output;
+    private final Output logOutput;
+    private final Output validTargetsOuput;
+    private final Output violatedTargetsOuput;
     private int maxRuleNumber;
 
 
-    Validator(SPARQLEndpoint endpoint, Schema schema, Output output) {
+    Validator(SPARQLEndpoint endpoint, Schema schema, Output logOutput, Output validTargetsOuput, Output violatedTargetsOuput) {
         this.endpoint = endpoint;
         this.schema = schema;
+        this.validTargetsOuput = validTargetsOuput;
+        this.violatedTargetsOuput = violatedTargetsOuput;
         targetShape = Optional.empty();
-        this.output = output;
+        this.logOutput = logOutput;
         this.maxRuleNumber = 0;
     }
 
     public void validate() throws IOException {
+        Instant start = Instant.now();
         validate(
                 0,
                 new EvalState(
@@ -47,8 +54,14 @@ class Validator {
                 ),
                 extractInitialFocusShapes()
         );
-        output.write("\nMaximal number or rules in memory: "+maxRuleNumber);
-        output.close();
+        Instant finish = Instant.now();
+        long elapsed = Duration.between(start, finish).toMillis();
+        System.out.println("Total execution time: " + elapsed);
+        logOutput.write("\nMaximal number or rules in memory: "+maxRuleNumber);
+        logOutput.write("Total execution time: " + elapsed);
+        logOutput.close();
+        validTargetsOuput.close();
+        violatedTargetsOuput.close();
     }
 
     private ImmutableList<Atom> extractTargetAtoms() {
@@ -160,35 +173,39 @@ class Validator {
     }
 
     private void evalShape(EvalState state, Shape s) {
-        output.start("evaluating queries for shape " + s.getId());
+        logOutput.start("evaluating queries for shape " + s.getId());
         s.getDisjuncts().forEach(d -> evalDisjunct(state, d, s));
         state.visitedShapes.addAll(s.getPredicates());
         saveRuleNumber(state);
 
-        output.start("saturation ...");
+        logOutput.start("saturation ...");
         Set<Atom> freshAtoms = saturate(state, new HashSet<>());
-        output.elapsed();
+        logOutput.elapsed();
         saveRuleNumber(state);
 
         // partitions target atoms into atoms that have just been validated, and remaining ones
         Map<Boolean, List<Atom>> part1 = state.remainingTargetAtoms.stream()
                 .collect(Collectors.partitioningBy(a -> freshAtoms.contains(a)));
-        output.write("\nvalid targets: "+part1.get(true).size());
+        logOutput.write("\nvalid targets: "+part1.get(true).size());
+        part1.get(true)
+                .forEach(a -> validTargetsOuput.write(a.toString()));
 
         Set<Atom> ruleHeads = state.ruleMap.keySet();
         // partitions non-validated atoms into atoms that have just been violated, and remaining ones
         Map<Boolean, List<Atom>> part2 = part1.get(false).stream()
                 .collect(Collectors.partitioningBy(a -> freshAtoms.contains(a.getNegation())|| !ruleHeads.contains(a)));
-        output.write("Invalid targets: "+part2.get(true).size());
+        logOutput.write("Invalid targets: "+part2.get(true).size());
+        part2.get(true)
+                .forEach(a -> violatedTargetsOuput.write(a.toString()));
 
-        output.write("Remaining targets: "+part2.get(false).size());
+        logOutput.write("Remaining targets: "+part2.get(false).size());
         state.remainingTargetAtoms = part2.get(false);
 
     }
 
     private void saveRuleNumber(EvalState state) {
         int ruleNumber = state.ruleMap.getRuleNumber();
-        output.write("Number of rules "+ ruleNumber);
+        logOutput.write("Number of rules "+ ruleNumber);
         maxRuleNumber = ruleNumber > maxRuleNumber?
                 ruleNumber:
                 maxRuleNumber;
@@ -203,15 +220,15 @@ class Validator {
     }
 
     private void evalQuery(EvalState state, Query q, Shape s) {
-        output.start("Evaluating query\n"+q.getSparql());
+        logOutput.start("Evaluating query\n"+q.getSparql());
         QueryEvaluation eval = endpoint.runQuery(q.getId(), q.getSparql());
-        output.elapsed();
-        output.write("Number of solution mappings: "+eval.getBindingSets().size());
-        output.start("Grounding rules ...");
+        logOutput.elapsed();
+        logOutput.write("Number of solution mappings: "+eval.getBindingSets().size());
+        logOutput.start("Grounding rules ...");
         eval.getBindingSets().forEach(
                 b -> evalBindingSet(state, b, q.getRulePattern(), s.getRulePatterns())
         );
-        output.elapsed();
+        logOutput.elapsed();
     }
 
     private void evalBindingSet(EvalState state, BindingSet bs, RulePattern queryRP, ImmutableSet<RulePattern> shapeRPs) {

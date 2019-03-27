@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -13,7 +14,7 @@ public class Output {
 
     private final File outputFile;
     private final BufferedWriter writer;
-    private long previous;
+    private Instant previous;
     private final DateTimeFormatter formatter = DateTimeFormatter
             .ofLocalizedDateTime( FormatStyle.SHORT )
 //            .withLocale( Locale.UK )
@@ -41,9 +42,8 @@ public class Output {
 
     public void start(String s) {
         try {
-            Instant instant = Instant.now();
-            writer.write("\n"+formatter.format(instant)+ ":\n");
-            previous = instant.toEpochMilli();
+            previous= Instant.now();
+            writer.write("\n"+formatter.format(previous)+ ":\n");
             writer.write(s + "\n");
 //            writer.flush();
         } catch (IOException e) {
@@ -53,9 +53,10 @@ public class Output {
     }
 
     public void elapsed() {
-        long epoch = Instant.now().toEpochMilli();
+        Instant now = Instant.now();
         try {
-            writer.write("elapsed: " +(epoch - previous)+" ms\n");
+            writer.write("elapsed: " +
+            Duration.between(previous, now).toMillis()+" ms\n");
 //            writer.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);

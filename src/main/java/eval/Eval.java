@@ -1,7 +1,8 @@
 package eval;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 import endpoint.SPARQLEndpoint;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import preprocess.ShapeParser;
 import shape.Schema;
@@ -13,14 +14,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Iterator;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
+
+import static ch.qos.logback.classic.Level.INFO;
 
 public class Eval {
 
 
-    static Logger log = LoggerFactory.getLogger(Eval.class);
+    static Logger log = (Logger) LoggerFactory.getLogger(Eval.class);
     private static final String usage =
             "USAGE: \n" + Eval.class.getSimpleName() +
                     " [-t targetShape] endpoint shapeDir outputDir";
@@ -32,6 +34,7 @@ public class Eval {
     private static Path outputDir;
 
     public static void main(String[] args) {
+        setLoggers();
 //        parseArguments(args);
         readHardCodedArguments();
         schema.getShapes().forEach(s -> s.computeConstraintQueries(schema, graph));
@@ -39,7 +42,9 @@ public class Eval {
             Validator validator = new Validator(
                     endpoint,
                     schema,
-                    new Output(Paths.get(outputDir.toString(), "validation.log").toFile())
+                    new Output(Paths.get(outputDir.toString(), "validation.log").toFile()),
+                    new Output(Paths.get(outputDir.toString(), "targets_valid.txt").toFile()),
+                    new Output(Paths.get(outputDir.toString(), "targets_violated.txt").toFile())
             );
             Instant start = Instant.now();
             validator.validate();
@@ -49,6 +54,16 @@ public class Eval {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void setLoggers() {
+        Set<String> loggers = new HashSet<>(Arrays.asList("org.apache.http", "o.e.r.q.r"));
+
+    for(String log:loggers) {
+        Logger logger = (Logger) LoggerFactory.getLogger(log);
+    logger.setLevel(INFO);
+    logger.setAdditive(false);
+    }
     }
 
     private static void parseArguments(String[] args) {
