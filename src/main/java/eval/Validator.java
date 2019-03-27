@@ -9,8 +9,6 @@ import core.global.RuleMap;
 import endpoint.QueryEvaluation;
 import endpoint.SPARQLEndpoint;
 import org.eclipse.rdf4j.query.BindingSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import shape.ConstraintConjunction;
 import shape.Schema;
 import shape.Shape;
@@ -20,6 +18,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -115,7 +114,6 @@ class Validator {
     }
 
     private Set<Atom> saturate(EvalState state, Set<Atom> inferredAtoms) {
-
         Set<Atom> freshAtoms = negateUnMatchableHeads(state);
 //        filterRules(state);
         freshAtoms.addAll(applyRules(state));
@@ -189,8 +187,8 @@ class Validator {
     }
 
     private Optional<Atom> applyRules(Atom head, Set<ImmutableSet<Atom>> bodies, EvalState state, RuleMap retainedRules) {
-        if(bodies.stream()
-                .anyMatch(b -> applyRule(head, b, state, retainedRules))){
+        if (bodies.stream()
+                .anyMatch(b -> applyRule(head, b, state, retainedRules))) {
             state.assignment.add(head);
             return Optional.of(head);
         }
@@ -198,11 +196,11 @@ class Validator {
     }
 
     private boolean applyRule(Atom head, ImmutableSet<Atom> body, EvalState state, RuleMap retainedRules) {
-        if(state.assignment.containsAll(body)){
+        if (state.assignment.containsAll(body)) {
             return true;
         }
-        if(body.stream()
-                .noneMatch(a -> state.assignment.contains(a.getNegation()))){
+        if (body.stream()
+                .noneMatch(a -> state.assignment.contains(a.getNegation()))) {
             retainedRules.addRule(head, body);
         }
         return false;
@@ -226,16 +224,26 @@ class Validator {
     }
 
     private void evalShape(EvalState state, Shape s) {
+        output("evaluating queries for shape " + s.getId());
         s.getDisjuncts().forEach(d -> evalDisjunct(state, d, s));
         state.visitedShapes.addAll(s.getPredicates());
 
+        output("saturation ...");
         Set<Atom> freshAtoms = saturate(state, new HashSet<>());
 
-        // partition target atoms into atoms that have just been validated/violated, and remaining ones
-        Map<Boolean, List<Atom>> part = state.remainingTargetAtoms.stream()
-                .collect(Collectors.partitioningBy(a -> freshAtoms.contains(a) || freshAtoms.contains(a.getNegation())));
+        // partitions target atoms into atoms that have just been validated, and remaining ones
+        Map<Boolean, List<Atom>> part1 = state.remainingTargetAtoms.stream()
+                .collect(Collectors.partitioningBy(a -> freshAtoms.contains(a)));
+        output("valid targets: "+part1.get(true).size());
 
-        state.remainingTargetAtoms = ImmutableList.copyOf(part.get(false));
+        Set<Atom> ruleHeads = state.ruleMap.keySet();
+        // partitions non-validated atoms into atoms that have just been violated, and remaining ones
+        Map<Boolean, List<Atom>> part2 = part1.get(false).stream()
+                .collect(Collectors.partitioningBy(a -> freshAtoms.contains(a.getNegation())|| !ruleHeads.contains(a)));
+        output("Invalid targets: "+part2.get(true).size());
+
+        output("Remaining targets: "+part2.get(false).size());
+        state.remainingTargetAtoms = part2.get(false);
 
     }
 
@@ -284,7 +292,7 @@ class Validator {
         Set<Atom> negatedUnmatchableAtoms = state.ruleMap.getAllBodyAtoms()
                 .filter(a -> state.visitedShapes.contains(a.getPredicate()))
                 .filter(a -> !ruleHeads.contains(a) && !state.assignment.contains(a))
-                .map(a -> a.getNegation())
+                .map(Atom::getNegation)
                 .collect(Collectors.toSet());
 
         //state.ruleMap = dropUnmatchableNegatedAtoms(state, unmatchableAtoms);
@@ -389,11 +397,20 @@ class Validator {
 //        return new Atom(atom.getPredicate(), value.stringValue(), atom.isPos());
 //    }
 
+    private void output(String s) {
+        try {
+            writer.write(Instant.now().toEpochMilli() + ":\n");
+            writer.write(s + "\n");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private class EvalState {
 
         Set<String> visitedShapes;
         RuleMap ruleMap;
-        ImmutableList<Atom> remainingTargetAtoms;
+        List<Atom> remainingTargetAtoms;
         Set<Atom> assignment;
 
         private EvalState(ImmutableList<Atom> targetAtoms, RuleMap ruleMap, Set<Atom> assignment, Set<String> visitedShapes) {

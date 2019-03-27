@@ -80,8 +80,8 @@ public class Eval {
         String cwd = System.getProperty("user.dir");
         String resourceDir = Paths.get(cwd, "tests").toString();
         endpoint = new SPARQLEndpoint("http://obdalin.inf.unibz.it:8890/sparql");
-//        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
-        graph = Optional.of("<dbpedia-person.org>");
+        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
+//        graph = Optional.of("<dbpedia-person.org>");
         graph = Optional.empty();
         schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/light"));
         outputDir = Paths.get(resourceDir, "output");
