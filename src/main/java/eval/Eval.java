@@ -1,13 +1,14 @@
 package eval;
 
 import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
 import endpoint.SPARQLEndpoint;
 import org.slf4j.LoggerFactory;
 import preprocess.ShapeParser;
 import shape.Schema;
 import shape.Shape;
 import util.Output;
+import valid.impl.RuleBasedValidator;
+import valid.impl.UnfoldingBasedValidator;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -39,7 +40,8 @@ public class Eval {
         readHardCodedArguments();
         schema.getShapes().forEach(s -> s.computeConstraintQueries(schema, graph));
         try {
-            Validator validator = new Validator(
+            UnfoldingBasedValidator validator = new UnfoldingBasedValidator(
+//            RuleBasedValidator validator = new RuleBasedValidator(
                     endpoint,
                     schema,
                     new Output(Paths.get(outputDir.toString(), "validation.log").toFile()),
@@ -94,7 +96,8 @@ public class Eval {
 
     private static void readHardCodedArguments() {
         String cwd = System.getProperty("user.dir");
-        String resourceDir = Paths.get(cwd, "tests").toString();
+        System.out.println(cwd);
+        String resourceDir = Paths.get(cwd, "../tests").toString();
         endpoint = new SPARQLEndpoint("http://obdalin.inf.unibz.it:8890/sparql");
 //        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
         graph = Optional.of("<dbpedia-person.org>");

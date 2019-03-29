@@ -1,4 +1,4 @@
-package eval;
+package valid.impl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -14,6 +14,7 @@ import shape.Schema;
 import shape.Shape;
 import util.ImmutableCollectors;
 import util.Output;
+import valid.Validator;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -21,7 +22,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class Validator {
+public class RuleBasedValidator implements Validator {
 
     private final SPARQLEndpoint endpoint;
     private final Schema schema;
@@ -32,17 +33,17 @@ class Validator {
     private int maxRuleNumber;
 
 
-    Validator(SPARQLEndpoint endpoint, Schema schema, Output logOutput, Output validTargetsOuput, Output violatedTargetsOuput) {
+    public RuleBasedValidator(SPARQLEndpoint endpoint, Schema schema, Output logOutput, Output validTargetsOuput, Output violatedTargetsOuput) {
         this.endpoint = endpoint;
         this.schema = schema;
         this.validTargetsOuput = validTargetsOuput;
         this.violatedTargetsOuput = violatedTargetsOuput;
-        targetShape = Optional.empty();
         this.logOutput = logOutput;
+        targetShape = Optional.empty();
         this.maxRuleNumber = 0;
     }
 
-    public void validate() throws IOException {
+    public void validate() {
         Instant start = Instant.now();
         validate(
                 0,
@@ -59,9 +60,13 @@ class Validator {
         System.out.println("Total execution time: " + elapsed);
         logOutput.write("\nMaximal number or rules in memory: "+maxRuleNumber);
         logOutput.write("Total execution time: " + elapsed);
-        logOutput.close();
-        validTargetsOuput.close();
-        violatedTargetsOuput.close();
+        try {
+            logOutput.close();
+            validTargetsOuput.close();
+            violatedTargetsOuput.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private ImmutableList<Atom> extractTargetAtoms() {

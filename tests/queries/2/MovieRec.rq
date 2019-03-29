@@ -1,0 +1,9 @@
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+SELECT * WHERE{
+
+?x dbo:director ?p_1.
+
+FILTER NOT EXISTS { ?x DBo:birthYear ?y}
+}
+
