@@ -1,6 +1,6 @@
 PREFIX dbo:<http://dbpedia.org/ontology/>
 PREFIX dbr:<http://dbpedia.org/resource/>
-SELECT distinct(?x) WHERE{
+SELECT * WHERE{
 
 ?x dbo:director ?d.
 ?d dbo:birthPlace ?p. 

@@ -11,6 +11,7 @@ import util.ImmutableCollectors;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -99,14 +100,20 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 
     public void computeQueries(Optional<String> graphName) {
 
-        // Split constraints into min constraints and max constraints
-//        Map<Boolean, List<Constraint>> part = constraints.stream()
-//                .collect(Collectors.partitioningBy(
-//                        c -> c.getMin().isPresent()
-//                ));
+        // Create a subquery for all local constraints (i.e. without shape propagation) positive constraints
+        // Every other query for this conjunct will contain this as a subquery.
+        // This is unnecessary in theory, but does not compromise soundness, and makes queries a lot more selective.
+        Optional<String> subquery = QueryGenerator.generateLocalSubquery(graphName,this.minConstraints);
 
-        // Build a unique set of triples (+ filter) for all min constraints
-        this.minQuery = QueryGenerator.generateQuery(this.minQueryPredicate, minConstraints, graphName, Optional.empty());
+        // Build a unique set of triples (+ filter) for all min that are not local (te local ones will br handled by the subquery)
+        this.minQuery = QueryGenerator.generateQuery(
+                this.minQueryPredicate,
+                minConstraints.stream()
+                        .filter(c -> c.getShapeRef().isPresent())
+                        .collect(ImmutableCollectors.toList()),
+                graphName,
+                subquery
+        );
 
         // Build one set of triples (+ filter) for each max constraint
         AtomicInteger i = new AtomicInteger(0);
@@ -115,16 +122,17 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
                         maxQueryPredicates.get(i.getAndIncrement()),
                         ImmutableList.of(c),
                         graphName,
-                        getSubQuery(c.getMax().get(), minQuery)
+                        subquery
+//                        getSubQuery(c.getMax().get(), minQuery)
                 ))
                 .collect(ImmutableCollectors.toSet());
     }
 
-    private Optional<String> getSubQuery(Integer card, Query minQuery) {
-        return card>0?
-                Optional.of(minQuery.asSubQuery()):
-                Optional.empty();
-    }
+//    private Optional<String> getSubQuery(Integer card, Query minQuery) {
+//        return card>0?
+//                Optional.of(minQuery.asSubQuery()):
+//                Optional.empty();
+//    }
 
 
 //    @Override

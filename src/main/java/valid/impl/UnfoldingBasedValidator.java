@@ -55,7 +55,7 @@ public class UnfoldingBasedValidator implements Validator {
                 "q",
                 null,
                 new String(Files.readAllBytes(
-                        Paths.get(cwd, "../tests/queries/2/test.rq")
+                        Paths.get(cwd, "/tests/queries/2/test4.rq")
         )
                 ));
 

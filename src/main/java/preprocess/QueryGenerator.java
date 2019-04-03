@@ -25,7 +25,7 @@ public class QueryGenerator {
         }
         RulePattern rp = computeRulePattern(constraints, id);
 
-        QueryBuilder builder = new QueryBuilder(id, graph, subquery);
+        QueryBuilder builder = new QueryBuilder(id, graph, subquery, rp.getVariables());
         constraints.forEach(c -> builder.buildClause(c));
 
         return builder.buildQuery(rp);
@@ -44,6 +44,25 @@ public class QueryGenerator {
         );
     }
 
+    public static Optional<String> generateLocalSubquery(Optional<String> graphName, ImmutableList<Constraint> posConstraints) {
+
+        ImmutableList<Constraint> localPosConstraints = posConstraints.stream()
+            .filter(c -> !c.getShapeRef().isPresent())
+            .collect(ImmutableCollectors.toList());
+
+        if(localPosConstraints.isEmpty()){
+            return Optional.empty();
+        }
+        QueryBuilder builder = new QueryBuilder(
+                "tmp",
+                graphName,
+                Optional.empty(),
+                ImmutableSet.of(VariableGenerator.getFocusNodeVar())
+        );
+        localPosConstraints.forEach(c -> builder.buildClause(c));
+        return Optional.of(builder.getSparql());
+    }
+
     // mutable
     private static class QueryBuilder {
         List<String> filters;
@@ -52,10 +71,12 @@ public class QueryGenerator {
         private final String id;
         private final Optional<String> subQuery;
         private final Optional<String> graph;
+        private final ImmutableSet<String> projectedVariables;
 
-        public QueryBuilder(String id, Optional<String> graph, Optional<String> subquery) {
+        public QueryBuilder(String id, Optional<String> graph, Optional<String> subquery, ImmutableSet<String> projectedVariables) {
             this.id = id;
             this.graph = graph;
+            this.projectedVariables = projectedVariables;
             this.filters = new ArrayList<>();
             this.triples = new ArrayList<>();
             subQuery = subquery;
@@ -92,7 +113,8 @@ public class QueryGenerator {
 
         String getSparql() {
             return SPARQLPrefixHandler.getPrexixString() +
-                    "SELECT * WHERE{" +
+                    getProjectionString()+
+                    " WHERE{" +
                     (graph.map(s -> "\nGRAPH " + s + "{").orElse("")
                     ) +
                     "\n\n" +
@@ -107,6 +129,13 @@ public class QueryGenerator {
                             ""
                     ) +
                     "\n}";
+        }
+
+        private String getProjectionString() {
+            return "SELECT "+
+                    projectedVariables.stream()
+                    .map(v -> "?"+v)
+                    .collect(Collectors.joining(", "));
         }
 
         String getTriplePatterns() {

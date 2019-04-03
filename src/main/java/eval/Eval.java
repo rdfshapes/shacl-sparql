@@ -97,7 +97,7 @@ public class Eval {
     private static void readHardCodedArguments() {
         String cwd = System.getProperty("user.dir");
         System.out.println(cwd);
-        String resourceDir = Paths.get(cwd, "../tests").toString();
+        String resourceDir = Paths.get(cwd, "/tests").toString();
         endpoint = new SPARQLEndpoint("http://obdalin.inf.unibz.it:8890/sparql");
 //        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
         graph = Optional.of("<dbpedia-person.org>");

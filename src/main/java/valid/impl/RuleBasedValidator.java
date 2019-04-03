@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RuleBasedValidator implements Validator {
 
@@ -255,8 +256,11 @@ public class RuleBasedValidator implements Validator {
     private Set<Atom> negateUnMatchableHeads(EvalState state) {
         Set<Atom> ruleHeads = state.ruleMap.keySet();
 
-        Set<Atom> negatedUnmatchableAtoms = state.ruleMap.getAllBodyAtoms()
-                .filter(a -> state.visitedShapes.contains(a.getPredicate()))
+        Set<Atom> negatedUnmatchableAtoms =
+                Stream.concat(
+                        state.remainingTargetAtoms.stream(),
+                        state.ruleMap.getAllBodyAtoms()
+                ).filter(a -> state.visitedShapes.contains(a.getPredicate()))
                 .filter(a -> !ruleHeads.contains(a) && !state.assignment.contains(a))
                 .map(Atom::getNegation)
                 .collect(Collectors.toSet());
