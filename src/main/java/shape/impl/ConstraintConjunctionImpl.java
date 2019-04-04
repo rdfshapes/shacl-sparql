@@ -105,7 +105,7 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
         // This is unnecessary in theory, but does not compromise soundness, and makes queries a lot more selective.
         Optional<String> subquery = QueryGenerator.generateLocalSubquery(graphName,this.minConstraints);
 
-        // Build a unique set of triples (+ filter) for all min that are not local (te local ones will br handled by the subquery)
+        // Build a unique set of triples (+ filter) for all min constraints (note that the local ones are handled by the subquery)
         this.minQuery = QueryGenerator.generateQuery(
                 this.minQueryPredicate,
                 minConstraints.stream()

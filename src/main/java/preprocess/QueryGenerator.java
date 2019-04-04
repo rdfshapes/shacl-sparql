@@ -2,6 +2,7 @@ package preprocess;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.UnmodifiableIterator;
 import core.Atom;
 import core.Query;
 import core.RulePattern;
@@ -32,11 +33,12 @@ public class QueryGenerator {
     }
 
     private static RulePattern computeRulePattern(ImmutableList<Constraint> constraints, String id) {
+        UnmodifiableIterator<Constraint> it = constraints.iterator();
         return new RulePattern(
                 new Atom(
                         id,
                         VariableGenerator.getFocusNodeVar(),
-                        !constraints.iterator().next().getMax().isPresent()
+                        !(it.hasNext() && it.next().getMax().isPresent())
                 ),
                 constraints.stream()
                 .flatMap(c -> c.computeRulePatternBody().stream())
@@ -60,7 +62,7 @@ public class QueryGenerator {
                 ImmutableSet.of(VariableGenerator.getFocusNodeVar())
         );
         localPosConstraints.forEach(c -> builder.buildClause(c));
-        return Optional.of(builder.getSparql());
+        return Optional.of(builder.getSparql(false));
     }
 
     // mutable
@@ -111,8 +113,10 @@ public class QueryGenerator {
 //            ruleBody.add(new Atom(s, v, idPos));
 //        }
 
-        String getSparql() {
-            return SPARQLPrefixHandler.getPrexixString() +
+        String getSparql(boolean includePrefixes) {
+            return (includePrefixes?
+                    SPARQLPrefixHandler.getPrexixString():
+                    "")+
                     getProjectionString()+
                     " WHERE{" +
                     (graph.map(s -> "\nGRAPH " + s + "{").orElse("")
@@ -194,7 +198,7 @@ public class QueryGenerator {
             return new Query(
                     id,
                     rulePattern,
-                    getSparql()
+                    getSparql(true)
             );
         }
     }

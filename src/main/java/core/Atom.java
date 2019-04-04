@@ -38,7 +38,6 @@ public class Atom {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(pred, arg, isPos);
     }
 

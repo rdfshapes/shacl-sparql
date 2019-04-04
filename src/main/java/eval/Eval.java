@@ -40,8 +40,8 @@ public class Eval {
         readHardCodedArguments();
         schema.getShapes().forEach(s -> s.computeConstraintQueries(schema, graph));
         try {
-            UnfoldingBasedValidator validator = new UnfoldingBasedValidator(
-//            RuleBasedValidator validator = new RuleBasedValidator(
+//            UnfoldingBasedValidator validator = new UnfoldingBasedValidator(
+            RuleBasedValidator validator = new RuleBasedValidator(
                     endpoint,
                     schema,
                     new Output(Paths.get(outputDir.toString(), "validation.log").toFile()),
