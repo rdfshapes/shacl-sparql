@@ -4,12 +4,10 @@
 		"query":"SELECT ?x WHERE {?x a dbo:Film . ?x dbo:language dbr:Japanese_language.}"
 	},
 	"constraintDef":{
-		"queryPos": "pathToQuery.rq",
-		"queryNeg": "pathToQuery.rq",
 		"conjunctions":[
 			[ 	
 				{ "path": "dbo:starring", "min": 1, "shape": "JapaneseStar" },
-				{ "path": "dbo:cinematography", "min": 1, "value": "dbr:Saburo_Isayama" }
+				{ "path": "dbo:director", "min": 1, "value": "dbr:Akira_Kurosawa" }
 			]
 		]
 	}

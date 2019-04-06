@@ -102,6 +102,7 @@ public class RuleBasedValidator implements Validator {
 
         // termination condition 1: all shapes have been visited
         if (state.visitedShapes.size() == schema.getShapeNames().size()) {
+            state.remainingTargets.forEach(t -> validTargetsOuput.write(t.toString() + ", not violated"));
             return;
         }
         // termination condition 2: all targets are validated/violated
@@ -109,7 +110,7 @@ public class RuleBasedValidator implements Validator {
             return;
         }
 
-        logOutput.start("Starting validation at depth :"+depth);
+        logOutput.start("Starting validation at depth :" + depth);
         validateFocusShapes(state, focusShapes, depth);
 
         // Set<Atom> assignment = state.assignment;
@@ -157,11 +158,17 @@ public class RuleBasedValidator implements Validator {
                 .filter(a -> targetShapePredicates.contains(a.getPredicate()))
                 .collect(ImmutableCollectors.toSet());
 
-        Map<Boolean, List<Atom>> part = state.remainingTargets.stream()
+        Map<Boolean, List<Atom>> part1 = state.remainingTargets.stream()
                 .collect(Collectors.partitioningBy(a -> candidateValidTargets.contains(a)));
-        state.remainingTargets = ImmutableSet.copyOf(part.get(false));
-        state.validTargets.addAll(part.get(true));
-        part.get(true).forEach(t -> validTargetsOuput.write(t.toString()+", depth "+depth+", focus shape "+s.getId()));
+        state.remainingTargets = ImmutableSet.copyOf(part1.get(false));
+
+        Map<Boolean, List<Atom>> part2 = part1.get(true).stream()
+                .collect(Collectors.partitioningBy(a -> a.isPos()));
+
+        state.validTargets.addAll(part2.get(true));
+        part2.get(true).forEach(t -> validTargetsOuput.write(t.toString() + ", depth " + depth + ", focus shape " + s.getId()));
+        state.invalidTargets.addAll(part2.get(false));
+        part1.get(true).forEach(t -> invalidTargetsOuput.write(t.toString() + ", depth " + depth + ", focus shape " + s.getId()));
 
         logOutput.write("Remaining targets :" + state.remainingTargets.size());
         return true;
@@ -260,36 +267,38 @@ public class RuleBasedValidator implements Validator {
     private boolean negateUnMatchableHeads(EvalState state, int depth, Shape s) {
         Set<Atom> ruleHeads = state.ruleMap.keySet();
 
+        int initialAssignmentSize = state.assignment.size();
 
-        Set<Atom> negatedUnmatchableAtoms = new HashSet();
-        negatedUnmatchableAtoms.addAll(
-                state.ruleMap.getAllBodyAtoms()
-                        .filter(a -> !isSatisfiable(a, state, ruleHeads))
-                        .map(Atom::getNegation)
-                        .collect(Collectors.toSet()));
+        // first negate unmatchable body atoms
+        state.ruleMap.getAllBodyAtoms().
+                filter(a -> !isSatisfiable(a, state, ruleHeads))
+                .map(a -> a.getNegation())
+                .forEach(a -> state.assignment.add(a));
 
-        Map<Boolean, List<Atom>> part = state.remainingTargets.stream().
+        // then negate unmatchable targets
+        Map<Boolean, List<Atom>> part2 = state.remainingTargets.stream().
                 collect(Collectors.partitioningBy(
-                        a -> !isSatisfiable(a, state, ruleHeads)
+                        a -> isSatisfiable(a, state, ruleHeads)
                 ));
-        negatedUnmatchableAtoms.addAll(
-                part.get(true).stream()
+        List<Atom> inValidTargets = part2.get(false);
+        state.invalidTargets.addAll(inValidTargets);
+        inValidTargets.forEach(t -> invalidTargetsOuput.write(t.toString() + ", depth " + depth + ", focus shape " + s.getId()));
+
+        state.assignment.addAll(
+                inValidTargets.stream()
                         .map(Atom::getNegation)
                         .collect(ImmutableCollectors.toSet())
         );
-        List<Atom> inValidTargets = part.get(true);
-        state.invalidTargets.addAll(inValidTargets);
-        inValidTargets.forEach(t -> invalidTargetsOuput.write(t.toString()+", depth "+depth+", focus shape "+s.getId()));
+        state.remainingTargets = new HashSet<>(part2.get(true));
 
-        state.remainingTargets = new HashSet<>(part.get(false));
-
-        state.assignment.addAll(negatedUnmatchableAtoms);
-        return !negatedUnmatchableAtoms.isEmpty();
+        return initialAssignmentSize != state.assignment.size();
     }
 
     private boolean isSatisfiable(Atom a, EvalState state, Set<Atom> ruleHeads) {
-        return !state.visitedShapes.contains(a.getPredicate()) ||
-                ruleHeads.contains(a);
+//        boolean b = !state.visitedShapes.contains(a.getPredicate());
+//        b = (!state.visitedShapes.contains(a.getPredicate())) || ruleHeads.contains(a);
+//        return b;
+        return (!state.visitedShapes.contains(a.getPredicate())) || ruleHeads.contains(a);
     }
 
 
