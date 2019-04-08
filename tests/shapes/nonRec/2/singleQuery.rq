@@ -1,0 +1,29 @@
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+SELECT ?x WHERE{
+{
+?x a dbo:Film .
+
+}
+FILTER 
+(NOT EXISTS{ 
+
+?x dbo:imdbId ?id.
+?x dbo:starring ?s.
+?x dbo:director ?d.
+
+} OR {
+?x dbo:imdbId ?n_10.
+?x dbo:imdbId ?n_11.
+FILTER(
+?n_10 != ?n_11)
+
+
+
+
+} OR NOT EXISTS{ 
+?x dbo:director dbr:Akira_Kurosawa.
+
+}
+)
+}

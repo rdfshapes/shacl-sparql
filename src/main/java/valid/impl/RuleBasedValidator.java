@@ -134,7 +134,7 @@ public class RuleBasedValidator implements Validator {
     }
 
     private void saturate(EvalState state, int depth, Shape s) {
-        boolean negated = negateUnMatchableHeads(state, depth, s);
+       boolean negated = negateUnMatchableHeads(state, depth, s);
         boolean inferred = applyRules(state, depth, s);
         if (negated || inferred) {
             saturate(state, depth, s);
@@ -168,7 +168,7 @@ public class RuleBasedValidator implements Validator {
         state.validTargets.addAll(part2.get(true));
         part2.get(true).forEach(t -> validTargetsOuput.write(t.toString() + ", depth " + depth + ", focus shape " + s.getId()));
         state.invalidTargets.addAll(part2.get(false));
-        part1.get(true).forEach(t -> invalidTargetsOuput.write(t.toString() + ", depth " + depth + ", focus shape " + s.getId()));
+        part2.get(false).forEach(t -> invalidTargetsOuput.write(t.toString() + ", depth " + depth + ", focus shape " + s.getId()));
 
         logOutput.write("Remaining targets :" + state.remainingTargets.size());
         return true;
@@ -272,7 +272,7 @@ public class RuleBasedValidator implements Validator {
         // first negate unmatchable body atoms
         state.ruleMap.getAllBodyAtoms().
                 filter(a -> !isSatisfiable(a, state, ruleHeads))
-                .map(a -> a.getNegation())
+                .map(a -> getNegatedAtom(a))
                 .forEach(a -> state.assignment.add(a));
 
         // then negate unmatchable targets
@@ -294,8 +294,14 @@ public class RuleBasedValidator implements Validator {
         return initialAssignmentSize != state.assignment.size();
     }
 
+    private Atom getNegatedAtom(Atom a) {
+        return a.isPos()?
+                a.getNegation():
+                a;
+    }
+
     private boolean isSatisfiable(Atom a, EvalState state, Set<Atom> ruleHeads) {
-//        boolean b = !state.visitedShapes.contains(a.getPredicate());
+        boolean b = ruleHeads.contains(a);
 //        b = (!state.visitedShapes.contains(a.getPredicate())) || ruleHeads.contains(a);
 //        return b;
         return (!state.visitedShapes.contains(a.getPredicate())) || ruleHeads.contains(a);

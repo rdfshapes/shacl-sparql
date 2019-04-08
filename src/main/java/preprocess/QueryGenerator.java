@@ -38,7 +38,8 @@ public class QueryGenerator {
                 new Atom(
                         id,
                         VariableGenerator.getFocusNodeVar(),
-                        !(it.hasNext() && it.next().getMax().isPresent())
+                        true
+//                        !(it.hasNext() && it.next().getMax().isPresent())
                 ),
                 constraints.stream()
                 .flatMap(c -> c.computeRulePatternBody().stream())
@@ -136,7 +137,7 @@ public class QueryGenerator {
         }
 
         private String getProjectionString() {
-            return "SELECT "+
+            return "SELECT DISTINCT "+
                     projectedVariables.stream()
                     .map(v -> "?"+v)
                     .collect(Collectors.joining(", "));

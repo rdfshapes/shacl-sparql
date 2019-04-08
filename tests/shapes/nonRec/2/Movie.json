@@ -1,5 +1,5 @@
 {
-	"name": "MovieRec",
+	"name": "Movie",
 	"targetDef":{
 		"query":"SELECT ?x WHERE {GRAPH <dbpedia-person.org> {?x a dbo:Film}}"
 	},

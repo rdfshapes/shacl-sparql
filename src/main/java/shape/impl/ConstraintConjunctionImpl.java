@@ -100,7 +100,7 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 
     public void computeQueries(Optional<String> graphName) {
 
-        // Create a subquery for all local constraints (i.e. without shape propagation) positive constraints
+        // Create a subquery for all local (i.e. without shape propagation) and positive constraints
         // Every other query for this conjunct will contain this as a subquery.
         // This is unnecessary in theory, but does not compromise soundness, and makes queries a lot more selective.
         Optional<String> subquery = QueryGenerator.generateLocalSubquery(graphName,this.minConstraints);

@@ -97,13 +97,16 @@ public class Eval {
         String cwd = System.getProperty("user.dir");
         System.out.println(cwd);
         String resourceDir = Paths.get(cwd, "/tests").toString();
-//        endpoint = new SPARQLEndpoint("http://obdalin.inf.unibz.it:8890/sparql");
-        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
-//        graph = Optional.of("<dbpedia-person.org>");
-        graph = Optional.empty();
+        endpoint = new SPARQLEndpoint("http://obdalin.inf.unibz.it:8890/sparql");
+//        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
+        graph = Optional.of("<dbpedia-person.org>");
+//        graph = Optional.empty();
 //        schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/light"));
-        schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/toy"));
-        outputDir = Paths.get(resourceDir, "output");
+//        schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/nonRec/2/official/tmp"));
+        schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/toy/"));
+//        outputDir = Paths.get(resourceDir, "output");
+//        outputDir = Paths.get(resourceDir, "shapes/nonRec/2/official/tmp/output");
+        outputDir = Paths.get(resourceDir, "shapes/toy/output");
         targetShape = Optional.empty();
         //targetShape = Optional.of(schema.getShape("JapaneseMovieRec").get());
     }
