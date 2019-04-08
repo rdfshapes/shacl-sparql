@@ -5,7 +5,7 @@
 			[ 	
 				{ "path": "dbo:country", "min": 1},
 				{ "path": "dbo:populationTotal", "min": 1, "datatype": "xsd:nonNegativeInteger"},
-				{ "path": "http://xmlns.com/foaf/0.1/name", "min": 1}
+				{ "path": "foaf:name", "min": 1}
 			]
 		]
 	}

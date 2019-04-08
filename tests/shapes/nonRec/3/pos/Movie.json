@@ -1,14 +1,15 @@
 {
-	"name": "MovieRec",
+	"name": "Movie",
 	"targetDef":{
-		"query":"SELECT ?x WHERE {?x a dbo:Film}"
+		"query":"SELECT ?x WHERE {GRAPH <dbpedia-person.org> {?x a dbo:Film}}"
 	},
 	"constraintDef":{
 		"conjunctions":[
 			[ 	
 				{ "path": "dbo:director", "min": 1, "shape": "DirectorShape" },
 				{ "path": "dbo:imdbId", "min": 1 },
-				{ "path": "dbo:starring", "max": 0,  "shape": "ActorShape", "negated":true}
+				{ "path": "dbo:imdbId", "max": 1 },
+				{ "path": "dbo:starring", "min": 1}
 			]
 		]
 	}

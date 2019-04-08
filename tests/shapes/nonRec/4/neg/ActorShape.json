@@ -4,8 +4,9 @@
 		"conjunctions":[
 			[ 	
 				{ "path": "dbo:occupation", "min":1, "value": "dbr:Actor"},
+				{ "path": "dbo:birthYear", "min": 1, "datatype":"xsd:gYear"},
 				{ "path": "dbo:birthYear", "max": 1},
-				{ "path": "dbo:birthPlace", "min":1, "shape": "LocationShape"}
+				{ "path": "dbo:birthPlace", "max":0, "shape": "LocationShape", "negated":true}
 			]
 		]
 	}
