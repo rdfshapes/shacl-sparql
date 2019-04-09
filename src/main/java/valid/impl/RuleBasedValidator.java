@@ -251,6 +251,7 @@ public class RuleBasedValidator implements Validator {
         stats.recordQueryExecTime(logOutput.elapsed());
         logOutput.write("Number of solution mappings: " + eval.getBindingSets().size());
         stats.recordNumberOfSolutionMappings(eval.getBindingSets().size());
+        stats.recordQuery();
         logOutput.start("Grounding rules ...");
         eval.getBindingSets().forEach(
                 b -> evalBindingSet(state, b, q.getRulePattern(), s.getRulePatterns())
@@ -345,7 +346,7 @@ public class RuleBasedValidator implements Validator {
             statsOutput.write("max number of solution mappings for a query:\n"+maxSolutionMappings);
             statsOutput.write("total number of solution mappings:\n"+totalSolutionMappings);
             statsOutput.write("max number of rules in memory:\n"+maxRuleNumber);
-
+            statsOutput.write("number of queries:\n"+numberOfQueries);
             statsOutput.write("max exec time for a query:\n"+maxQueryExectime);
             statsOutput.write("total query exec time:\n"+totalQueryExectime);
             statsOutput.write("max grounding time for a query:\n"+maxGroundingTime);
@@ -366,6 +367,8 @@ public class RuleBasedValidator implements Validator {
         private long maxGroundingTime = 0;
         private long totalSaturationTime = 0;
         private long maxSaturationTime = 0;
+        private int numberOfQueries = 0;
+
 
         private long totalTime = 0;
 
@@ -412,6 +415,9 @@ public class RuleBasedValidator implements Validator {
             totalTime = ms;
         };
 
+        void recordQuery(){
+            numberOfQueries++;
+        }
 
     }
 }

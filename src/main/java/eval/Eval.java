@@ -117,10 +117,10 @@ public class Eval {
         endpoint = new SPARQLEndpoint("http://obdalin.inf.unibz.it:8890/sparql");
 //        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
         graph = Optional.of("<dbpedia-person.org>");
-        graph = Optional.empty();
-        schema = Optional.of(ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/rec/2/debug")));
+//        graph = Optional.empty();
+        schema = Optional.of(ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/rec/3")));
 //        schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/toy/"));
-        outputDir = Paths.get(resourceDir, "shapes/rec/2/debug/output");
+        outputDir = Paths.get(resourceDir, "shapes/rec/3/output");
 //        outputDir = Paths.get(resourceDir, "shapes/toy/output");
         targetShape = Optional.empty();
         //targetShape = Optional.of(schema.getShape("JapaneseMovieRec").get());

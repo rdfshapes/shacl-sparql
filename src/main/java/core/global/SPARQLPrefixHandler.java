@@ -9,6 +9,7 @@ public class SPARQLPrefixHandler {
     static ImmutableMap<String, String> prefixes = ImmutableMap.of(
             "dbo", "<http://dbpedia.org/ontology/>",
             "dbr", "<http://dbpedia.org/resource/>",
+            "yago", "<http://dbpedia.org/class/yago/>",
             "foaf", "<http://xmlns.com/foaf/0.1/>"
     );
     static String prexixString = prefixes.entrySet().stream()

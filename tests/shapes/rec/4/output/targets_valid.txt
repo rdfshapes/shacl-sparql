@@ -1,0 +1,4 @@
+MovieShape(http://dbpedia.org/resource/Hollywood_Without_Make-Up), not violated
+MovieShape(http://dbpedia.org/resource/Der_Schuß_durchs_Fenster), not violated
+MovieShape(http://dbpedia.org/resource/Stark_Fear), not violated
+MovieShape(http://dbpedia.org/resource/Perri_(film)), not violated
