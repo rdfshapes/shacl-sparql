@@ -9,16 +9,16 @@ max number of rules in memory:
 number of queries:
 4
 max exec time for a query:
-1188
-total query exec time:
-1596
-max grounding time for a query:
-265
-total grounding time:
-312
-max saturation time:
 856
+total query exec time:
+1193
+max grounding time for a query:
+199
+total grounding time:
+242
+max saturation time:
+872
 total saturation time:
-1191
+1152
 total time:
-6641
+5712
