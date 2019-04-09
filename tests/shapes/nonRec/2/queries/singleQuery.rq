@@ -6,9 +6,12 @@ SELECT ?x1 WHERE{
 
 FILTER NOT EXISTS {
  
-?x1 dbo:director ?x2.
+?x1 dbo:starring ?x2.
 ?x1 dbo:imdbId ?id1.
 ?x1 dbo:starring ?s1.
+?x1 dbo:writer ?w1.
+?x1 dbo:musicComposer ?c1.
+?x1 dbo:director ?d1.
  
 FILTER NOT EXISTS {
 ?x1 dbo:imdbId ?n_11.
@@ -17,26 +20,12 @@ FILTER(?n_11 != ?n_12)
 }
 
 
- 
+?x2 dbo:activeYearsStartYear ?y2 .
 ?x2 dbo:birthPlace ?b2.
-?x2 dbo:birthYear ?y2.
 ?x2 dbo:imdbId ?i2.
+?x2 dbo:occupation dbr:Actor .
+?x2 ^dbo:starring ?m2.
  
-FILTER
-( 
-datatype(?y2) = xsd:gYear
-AND NOT EXISTS {
-?x2 dbo:birthYear ?y21 .
-?x2 dbo:birthYear ?y22.
-FILTER(?y21 != ?y22)
-}
-AND  NOT EXISTS {
-?x2 dbo:activeYearsSartYear ?a21 .
-?x2 dbo:activeYearsSartYear ?a22.
-FILTER(?a21 != ?a22)
-}
-)
 
 }
 }
-
