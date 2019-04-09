@@ -11,7 +11,7 @@
 				{ "path": "dbo:director", "min": 1},
 				{ "path": "dbo:imdbId", "min": 1 },
 				{ "path": "dbo:imdbId", "max": 1 },
-				{ "path": "dbo:starring", "max": 0, "shape":"ActorShape","negated":true}
+				{ "path": "dbo:starring", "min": 1, "shape":"ActorShape"}
 			]
 		]
 	}
