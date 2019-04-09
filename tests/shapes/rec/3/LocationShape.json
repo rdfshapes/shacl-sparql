@@ -1,0 +1,13 @@
+{
+	"name": "LocationShape",
+	"constraintDef":{
+		"conjunctions":[
+			[ 	
+				{ "path": "dbo:country", "min": 1, "shape":"LocationShape"},
+				{ "path": "dbo:leaderTitle", "min": 1},
+				{ "path": "dbo:populationDensity", "min": 1}
+			
+		]
+		]
+	}
+}

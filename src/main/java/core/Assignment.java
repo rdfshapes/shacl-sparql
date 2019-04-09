@@ -6,25 +6,25 @@ import java.util.Set;
 
 public class Assignment {
 
-    private Set<Atom> atoms;
-//    private Set<Atom> negatedAtoms;
+    private Set<Literal> literals;
+//    private Set<Literal> negatedAtoms;
 
     public Assignment() {
-        this.atoms = new HashSet<>();
+        this.literals = new HashSet<>();
 //        this.negatedAtoms = new HashSet<>();
     }
 
-    public void addAtom(Atom atom){
-        atoms.add(atom);
-//        negatedAtoms.add(atom.getNegation());
+    public void addAtom(Literal literal){
+        literals.add(literal);
+//        negatedAtoms.add(literal.getNegation());
     }
 
-//    public Set<Atom> getNegatedAtoms() {
+//    public Set<Literal> getNegatedAtoms() {
 //        return negatedAtoms;
 //    }
 
-    public boolean contains(Atom a){
-        return atoms.contains(a);
+    public boolean contains(Literal a){
+        return literals.contains(a);
     }
 
     @Override
@@ -32,12 +32,12 @@ public class Assignment {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Assignment that = (Assignment) o;
-        return Objects.equals(atoms, that.atoms); //&&
+        return Objects.equals(literals, that.literals); //&&
 //                Objects.equals(negatedAtoms, that.negatedAtoms);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(atoms);
+        return Objects.hash(literals);
     }
 }

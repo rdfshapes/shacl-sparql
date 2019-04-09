@@ -2,7 +2,7 @@ package valid.impl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import core.Atom;
+import core.Literal;
 import core.Query;
 import core.RulePattern;
 import core.global.RuleMap;
@@ -31,10 +31,12 @@ public class RuleBasedValidator implements Validator {
     private final Output logOutput;
     private final Output validTargetsOuput;
     private final Output invalidTargetsOuput;
-    private int maxRuleNumber;
+    private final Output statsOutput;
+    private final Stats stats;
+//    private int maxRuleNumber;
 
 
-    public RuleBasedValidator(SPARQLEndpoint endpoint, Schema schema, Output logOutput, Output validTargetsOuput, Output invalidTargetsOuput) {
+    public RuleBasedValidator(SPARQLEndpoint endpoint, Schema schema, Output logOutput, Output validTargetsOuput, Output invalidTargetsOuput, Output statsOuput) {
         this.endpoint = endpoint;
         this.schema = schema;
         this.validTargetsOuput = validTargetsOuput;
@@ -44,15 +46,19 @@ public class RuleBasedValidator implements Validator {
         targetShapePredicates = targetShapes.stream()
                 .map(s -> s.getId())
                 .collect(ImmutableCollectors.toSet());
-        this.maxRuleNumber = 0;
+//        this.maxRuleNumber = 0;
+        this.stats = new Stats();
+        statsOutput = statsOuput;
     }
 
     public void validate() {
         Instant start = Instant.now();
+        Set<Literal> targets = extractTargetAtoms();
+        stats.recordInitialTargets(targets.size());
         validate(
                 0,
                 new EvalState(
-                        extractTargetAtoms(),
+                        targets,
                         new RuleMap(),
                         new HashSet<>(),
                         new HashSet<>(),
@@ -63,32 +69,35 @@ public class RuleBasedValidator implements Validator {
         );
         Instant finish = Instant.now();
         long elapsed = Duration.between(start, finish).toMillis();
+        stats.recordTotalTime(elapsed);
         System.out.println("Total execution time: " + elapsed);
-        logOutput.write("\nMaximal number or rules in memory: " + maxRuleNumber);
-        logOutput.write("Total execution time: " + elapsed);
+        logOutput.write("\nMaximal number or rules in memory: " + stats.maxRuleNumber);
+        stats.writeAll(statsOutput);
+
         try {
             logOutput.close();
             validTargetsOuput.close();
             invalidTargetsOuput.close();
+            statsOutput.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Set<Atom> extractTargetAtoms() {
+    private Set<Literal> extractTargetAtoms() {
         return targetShapes.stream()
                 .filter(s -> s.getTargetQuery().isPresent())
                 .flatMap(s -> extractTargetAtoms(s).stream())
                 .collect(Collectors.toSet());
     }
 
-    private Set<Atom> extractTargetAtoms(Shape shape) {
+    private Set<Literal> extractTargetAtoms(Shape shape) {
         return endpoint.runQuery(
                 shape.getId(),
                 shape.getTargetQuery().get()
         ).getBindingSets().stream()
                 .map(b -> b.getBinding("x").getValue().stringValue())
-                .map(i -> new Atom(shape.getId(), i, true))
+                .map(i -> new Literal(shape.getId(), i, true))
                 .collect(Collectors.toSet());
     }
 
@@ -113,7 +122,7 @@ public class RuleBasedValidator implements Validator {
         logOutput.start("Starting validation at depth :" + depth);
         validateFocusShapes(state, focusShapes, depth);
 
-        // Set<Atom> assignment = state.assignment;
+        // Set<Literal> assignment = state.assignment;
 
         printLog(depth, state);
 
@@ -143,26 +152,29 @@ public class RuleBasedValidator implements Validator {
 
     private boolean applyRules(EvalState state, int depth, Shape s) {
         RuleMap retainedRules = new RuleMap();
-        ImmutableList<Atom> freshAtoms = state.ruleMap.entrySet().stream()
+        ImmutableList<Literal> freshLiterals = state.ruleMap.entrySet().stream()
                 .map(e -> applyRules(e.getKey(), e.getValue(), state, retainedRules))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(ImmutableCollectors.toList());
         state.ruleMap = retainedRules;
-        state.assignment.addAll(freshAtoms);
-        if (freshAtoms.isEmpty()) {
+        state.assignment.addAll(freshLiterals);
+        if (freshLiterals.isEmpty()) {
             return false;
         }
 
-        ImmutableSet<Atom> candidateValidTargets = freshAtoms.stream()
+        ImmutableSet<Literal> candidateValidTargets = freshLiterals.stream()
                 .filter(a -> targetShapePredicates.contains(a.getPredicate()))
                 .collect(ImmutableCollectors.toSet());
 
-        Map<Boolean, List<Atom>> part1 = state.remainingTargets.stream()
+        Map<Boolean, List<Literal>> part1 = state.remainingTargets.stream()
                 .collect(Collectors.partitioningBy(a -> candidateValidTargets.contains(a)));
+
         state.remainingTargets = ImmutableSet.copyOf(part1.get(false));
 
-        Map<Boolean, List<Atom>> part2 = part1.get(true).stream()
+        stats.recordDecidedTargets(part1.get(true).size());
+
+        Map<Boolean, List<Literal>> part2 = part1.get(true).stream()
                 .collect(Collectors.partitioningBy(a -> a.isPos()));
 
         state.validTargets.addAll(part2.get(true));
@@ -174,15 +186,15 @@ public class RuleBasedValidator implements Validator {
         return true;
     }
 
-    private boolean isValid(Atom t, ImmutableList<Atom> freshAtoms) {
-        if (freshAtoms.contains(t)) {
+    private boolean isValid(Literal t, ImmutableList<Literal> freshLiterals) {
+        if (freshLiterals.contains(t)) {
             validTargetsOuput.write(t.toString());
             return true;
         }
         return false;
     }
 
-    private Optional<Atom> applyRules(Atom head, Set<ImmutableSet<Atom>> bodies, EvalState state, RuleMap retainedRules) {
+    private Optional<Literal> applyRules(Literal head, Set<ImmutableSet<Literal>> bodies, EvalState state, RuleMap retainedRules) {
         if (bodies.stream()
                 .anyMatch(b -> applyRule(head, b, state, retainedRules))) {
             state.assignment.add(head);
@@ -191,7 +203,7 @@ public class RuleBasedValidator implements Validator {
         return Optional.empty();
     }
 
-    private boolean applyRule(Atom head, ImmutableSet<Atom> body, EvalState state, RuleMap retainedRules) {
+    private boolean applyRule(Literal head, ImmutableSet<Literal> body, EvalState state, RuleMap retainedRules) {
         if (state.assignment.containsAll(body)) {
             return true;
         }
@@ -207,15 +219,14 @@ public class RuleBasedValidator implements Validator {
     }
 
     private void evalShape(EvalState state, Shape s, int depth) {
-        logOutput.start("evaluating queries for shape " + s.getId());
+        logOutput.write("evaluating queries for shape " + s.getId());
         s.getDisjuncts().forEach(d -> evalDisjunct(state, d, s));
         state.visitedShapes.addAll(s.getPredicates());
         saveRuleNumber(state);
 
         logOutput.start("saturation ...");
         saturate(state, depth, s);
-        logOutput.elapsed();
-        saveRuleNumber(state);
+        stats.recordSaturationTime(logOutput.elapsed());
 
         logOutput.write("\nvalid targets: " + state.validTargets.size());
         logOutput.write("\nInvalid targets: " + state.invalidTargets.size());
@@ -225,9 +236,7 @@ public class RuleBasedValidator implements Validator {
     private void saveRuleNumber(EvalState state) {
         int ruleNumber = state.ruleMap.getRuleNumber();
         logOutput.write("Number of rules " + ruleNumber);
-        maxRuleNumber = ruleNumber > maxRuleNumber ?
-                ruleNumber :
-                maxRuleNumber;
+        stats.recordNumberOfRules(ruleNumber);
     }
 
     private void evalDisjunct(EvalState state, ConstraintConjunction d, Shape s) {
@@ -239,13 +248,14 @@ public class RuleBasedValidator implements Validator {
     private void evalQuery(EvalState state, Query q, Shape s) {
         logOutput.start("Evaluating query\n" + q.getSparql());
         QueryEvaluation eval = endpoint.runQuery(q.getId(), q.getSparql());
-        logOutput.elapsed();
+        stats.recordQueryExecTime(logOutput.elapsed());
         logOutput.write("Number of solution mappings: " + eval.getBindingSets().size());
+        stats.recordNumberOfSolutionMappings(eval.getBindingSets().size());
         logOutput.start("Grounding rules ...");
         eval.getBindingSets().forEach(
                 b -> evalBindingSet(state, b, q.getRulePattern(), s.getRulePatterns())
         );
-        logOutput.elapsed();
+        stats.recordGroundingTime(logOutput.elapsed());
     }
 
     private void evalBindingSet(EvalState state, BindingSet bs, RulePattern queryRP, ImmutableSet<RulePattern> shapeRPs) {
@@ -265,28 +275,28 @@ public class RuleBasedValidator implements Validator {
     }
 
     private boolean negateUnMatchableHeads(EvalState state, int depth, Shape s) {
-        Set<Atom> ruleHeads = state.ruleMap.keySet();
+        Set<Literal> ruleHeads = state.ruleMap.keySet();
 
         int initialAssignmentSize = state.assignment.size();
 
         // first negate unmatchable body atoms
         state.ruleMap.getAllBodyAtoms().
                 filter(a -> !isSatisfiable(a, state, ruleHeads))
-                .map(a -> getNegatedAtom(a))
+                .map(this::getNegatedAtom)
                 .forEach(a -> state.assignment.add(a));
 
         // then negate unmatchable targets
-        Map<Boolean, List<Atom>> part2 = state.remainingTargets.stream().
+        Map<Boolean, List<Literal>> part2 = state.remainingTargets.stream().
                 collect(Collectors.partitioningBy(
                         a -> isSatisfiable(a, state, ruleHeads)
                 ));
-        List<Atom> inValidTargets = part2.get(false);
+        List<Literal> inValidTargets = part2.get(false);
         state.invalidTargets.addAll(inValidTargets);
         inValidTargets.forEach(t -> invalidTargetsOuput.write(t.toString() + ", depth " + depth + ", focus shape " + s.getId()));
 
         state.assignment.addAll(
                 inValidTargets.stream()
-                        .map(Atom::getNegation)
+                        .map(Literal::getNegation)
                         .collect(ImmutableCollectors.toSet())
         );
         state.remainingTargets = new HashSet<>(part2.get(true));
@@ -294,17 +304,17 @@ public class RuleBasedValidator implements Validator {
         return initialAssignmentSize != state.assignment.size();
     }
 
-    private Atom getNegatedAtom(Atom a) {
+    private Literal getNegatedAtom(Literal a) {
         return a.isPos()?
                 a.getNegation():
                 a;
     }
 
-    private boolean isSatisfiable(Atom a, EvalState state, Set<Atom> ruleHeads) {
-        boolean b = ruleHeads.contains(a);
+    private boolean isSatisfiable(Literal a, EvalState state, Set<Literal> ruleHeads) {
+       // boolean b = ruleHeads.contains(a);
 //        b = (!state.visitedShapes.contains(a.getPredicate())) || ruleHeads.contains(a);
 //        return b;
-        return (!state.visitedShapes.contains(a.getPredicate())) || ruleHeads.contains(a);
+        return (!state.visitedShapes.contains(a.getPredicate())) || ruleHeads.contains(a.getAtom()) || state.assignment.contains(a);
     }
 
 
@@ -312,18 +322,96 @@ public class RuleBasedValidator implements Validator {
 
         Set<String> visitedShapes;
         RuleMap ruleMap;
-        Set<Atom> remainingTargets;
-        Set<Atom> validTargets;
-        Set<Atom> invalidTargets;
-        Set<Atom> assignment;
+        Set<Literal> remainingTargets;
+        Set<Literal> validTargets;
+        Set<Literal> invalidTargets;
+        Set<Literal> assignment;
 
-        private EvalState(Set<Atom> targetAtoms, RuleMap ruleMap, Set<Atom> assignment, Set<String> visitedShapes, Set<Atom> validTargets, Set<Atom> invalidTargets) {
-            this.remainingTargets = targetAtoms;
+        private EvalState(Set<Literal> targetLiterals, RuleMap ruleMap, Set<Literal> assignment, Set<String> visitedShapes, Set<Literal> validTargets, Set<Literal> invalidTargets) {
+            this.remainingTargets = targetLiterals;
             this.ruleMap = ruleMap;
             this.assignment = assignment;
             this.visitedShapes = visitedShapes;
             this.validTargets = validTargets;
             this.invalidTargets = invalidTargets;
         }
+    }
+
+
+    private class Stats {
+
+        public void writeAll(Output statsOutput) {
+            statsOutput.write("targets:\n"+initialTargets);
+            statsOutput.write("max number of solution mappings for a query:\n"+maxSolutionMappings);
+            statsOutput.write("total number of solution mappings:\n"+totalSolutionMappings);
+            statsOutput.write("max number of rules in memory:\n"+maxRuleNumber);
+
+            statsOutput.write("max exec time for a query:\n"+maxQueryExectime);
+            statsOutput.write("total query exec time:\n"+totalQueryExectime);
+            statsOutput.write("max grounding time for a query:\n"+maxGroundingTime);
+            statsOutput.write("total grounding time:\n"+totalGroundingTime);
+            statsOutput.write("max saturation time:\n"+maxSaturationTime);
+            statsOutput.write("total saturation time:\n"+totalSaturationTime);
+            statsOutput.write("total time:\n"+totalTime);
+        }
+        private int initialTargets = 0;
+
+        private int maxRuleNumber = 0;
+        private int totalSolutionMappings = 0;
+        private int maxSolutionMappings = 0;
+
+        private long totalQueryExectime = 0;
+        private long maxQueryExectime = 0;
+        private long totalGroundingTime = 0;
+        private long maxGroundingTime = 0;
+        private long totalSaturationTime = 0;
+        private long maxSaturationTime = 0;
+
+        private long totalTime = 0;
+
+        private Map<Integer,Integer> depth2DecidedTargets = new HashMap<>();
+
+        void recordInitialTargets(int k){
+            initialTargets = k;
+        }
+        void recordGroundingTime(long ms){
+            if(ms > maxGroundingTime){
+                maxGroundingTime = ms;
+            }
+            totalGroundingTime += ms;
+        };
+        void recordQueryExecTime(long ms){
+            if(ms > maxQueryExectime){
+                maxQueryExectime = ms;
+            }
+            totalQueryExectime += ms;
+
+        };
+        void recordSaturationTime(long ms){
+            if(ms > maxSaturationTime){
+                maxSaturationTime = ms;
+            }
+            totalSaturationTime += ms;
+        };
+        void recordNumberOfRules(int k){
+            if(k > maxRuleNumber){
+                maxRuleNumber = k;
+            }
+        };
+        void recordNumberOfSolutionMappings(int k){
+            if(k > maxSolutionMappings){
+                maxSolutionMappings = k;
+            }
+            totalSolutionMappings += k;
+        };
+        void recordDecidedTargets(int numberOfargets){
+
+
+        };
+        void recordTotalTime(long ms){
+            totalTime = ms;
+        };
+
+
     }
 }

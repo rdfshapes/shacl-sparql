@@ -43,7 +43,6 @@ public class SPARQLEndpoint {
         Repository repo = new SPARQLRepository(endPointURL);
         repo.initialize();
 
-        log.debug("Evaluating query:\n" + queryString);
         try (RepositoryConnection conn = repo.getConnection()) {
             QueryEvaluation eval = runQuery(conn, queryId, queryString);
             repo.shutDown();

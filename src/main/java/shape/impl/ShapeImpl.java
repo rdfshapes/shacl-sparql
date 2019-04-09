@@ -1,7 +1,7 @@
 package shape.impl;
 
 import com.google.common.collect.ImmutableSet;
-import core.Atom;
+import core.Literal;
 import core.RulePattern;
 import core.global.VariableGenerator;
 import shape.ConstraintConjunction;
@@ -67,7 +67,7 @@ public class ShapeImpl implements Shape {
 
     private ImmutableSet<RulePattern> computeRulePatterns() {
         String focusNodeVar = VariableGenerator.getFocusNodeVar();
-        Atom head = new Atom(id, focusNodeVar, true);
+        Literal head = new Literal(id, focusNodeVar, true);
         return disjuncts.stream()
                 .map(d -> new RulePattern(
                         head,
@@ -76,18 +76,18 @@ public class ShapeImpl implements Shape {
                 .collect(ImmutableCollectors.toSet());
     }
 
-    private ImmutableSet<Atom> getDisjunctRPBody(ConstraintConjunction d) {
+    private ImmutableSet<Literal> getDisjunctRPBody(ConstraintConjunction d) {
         String focusNodeVar = VariableGenerator.getFocusNodeVar();
         return Stream.concat(
                 Stream.of(
-                        new Atom(
+                        new Literal(
                                 d.getMinQuery().getId(),
                                 focusNodeVar,
                                 true
                         )),
                 d.getMaxQueries().stream()
                         .map(q -> q.getId())
-                        .map(s -> new Atom(
+                        .map(s -> new Literal(
                                 s,
                                 focusNodeVar,
                                 false

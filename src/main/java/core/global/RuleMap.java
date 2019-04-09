@@ -1,14 +1,14 @@
 package core.global;
 
 import com.google.common.collect.ImmutableSet;
-import core.Atom;
+import core.Literal;
 
 import java.util.*;
 import java.util.stream.Stream;
 
 public class RuleMap {
 
-    private final Map<Atom, Set<ImmutableSet<Atom>>> map;
+    private final Map<Literal, Set<ImmutableSet<Literal>>> map;
     private int ruleNumber;
 
     public RuleMap() {
@@ -16,18 +16,18 @@ public class RuleMap {
         this.ruleNumber = 0;
     }
 
-    public RuleMap(Map<Atom, Set<ImmutableSet<Atom>>> map) {
+    public RuleMap(Map<Literal, Set<ImmutableSet<Literal>>> map) {
         this.map = map;
     }
 
-    public Set<ImmutableSet<Atom>> getRuleSet(Atom atom){
-        return map.get(atom);
+    public Set<ImmutableSet<Literal>> getRuleSet(Literal literal){
+        return map.get(literal);
     }
 
-    public void addRule(Atom head, ImmutableSet<Atom> body){
-        Set<ImmutableSet<Atom>> bodies = map.get(head);
+    public void addRule(Literal head, ImmutableSet<Literal> body){
+        Set<ImmutableSet<Literal>> bodies = map.get(head);
         if(bodies == null){
-            Set<ImmutableSet<Atom>> s = new HashSet<>();
+            Set<ImmutableSet<Literal>> s = new HashSet<>();
             s.add(body);
             map.put(head, s);
             ruleNumber++;
@@ -38,13 +38,13 @@ public class RuleMap {
         }
     }
 
-    public void addRuleSet(Atom head, Set<ImmutableSet<Atom>> body){
+    public void addRuleSet(Literal head, Set<ImmutableSet<Literal>> body){
             map.put(head, body);
     }
 
     // Returns true if there is no more rule body with head "head" after deletion
     // also deletes the map entry for the head
-//    public boolean deleteRule(Atom head, RuleBody body){
+//    public boolean deleteRule(Literal head, RuleBody body){
 //        Set<RuleBody> bodies = map.get(head);
 //        if(bodies != null){
 //            bodies.remove(body);
@@ -57,28 +57,28 @@ public class RuleMap {
 //        return true;
 //    }
 
-    public void remove(Atom a){
+    public void remove(Literal a){
         map.remove(a);
     }
 
-    public void replace(Atom head, Set<ImmutableSet<Atom>> bodies){
+    public void replace(Literal head, Set<ImmutableSet<Literal>> bodies){
         map.replace(head, bodies);
     }
 
 
-    public Stream<Atom> getAllBodyAtoms(){
+    public Stream<Literal> getAllBodyAtoms(){
         return map.values().stream()
                 .flatMap(s -> s.stream())
                 .flatMap(s -> s.stream());
     }
 
-    public Set<Map.Entry<Atom, Set<ImmutableSet<Atom>>>> entrySet(){
+    public Set<Map.Entry<Literal, Set<ImmutableSet<Literal>>>> entrySet(){
         return map.entrySet();
     }
-    public Set<Atom> keySet(){
+    public Set<Literal> keySet(){
         return map.keySet();
     }
-    public Collection<Set<ImmutableSet<Atom>>> values(){
+    public Collection<Set<ImmutableSet<Literal>>> values(){
         return map.values();
     }
 

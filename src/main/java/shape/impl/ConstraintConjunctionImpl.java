@@ -67,7 +67,7 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 //
 //        String focusNodeVar = VariableGenerator.getFocusNodeVar();
 //        this.rulePattern = new RulePattern(
-//                new Atom(id, focusNodeVar, true),
+//                new Literal(id, focusNodeVar, true),
 //                minConstraints.stream()
 //                        .map(c -> c.getRulePatternBody().getHead())
 //                        .collect(ImmutableCollectors.toSet()),
@@ -89,12 +89,12 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 //    }
 //
 //    @Override
-//    public ImmutableMap<String, Atom> getValidationRulePattern() {
+//    public ImmutableMap<String, Literal> getValidationRulePattern() {
 //        return validationRule;
 //    }
 //
 //    @Override
-//    public ImmutableList<ImmutableMap<String, Atom>> getViolationRulePatterns() {
+//    public ImmutableList<ImmutableMap<String, Literal>> getViolationRulePatterns() {
 //        return violationRules;
 //    }
 
@@ -178,15 +178,15 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 //                + "}";
 //    }
 
-//    private ImmutableMap<String, Atom> generateRule(QueryGenerator validationClause) {
+//    private ImmutableMap<String, Literal> generateRule(QueryGenerator validationClause) {
 //        return validationClause.ruleBody.stream()
 //                .collect(ImmutableCollectors.toMap(
-//                        Atom::getArg,
+//                        Literal::getArg,
 //                        a -> a
 //                ));
 //    }
 
-//    private ImmutableList<ImmutableMap<String, Atom>> generateViolationRules(ImmutableList<QueryGenerator> violationClauses) {
+//    private ImmutableList<ImmutableMap<String, Literal>> generateViolationRules(ImmutableList<QueryGenerator> violationClauses) {
 //        return violationClauses.stream()
 //                .map(this::generateRule)
 //                .collect(ImmutableCollectors.toList());
@@ -194,11 +194,11 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 
 
 
-//    private Map<String, Atom> createRule(ImmutableList<String> variables, Shape shape, boolean isPos) {
+//    private Map<String, Literal> createRule(ImmutableList<String> variables, Shape shape, boolean isPos) {
 //        return variables.stream()
 //                .collect(ImmutableCollectors.toMap(
 //                        v -> v,
-//                        v -> new Atom(shape.getId(), v, isPos)
+//                        v -> new Literal(shape.getId(), v, isPos)
 //                ));
 //    }
 }

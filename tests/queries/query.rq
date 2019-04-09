@@ -1,0 +1,36 @@
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+SELECT DISTINCT ?x1 WHERE{
+
+?x1 a dbo:Film.
+
+FILTER NOT EXISTS {
+ 	?x1 dbo:budget ?b1.
+	FILTER (NOT EXISTS {
+ 		?x1 dbo:director ?x2.
+		FILTER (NOT EXISTS {
+			?x2 dbo:birthDate ?d2.
+		} OR EXISTS {
+			?x2 dbo:birthPlace ?x3.
+			FILTER (NOT EXISTS {
+				?x3 dbo:country ?c3. 			
+			})
+		})
+	} AND NOT EXISTS {
+ 		?x1 dbo:starring ?x4.
+		FILTER (NOT EXISTS {
+			?x4 dbo:birthDate ?d4.
+		} OR EXISTS {
+			?x4 dbo:birthPlace ?x5.
+			FILTER (NOT EXISTS {
+				?x5 dbo:country ?c6. 			
+			})
+		})
+	} AND NOT EXISTS {
+ 		?x1 dbo:budget ?b1.
+ 		?x1 dbo:budget ?b2.
+		FILTER(?b1 != ?b2)
+	} 
+)
+}
+}

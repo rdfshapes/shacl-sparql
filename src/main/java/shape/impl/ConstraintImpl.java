@@ -1,7 +1,7 @@
 package shape.impl;
 
 import com.google.common.collect.ImmutableSet;
-import core.Atom;
+import core.Literal;
 import core.RulePattern;
 import core.global.VariableGenerator;
 import shape.Constraint;
@@ -94,10 +94,10 @@ public class ConstraintImpl implements Constraint {
 
 
     @Override
-    public ImmutableSet<Atom> computeRulePatternBody() {
+    public ImmutableSet<Literal> computeRulePatternBody() {
               return shapeRef.isPresent() ?
                         variables.stream()
-                                .map(v -> new Atom(
+                                .map(v -> new Literal(
                                         shapeRef.get(),
                                         v,
                                         isPos

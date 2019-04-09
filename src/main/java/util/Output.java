@@ -52,14 +52,15 @@ public class Output {
 
     }
 
-    public void elapsed() {
+    public long elapsed() {
         Instant now = Instant.now();
+        long elapsed = Duration.between(previous, now).toMillis();
         try {
-            writer.write("elapsed: " +
-            Duration.between(previous, now).toMillis()+" ms\n");
+            writer.write("elapsed: " + elapsed+" ms\n");
 //            writer.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return elapsed;
     }
 }

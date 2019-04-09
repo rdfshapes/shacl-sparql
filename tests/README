@@ -1,0 +1,9 @@
+########
+Examples
+########
+
+Rule-based validation:
+java -jar validation-1.0-SNAPSHOT.jar -s ./shapes/nonRec/2/ -g "<dbpedia-person.org>" "http://obdalin.inf.unibz.it:8890/sparql"  ./shapes/nonRec/2/output
+
+Single-query validation:
+java -jar validation-1.0-SNAPSHOT.jar -q ./shapes/nonRec/2/queries/singleQuery.rq "http://obdalin.inf.unibz.it:8890/sparql"  ./shapes/nonRec/2/queries/output

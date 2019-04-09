@@ -3,7 +3,7 @@ package preprocess;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.UnmodifiableIterator;
-import core.Atom;
+import core.Literal;
 import core.Query;
 import core.RulePattern;
 import core.global.SPARQLPrefixHandler;
@@ -35,7 +35,7 @@ public class QueryGenerator {
     private static RulePattern computeRulePattern(ImmutableList<Constraint> constraints, String id) {
         UnmodifiableIterator<Constraint> it = constraints.iterator();
         return new RulePattern(
-                new Atom(
+                new Literal(
                         id,
                         VariableGenerator.getFocusNodeVar(),
                         true
@@ -111,7 +111,7 @@ public class QueryGenerator {
         }
 
 //        void addRuleAtom(String v, String s, boolean idPos, Schema schema) {
-//            ruleBody.add(new Atom(s, v, idPos));
+//            ruleBody.add(new Literal(s, v, idPos));
 //        }
 
         String getSparql(boolean includePrefixes) {

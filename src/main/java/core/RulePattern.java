@@ -8,17 +8,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class RulePattern {
-    private final Atom head;
-    private final ImmutableSet<Atom> atoms;
+    private final Literal head;
+    private final ImmutableSet<Literal> literals;
     private final ImmutableSet<String> variables;
 
     // If a value for each variable is produced (by a solution mapping), then the rule pattern can be instantiated.
     // note that it may be the case that these variables do not appear in the the body of the rule (because there is no constraint to propagate on these values, they only need to exist)
 //    private final ImmutableSet<String> variables;
 
-    public RulePattern(Atom head, ImmutableSet<Atom> body) {
+    public RulePattern(Literal head, ImmutableSet<Literal> body) {
         this.head = head;
-        this.atoms = body;
+        this.literals = body;
         this.variables = Stream.concat(
                 Stream.of(head.getArg()),
                 body.stream()
@@ -26,7 +26,7 @@ public class RulePattern {
         ).collect(ImmutableCollectors.toSet());
     }
 
-    public Atom getHead() {
+    public Literal getHead() {
         return head;
     }
 
@@ -34,8 +34,8 @@ public class RulePattern {
 //        return variables;
 //    }
 
-    public ImmutableSet<Atom> getAtoms() {
-        return atoms;
+    public ImmutableSet<Literal> getLiterals() {
+        return literals;
     }
 
     @Override
@@ -57,22 +57,22 @@ public class RulePattern {
 //            return "neg: ()";
 //        }
 //        return "neg:(" + negatedAtoms.stream()
-//                .map(Atom::toString)
+//                .map(Literal::toString)
 //                .collect(Collectors.joining(", ")) +
 //                ")";
 //    }
 
     private String getBodyString() {
-        if (atoms.isEmpty()) {
+        if (literals.isEmpty()) {
             return "";
         }
-        return atoms.stream()
-                .map(Atom::toString)
+        return literals.stream()
+                .map(Literal::toString)
                 .collect(Collectors.joining(", "));
     }
 
-    public Atom instantiateAtom(Atom a, BindingSet bs) {
-        return new Atom(
+    public Literal instantiateAtom(Literal a, BindingSet bs) {
+        return new Literal(
                 a.getPredicate(),
                 bs.getValue(a.getArg()).stringValue(),
                 a.isPos()
@@ -80,8 +80,8 @@ public class RulePattern {
 
     }
 
-    public ImmutableSet<Atom> instantiateBody(BindingSet bs) {
-                return atoms.stream()
+    public ImmutableSet<Literal> instantiateBody(BindingSet bs) {
+                return literals.stream()
                         .map(a -> instantiateAtom(a, bs))
                         .collect(ImmutableCollectors.toSet());
 //                this.negatedAtoms.stream()

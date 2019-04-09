@@ -7,7 +7,9 @@ import preprocess.ShapeParser;
 import shape.Schema;
 import shape.Shape;
 import util.Output;
+import valid.Validator;
 import valid.impl.RuleBasedValidator;
+import valid.impl.UnfoldingBasedValidator;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -25,28 +27,37 @@ public class Eval {
     static Logger log = (Logger) LoggerFactory.getLogger(Eval.class);
     private static final String usage =
             "USAGE: \n" + Eval.class.getSimpleName() +
-                    " [-t targetShape] endpoint shapeDir outputDir";
+                    "[-s shapeDir] [-q queryFile] [-t targetShape] [-g graphName] endpoint outputDir";
 
     private static SPARQLEndpoint endpoint;
     private static Optional<String> graph;
     private static Optional<Shape> targetShape;
-    private static Schema schema;
+    private static Optional<Path> singleQuery = Optional.empty();
+    private static Optional<Schema> schema = Optional.empty();
     private static Path outputDir;
 
     public static void main(String[] args) {
         setLoggers();
 //        parseArguments(args);
         readHardCodedArguments();
-        schema.getShapes().forEach(s -> s.computeConstraintQueries(schema, graph));
+//        readHardCodedArguments2();
+        schema.ifPresent(s-> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
         try {
-//            UnfoldingBasedValidator validator = new UnfoldingBasedValidator(
-            RuleBasedValidator validator = new RuleBasedValidator(
-                    endpoint,
-                    schema,
-                    new Output(Paths.get(outputDir.toString(), "validation.log").toFile()),
-                    new Output(Paths.get(outputDir.toString(), "targets_valid.txt").toFile()),
-                    new Output(Paths.get(outputDir.toString(), "targets_violated.txt").toFile())
-            );
+            Validator validator = singleQuery.isPresent() ?
+                    new UnfoldingBasedValidator(
+                            singleQuery.get(),
+                            endpoint,
+                            new Output(Paths.get(outputDir.toString(), "validation.log").toFile()),
+                            new Output(Paths.get(outputDir.toString(), "targets_violated.txt").toFile())
+                    ) :
+                    new RuleBasedValidator(
+                            endpoint,
+                            schema.get(),
+                            new Output(Paths.get(outputDir.toString(), "validation.log").toFile()),
+                            new Output(Paths.get(outputDir.toString(), "targets_valid.txt").toFile()),
+                            new Output(Paths.get(outputDir.toString(), "targets_violated.txt").toFile()),
+                            new Output(Paths.get(outputDir.toString(), "stats.txt").toFile())
+                    );
             Instant start = Instant.now();
             validator.validate();
             Instant finish = Instant.now();
@@ -60,19 +71,26 @@ public class Eval {
     private static void setLoggers() {
         Set<String> loggers = new HashSet<>(Arrays.asList("org.apache.http", "o.e.r.q.r"));
 
-    for(String log:loggers) {
-        Logger logger = (Logger) LoggerFactory.getLogger(log);
-    logger.setLevel(INFO);
-    logger.setAdditive(false);
-    }
+        for (String log : loggers) {
+            Logger logger = (Logger) LoggerFactory.getLogger(log);
+            logger.setLevel(INFO);
+            logger.setAdditive(false);
+        }
     }
 
     private static void parseArguments(String[] args) {
         Optional<String> targetShapeName = Optional.empty();
+        Optional<Path> shapeDir = Optional.empty();
         Iterator<String> it = Stream.of(args).iterator();
         String currentOpt = it.next();
         while (currentOpt.startsWith("-")) {
             switch (currentOpt) {
+                case "-s":
+                    schema = Optional.of(ShapeParser.parseSchema(Paths.get(it.next())));
+                    break;
+                case "-q":
+                    singleQuery = Optional.of(Paths.get(it.next()));
+                    break;
                 case "-t":
                     targetShapeName = Optional.of(it.next());
                     break;
@@ -84,13 +102,12 @@ public class Eval {
             }
             currentOpt = it.next();
         }
-        endpoint = new SPARQLEndpoint(it.next());
-        Path shapeDir = Paths.get(it.next());
+        endpoint = new SPARQLEndpoint(currentOpt);
+        outputDir = Paths.get(it.next());
         log.info("endPoint: |" + endpoint.getURL() + "|");
         log.info("shapeDir: |" + shapeDir + "|");
         log.info("outputDir: |" + outputDir + "|");
-        schema = ShapeParser.parseSchema(shapeDir);
-        targetShapeName.ifPresent(n -> targetShape = Optional.of(schema.getShape(n).get()));
+        targetShapeName.ifPresent(n -> targetShape = Optional.of(schema.get().getShape(n).get()));
     }
 
     private static void readHardCodedArguments() {
@@ -100,15 +117,27 @@ public class Eval {
         endpoint = new SPARQLEndpoint("http://obdalin.inf.unibz.it:8890/sparql");
 //        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
         graph = Optional.of("<dbpedia-person.org>");
-//        graph = Optional.empty();
-//        schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/light"));
-//        schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/nonRec/2/official/tmp"));
-        schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/toy/"));
-//        outputDir = Paths.get(resourceDir, "output");
-//        outputDir = Paths.get(resourceDir, "shapes/nonRec/2/official/tmp/output");
-        outputDir = Paths.get(resourceDir, "shapes/toy/output");
+        graph = Optional.empty();
+        schema = Optional.of(ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/rec/2/debug")));
+//        schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/toy/"));
+        outputDir = Paths.get(resourceDir, "shapes/rec/2/debug/output");
+//        outputDir = Paths.get(resourceDir, "shapes/toy/output");
         targetShape = Optional.empty();
         //targetShape = Optional.of(schema.getShape("JapaneseMovieRec").get());
     }
 
+
+    private static void readHardCodedArguments2() {
+        String cwd = System.getProperty("user.dir");
+        System.out.println(cwd);
+        String resourceDir = Paths.get(cwd, "/tests").toString();
+        endpoint = new SPARQLEndpoint("http://obdalin.inf.unibz.it:8890/sparql");
+//        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
+        graph = Optional.of("<dbpedia-person.org>");
+//        graph = Optional.empty();
+        singleQuery = Optional.of(Paths.get(resourceDir, "queries/query.rq"));
+        outputDir = Paths.get(resourceDir, "queries/output");
+//        outputDir = Paths.get(resourceDir, "shapes/toy/output");
+
+    }
 }

@@ -1,0 +1,12 @@
+{
+	"name": "ActorShape",
+	"constraintDef":{
+		"conjunctions":[
+			[ 	
+				{ "path": "dbo:birthPlace", "min": 1},
+				{ "path": "dbo:imdbId", "min": 1},
+				{ "path": "dbo:starring", "max": 0, "shape":"MovieShape", "negated": true}
+			]
+		]
+	}
+}

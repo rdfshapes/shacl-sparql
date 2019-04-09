@@ -10,27 +10,24 @@ import valid.Validator;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
 public class UnfoldingBasedValidator implements Validator {
 
 
+    private final Path query;
     private final SPARQLEndpoint endpoint;
-    private final Schema schema;
-    private final Optional<Shape> targetShape;
     private final Output logOutput;
-    private final Output validTargetsOuput;
-    private final Output violatedTargetsOuput;
+    private final Output violationOutput;
 
 
-    public UnfoldingBasedValidator(SPARQLEndpoint endpoint, Schema schema, Output logOutput, Output validTargetsOuput, Output violatedTargetsOuput) {
+    public UnfoldingBasedValidator(Path query, SPARQLEndpoint endpoint, Output logOutput, Output violationOutput) {
+        this.query = query;
         this.endpoint = endpoint;
-        this.schema = schema;
-        this.validTargetsOuput = validTargetsOuput;
-        this.violatedTargetsOuput = violatedTargetsOuput;
         this.logOutput = logOutput;
-        targetShape = Optional.empty();
+        this.violationOutput = violationOutput;
     }
 
 
@@ -39,31 +36,22 @@ public class UnfoldingBasedValidator implements Validator {
         QueryEvaluation eval = endpoint.runQuery(q.getId(), q.getSparql());
         logOutput.elapsed();
         logOutput.write("Number of solution mappings: " + eval.getBindingSets().size());
-//        eval.getBindingSets().forEach(
-//                b -> evalBindingSet(state, b, q.getRulePattern(), s.getRulePatterns())
-//        );
-//        eval.getBindingSets()
-//                .forEach(bs -> logOutput.write(bs.toString()));
+        eval.getBindingSets().forEach(bs -> violationOutput.write(bs.getBinding("x1").getValue().stringValue()));
         logOutput.elapsed();
     }
 
     @Override
     public void validate() throws IOException {
 
-        String cwd = System.getProperty("user.dir");
         Query q = new Query(
                 "q",
                 null,
-                new String(Files.readAllBytes(
-                        Paths.get(cwd, "/tests/queries/2/test4.rq")
-        )
-                ));
+                new String(Files.readAllBytes(query))
+        );
 
         evalQuery(q);
         logOutput.close();
-        validTargetsOuput.close();
-        violatedTargetsOuput.close();
-
+        violationOutput.close();
 
     }
 }
