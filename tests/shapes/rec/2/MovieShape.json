@@ -1,7 +1,7 @@
 {
 	"name": "MovieShape",
 	"targetDef":{
-		"query":"SELECT ?x WHERE {GRAPH <dbpedia-person.org> {?x a dbo:Film}}"
+		"query":"SELECT ?x WHERE {GRAPH <dbpedia-person-5pct.org> {?x a dbo:Film}}"
 	},
 	"constraintDef":{
 		"conjunctions":[
