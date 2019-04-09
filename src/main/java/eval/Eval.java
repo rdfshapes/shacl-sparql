@@ -38,8 +38,8 @@ public class Eval {
 
     public static void main(String[] args) {
         setLoggers();
-//        parseArguments(args);
-        readHardCodedArguments();
+        parseArguments(args);
+//        readHardCodedArguments();
 //        readHardCodedArguments2();
         schema.ifPresent(s-> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
         try {

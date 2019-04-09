@@ -23,7 +23,6 @@ Movie(http://dbpedia.org/resource/I_Am_a_Sex_Addict), depth 1, focus shape Direc
 Movie(http://dbpedia.org/resource/Retour_de_manivelle), depth 1, focus shape DirectorShape
 Movie(http://dbpedia.org/resource/Forbidden_Zone), depth 1, focus shape DirectorShape
 Movie(http://dbpedia.org/resource/Veer-Zaara), depth 1, focus shape DirectorShape
-Movie(http://dbpedia.org/resource/Osmosis_Jones), depth 1, focus shape DirectorShape
 Movie(http://dbpedia.org/resource/Revolution_of_Pigs), depth 1, focus shape DirectorShape
 Movie(http://dbpedia.org/resource/The_Adventures_of_Robin_Hood), depth 1, focus shape DirectorShape
 Movie(http://dbpedia.org/resource/Honeysuckle_(film)), depth 1, focus shape DirectorShape
@@ -3664,6 +3663,7 @@ Movie(http://dbpedia.org/resource/Nine_Queens), depth 1, focus shape DirectorSha
 Movie(http://dbpedia.org/resource/Ek_Hi_Bhool), depth 1, focus shape DirectorShape
 Movie(http://dbpedia.org/resource/Convém_Martelar), depth 1, focus shape DirectorShape
 Movie(http://dbpedia.org/resource/The_Big_Trees), depth 1, focus shape DirectorShape
+Movie(http://dbpedia.org/resource/Osmosis_Jones), depth 1, focus shape DirectorShape
 Movie(http://dbpedia.org/resource/I_Was_Born,_But...), depth 1, focus shape DirectorShape
 Movie(http://dbpedia.org/resource/The_Mistress_of_Spices), depth 1, focus shape DirectorShape
 Movie(http://dbpedia.org/resource/Amrut_Manthan), depth 1, focus shape DirectorShape
