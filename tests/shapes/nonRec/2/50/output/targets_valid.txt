@@ -1,0 +1,1 @@
+MovieShape(http://dbpedia.org/resource/The_Venetian_Affair_(film)), depth 1, focus shape ActorShape

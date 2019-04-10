@@ -1,0 +1,1 @@
+Movie(http://dbpedia.org/resource/Titanic_(1997_film)), depth 1, focus shape DirectorShape

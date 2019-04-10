@@ -1,0 +1,11 @@
+{ 
+?x3 dbo:country ?c3.
+?x3 dbo:populationTotal ?p3.
+?x3 foaf:name ?n3.
+ 
+FILTER
+( 
+datatype(?p3) = xsd:nonNegativeInteger
+)
+}
+

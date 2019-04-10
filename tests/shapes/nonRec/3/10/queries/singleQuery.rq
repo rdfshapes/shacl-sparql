@@ -1,0 +1,37 @@
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+SELECT ?x1 WHERE{
+GRAPH <dbpedia-person-10pct.org>{
+
+?x1 a dbo:Film.
+
+FILTER NOT EXISTS {
+ 
+?x1 dbo:starring ?x2.
+?x1 dbo:imdbId ?id1.
+?x1 dbo:starring ?s1.
+?x1 dbo:writer ?w1.
+?x1 dbo:musicComposer ?c1.
+?x1 dbo:director ?d1.
+ 
+FILTER NOT EXISTS {
+?x1 dbo:imdbId ?n_11.
+?x1 dbo:imdbId ?n_12.
+FILTER(?n_11 != ?n_12)
+}
+
+
+?x2 dbo:activeYearsStartYear ?y2 .
+?x2 dbo:birthPlace ?x3.
+?x2 dbo:imdbId ?i2.
+?x2 dbo:occupation dbr:Actor .
+?x2 ^dbo:starring ?m2.
+ 
+
+?x3 dbo:country ?c3.
+?x3 dbo:leaderTitle ?l3.
+?x3 dbo:populationDensity ?d3.
+
+}
+}
+}

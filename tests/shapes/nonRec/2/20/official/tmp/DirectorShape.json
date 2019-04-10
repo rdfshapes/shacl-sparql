@@ -1,0 +1,14 @@
+{
+	"name": "DirectorShape",
+	"constraintDef":{
+		"conjunctions":[
+			[ 	
+				{ "path": "dbo:birthName", "min": 1},
+				{ "path": "dbo:birthYear", "min": 1, "datatype": "xsd:gYear"},
+				{ "path": "dbo:birthYear", "max": 1},
+				{ "path": "dbo:activeYearsSartYear", "max": 1},
+				{ "path": "dbo:imdbId", "min":1}
+			]
+		]
+	}
+}

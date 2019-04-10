@@ -1,0 +1,1 @@
+MovieShape(http://dbpedia.org/resource/Johnny_Lingo), depth 1, focus shape ActorShape

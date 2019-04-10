@@ -1,0 +1,17 @@
+{ 
+?x4 dbo:occupation dbr:Actor .
+?x4 dbo:birthYear ?y4.
+ 
+FILTER
+( 
+datatype(?y4) = xsd:gYear
+AND NOT EXISTS {
+?x4 dbo:birthYear ?y41 .
+?x4 dbo:birthYear ?y42.
+FILTER(?y41 != ?y42)
+}
+AND  NOT EXISTS {
+?x4 dbo:birthPlace <LocationShape> .
+}
+)
+}
