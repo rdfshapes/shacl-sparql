@@ -1,6 +1,7 @@
 PREFIX dbo:<http://dbpedia.org/ontology/>
 PREFIX dbr:<http://dbpedia.org/resource/>
-SELECT ?x1 WHERE{
+SELECT ?x1 WHERE 
+{GRAPH <dbpedia-person.org> {
 
 ?x1 a dbo:Film.
 
@@ -27,4 +28,4 @@ FILTER(?n_11 != ?n_12)
  
 
 }
-}
+}}

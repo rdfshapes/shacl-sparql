@@ -1,6 +1,7 @@
 PREFIX dbo:<http://dbpedia.org/ontology/>
 PREFIX dbr:<http://dbpedia.org/resource/>
 SELECT ?x1 WHERE{
+GRAPH <dbpedia-person.org>{
 
 ?x1 a dbo:Film.
 
@@ -8,7 +9,6 @@ FILTER NOT EXISTS {
  
 ?x1 dbo:starring ?x2.
 ?x1 dbo:imdbId ?id1.
-?x1 dbo:starring ?s1.
 ?x1 dbo:writer ?w1.
 ?x1 dbo:musicComposer ?c1.
 ?x1 dbo:director ?x4.
@@ -32,8 +32,6 @@ FILTER(?n_11 != ?n_12)
 ?x3 dbo:populationDensity ?d3.
 
 
-?x4 dbo:occupation dbr:Actor .
-?x4 dbo:activeYearsSartYear ?y4.
 ?x4 dbo:imdbId ?i4.
 ?x4 ^dbo:director ?d4.
 
@@ -49,4 +47,4 @@ FILTER NOT EXISTS{
 }
 }
 }
-}
+}}
