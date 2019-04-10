@@ -4,7 +4,6 @@
 		"conjunctions":[
 			[ 	
 				{ "path": "dbo:birthPlace", "max": 0, "shape":"LocationShape", "negated":true},
-				{ "path": "dbo:activeYearsSartYear", "max": 1},
 				{ "path": "dbo:imdbId", "min":1},
 				{ "path": "^dbo:director", "min":1}
 			]
