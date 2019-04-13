@@ -39,8 +39,6 @@ public class Eval {
     public static void main(String[] args) {
         setLoggers();
         parseArguments(args);
-//        readHardCodedArguments();
-//        readHardCodedArguments2();
         schema.ifPresent(s-> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
         try {
             Validator validator = singleQuery.isPresent() ?
@@ -108,36 +106,5 @@ public class Eval {
         log.info("shapeDir: |" + shapeDir + "|");
         log.info("outputDir: |" + outputDir + "|");
         targetShapeName.ifPresent(n -> targetShape = Optional.of(schema.get().getShape(n).get()));
-    }
-
-    private static void readHardCodedArguments() {
-        String cwd = System.getProperty("user.dir");
-        System.out.println(cwd);
-        String resourceDir = Paths.get(cwd, "/tests").toString();
-        endpoint = new SPARQLEndpoint("http://obdalin.inf.unibz.it:8890/sparql");
-//        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
-        graph = Optional.of("<dbpedia-person.org>");
-//        graph = Optional.empty();
-        schema = Optional.of(ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/rec/3")));
-//        schema = ShapeParser.parseSchema(Paths.get(resourceDir, "shapes/toy/"));
-        outputDir = Paths.get(resourceDir, "shapes/rec/3/output");
-//        outputDir = Paths.get(resourceDir, "shapes/toy/output");
-        targetShape = Optional.empty();
-        //targetShape = Optional.of(schema.getShape("JapaneseMovieRec").get());
-    }
-
-
-    private static void readHardCodedArguments2() {
-        String cwd = System.getProperty("user.dir");
-        System.out.println(cwd);
-        String resourceDir = Paths.get(cwd, "/tests").toString();
-        endpoint = new SPARQLEndpoint("http://obdalin.inf.unibz.it:8890/sparql");
-//        endpoint = new SPARQLEndpoint("http://dbpedia.org/sparql");
-        graph = Optional.of("<dbpedia-person.org>");
-//        graph = Optional.empty();
-        singleQuery = Optional.of(Paths.get(resourceDir, "queries/query.rq"));
-        outputDir = Paths.get(resourceDir, "queries/output");
-//        outputDir = Paths.get(resourceDir, "shapes/toy/output");
-
     }
 }

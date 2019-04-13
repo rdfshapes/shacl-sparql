@@ -33,7 +33,6 @@ public class RuleBasedValidator implements Validator {
     private final Output invalidTargetsOuput;
     private final Output statsOutput;
     private final Stats stats;
-//    private int maxRuleNumber;
 
 
     public RuleBasedValidator(SPARQLEndpoint endpoint, Schema schema, Output logOutput, Output validTargetsOuput, Output invalidTargetsOuput, Output statsOuput) {
@@ -46,7 +45,6 @@ public class RuleBasedValidator implements Validator {
         targetShapePredicates = targetShapes.stream()
                 .map(s -> s.getId())
                 .collect(ImmutableCollectors.toSet());
-//        this.maxRuleNumber = 0;
         this.stats = new Stats();
         statsOutput = statsOuput;
     }
@@ -122,11 +120,6 @@ public class RuleBasedValidator implements Validator {
         logOutput.start("Starting validation at depth :" + depth);
         validateFocusShapes(state, focusShapes, depth);
 
-        // Set<Literal> assignment = state.assignment;
-
-        printLog(depth, state);
-
-
         validate(depth + 1, state, updateFocusShapes(state));
     }
 
@@ -137,9 +130,6 @@ public class RuleBasedValidator implements Validator {
                 .map(Optional::get)
                 .filter(s -> !state.visitedShapes.contains(s.getId()))
                 .collect(ImmutableCollectors.toSet());
-    }
-
-    private void printLog(int depth, EvalState assignment) {
     }
 
     private void saturate(EvalState state, int depth, Shape s) {
@@ -312,9 +302,6 @@ public class RuleBasedValidator implements Validator {
     }
 
     private boolean isSatisfiable(Literal a, EvalState state, Set<Literal> ruleHeads) {
-       // boolean b = ruleHeads.contains(a);
-//        b = (!state.visitedShapes.contains(a.getPredicate())) || ruleHeads.contains(a);
-//        return b;
         return (!state.visitedShapes.contains(a.getPredicate())) || ruleHeads.contains(a.getAtom()) || state.assignment.contains(a);
     }
 
@@ -369,10 +356,7 @@ public class RuleBasedValidator implements Validator {
         private long maxSaturationTime = 0;
         private int numberOfQueries = 0;
 
-
         private long totalTime = 0;
-
-        private Map<Integer,Integer> depth2DecidedTargets = new HashMap<>();
 
         void recordInitialTargets(int k){
             initialTargets = k;
@@ -408,7 +392,6 @@ public class RuleBasedValidator implements Validator {
             totalSolutionMappings += k;
         };
         void recordDecidedTargets(int numberOfargets){
-
 
         };
         void recordTotalTime(long ms){

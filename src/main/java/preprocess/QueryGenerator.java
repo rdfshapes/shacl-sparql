@@ -39,7 +39,6 @@ public class QueryGenerator {
                         id,
                         VariableGenerator.getFocusNodeVar(),
                         true
-//                        !(it.hasNext() && it.next().getMax().isPresent())
                 ),
                 constraints.stream()
                 .flatMap(c -> c.computeRulePatternBody().stream())
@@ -109,10 +108,6 @@ public class QueryGenerator {
         private String getDatatypeFilter(String variable, String datatype) {
             return "datatype(?" + variable + ") = " + datatype;
         }
-
-//        void addRuleAtom(String v, String s, boolean idPos, Schema schema) {
-//            ruleBody.add(new Literal(s, v, idPos));
-//        }
 
         String getSparql(boolean includePrefixes) {
             return (includePrefixes?
