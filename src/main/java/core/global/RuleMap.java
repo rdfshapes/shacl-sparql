@@ -42,21 +42,6 @@ public class RuleMap {
             map.put(head, body);
     }
 
-    // Returns true if there is no more rule body with head "head" after deletion
-    // also deletes the map entry for the head
-//    public boolean deleteRule(Literal head, RuleBody body){
-//        Set<RuleBody> bodies = map.get(head);
-//        if(bodies != null){
-//            bodies.remove(body);
-//            if(bodies.isEmpty()){
-//                map.remove(head);
-//                return true;
-//            }
-//            return false;
-//        }
-//        return true;
-//    }
-
     public void remove(Literal a){
         map.remove(a);
     }

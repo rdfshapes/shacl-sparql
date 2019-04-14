@@ -12,7 +12,6 @@ import java.time.format.FormatStyle;
 
 public class Output {
 
-    private final File outputFile;
     private final BufferedWriter writer;
     private Instant previous;
     private final DateTimeFormatter formatter = DateTimeFormatter
@@ -21,7 +20,6 @@ public class Output {
             .withZone( ZoneId.systemDefault() );
 
     public Output(File outputFile) throws IOException {
-        this.outputFile = outputFile;
         writer = new BufferedWriter(new FileWriter(outputFile));
 
     }

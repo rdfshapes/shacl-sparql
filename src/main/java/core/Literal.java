@@ -24,7 +24,7 @@ public class Literal {
                 this.getNegation();
     }
 
-    public String getArg() {
+    String getArg() {
         return arg;
     }
 

@@ -60,44 +60,6 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
             ).flatMap(s -> s);
     }
 
-//    @Override
-//    public void computeRulePatterns(Schema s) {
-//        minConstraints.forEach(Constraint::computeRulePatternBody);
-//        maxConstraints.forEach(Constraint::computeRulePatternBody);
-//
-//        String focusNodeVar = VariableGenerator.getFocusNodeVar();
-//        this.rulePattern = new RulePattern(
-//                new Literal(id, focusNodeVar, true),
-//                minConstraints.stream()
-//                        .map(c -> c.getRulePatternBody().getHead())
-//                        .collect(ImmutableCollectors.toSet()),
-//                maxConstraints.stream()
-//                        .map(c -> c.getRulePatternBody().getHead())
-//                        .collect(ImmutableCollectors.toSet()),
-//                ImmutableSet.of(focusNodeVar)
-//        );
-//    }
-
-//    @Override
-//    public ImmutableSet<String> getLocalViolationVars() {
-//        return localViolationVars;
-//    }
-//
-//    @Override
-//    public ImmutableSet<String> getDistantViolationVars() {
-//        return distantViolationVars;
-//    }
-//
-//    @Override
-//    public ImmutableMap<String, Literal> getValidationRulePattern() {
-//        return validationRule;
-//    }
-//
-//    @Override
-//    public ImmutableList<ImmutableMap<String, Literal>> getViolationRulePatterns() {
-//        return violationRules;
-//    }
-
     public void computeQueries(Optional<String> graphName) {
 
         // Create a subquery for all local (i.e. without shape propagation) and positive constraints
@@ -123,83 +85,8 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
                         ImmutableList.of(c),
                         graphName,
                         subquery
-//                        getSubQuery(c.getMax().get(), minQuery)
                 ))
                 .collect(ImmutableCollectors.toSet());
     }
-
-//    private Optional<String> getSubQuery(Integer card, Query minQuery) {
-//        return card>0?
-//                Optional.of(minQuery.asSubQuery()):
-//                Optional.empty();
-//    }
-
-
-//    @Override
-//    public ImmutableSet<RulePattern> getRulePattern() {
-//        return Stream.of(
-//                Stream.of(this.rulePattern),
-//                minConstraints.stream()
-//                        .map(Constraint::getRulePatternBody),
-//                maxConstraints.stream()
-//                        .map(Constraint::getRulePatternBody)
-//        ).flatMap(s -> s)
-//                .collect(ImmutableCollectors.toSet());
-//    }
-
-//    private String generateQueryString(QueryGenerator validationClause, ImmutableList<QueryGenerator> violationClauses, Optional<String> graph) {
-//        return SPARQLPrefixHandler.getPrexixString() +
-//                "SELECT * WHERE{" +
-//                (graph.isPresent() ?
-//                        "\nGRAPH " + graph.get() + "{" :
-//                        ""
-//                ) +
-//                "\n\n" +
-//                validationClause.getSparql() +
-//                "\n" +
-//                getViolationClausesSparql(violationClauses) +
-//                (graph.isPresent() ?
-//                        "\n}" :
-//                        ""
-//                ) +
-//                "\n}";
-//    }
-
-//    private String getViolationClausesSparql(ImmutableList<QueryGenerator> violationClauses) {
-//        return violationClauses.stream()
-//                .map(this::getViolationClauseSparql)
-//                .collect(Collectors.joining("\n"));
-//    }
-//
-//    private String getViolationClauseSparql(QueryGenerator c) {
-//        return "\nOPTIONAL {" +
-//                "\n" +
-//                c.getSparql()
-//                + "}";
-//    }
-
-//    private ImmutableMap<String, Literal> generateRule(QueryGenerator validationClause) {
-//        return validationClause.ruleBody.stream()
-//                .collect(ImmutableCollectors.toMap(
-//                        Literal::getArg,
-//                        a -> a
-//                ));
-//    }
-
-//    private ImmutableList<ImmutableMap<String, Literal>> generateViolationRules(ImmutableList<QueryGenerator> violationClauses) {
-//        return violationClauses.stream()
-//                .map(this::generateRule)
-//                .collect(ImmutableCollectors.toList());
-//    }
-
-
-
-//    private Map<String, Literal> createRule(ImmutableList<String> variables, Shape shape, boolean isPos) {
-//        return variables.stream()
-//                .collect(ImmutableCollectors.toMap(
-//                        v -> v,
-//                        v -> new Literal(shape.getId(), v, isPos)
-//                ));
-//    }
 }
 

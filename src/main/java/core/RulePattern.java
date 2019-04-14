@@ -13,8 +13,7 @@ public class RulePattern {
     private final ImmutableSet<String> variables;
 
     // If a value for each variable is produced (by a solution mapping), then the rule pattern can be instantiated.
-    // note that it may be the case that these variables do not appear in the the body of the rule (because there is no constraint to propagate on these values, they only need to exist)
-//    private final ImmutableSet<String> variables;
+    // Note that it may be the case that these variables do not appear in the the body of the rule (because there is no constraint to propagate on these values, they only need to exist)
 
     public RulePattern(Literal head, ImmutableSet<Literal> body) {
         this.head = head;
@@ -30,10 +29,6 @@ public class RulePattern {
         return head;
     }
 
-//    public ImmutableSet<String> getVariables() {
-//        return variables;
-//    }
-
     public ImmutableSet<Literal> getLiterals() {
         return literals;
     }
@@ -42,25 +37,7 @@ public class RulePattern {
     public String toString() {
         return head + ": - " +
                 getBodyString();
-//                getNegAtomsString() + ", " +
-//                getVariablesString();
     }
-
-//    private String getVariablesString() {
-//        return "var: (" + variables.stream()
-//                .collect(Collectors.joining(", "))
-//                + ")";
-//    }
-
-//    private String getNegAtomsString() {
-//        if (negatedAtoms.isEmpty()) {
-//            return "neg: ()";
-//        }
-//        return "neg:(" + negatedAtoms.stream()
-//                .map(Literal::toString)
-//                .collect(Collectors.joining(", ")) +
-//                ")";
-//    }
 
     private String getBodyString() {
         if (literals.isEmpty()) {
@@ -84,9 +61,6 @@ public class RulePattern {
                 return literals.stream()
                         .map(a -> instantiateAtom(a, bs))
                         .collect(ImmutableCollectors.toSet());
-//                this.negatedAtoms.stream()
-//                        .map(a -> instantiateAtom(a, bs))
-//                        .collect(ImmutableCollectors.toSet())
     }
 
     public ImmutableSet<String> getVariables() {

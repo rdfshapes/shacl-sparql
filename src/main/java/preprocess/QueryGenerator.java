@@ -2,7 +2,6 @@ package preprocess;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.UnmodifiableIterator;
 import core.Literal;
 import core.Query;
 import core.RulePattern;
@@ -14,7 +13,6 @@ import util.ImmutableCollectors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class QueryGenerator {
@@ -27,19 +25,17 @@ public class QueryGenerator {
         RulePattern rp = computeRulePattern(constraints, id);
 
         QueryBuilder builder = new QueryBuilder(id, graph, subquery, rp.getVariables());
-        constraints.forEach(c -> builder.buildClause(c));
+        constraints.forEach(builder::buildClause);
 
         return builder.buildQuery(rp);
     }
 
     private static RulePattern computeRulePattern(ImmutableList<Constraint> constraints, String id) {
-        UnmodifiableIterator<Constraint> it = constraints.iterator();
         return new RulePattern(
                 new Literal(
                         id,
                         VariableGenerator.getFocusNodeVar(),
                         true
-//                        !(it.hasNext() && it.next().getMax().isPresent())
                 ),
                 constraints.stream()
                 .flatMap(c -> c.computeRulePatternBody().stream())
@@ -62,7 +58,7 @@ public class QueryGenerator {
                 Optional.empty(),
                 ImmutableSet.of(VariableGenerator.getFocusNodeVar())
         );
-        localPosConstraints.forEach(c -> builder.buildClause(c));
+        localPosConstraints.forEach(builder::buildClause);
         return Optional.of(builder.getSparql(false));
     }
 
@@ -70,13 +66,12 @@ public class QueryGenerator {
     private static class QueryBuilder {
         List<String> filters;
         List<String> triples;
-        Set<String> variables;
         private final String id;
         private final Optional<String> subQuery;
         private final Optional<String> graph;
         private final ImmutableSet<String> projectedVariables;
 
-        public QueryBuilder(String id, Optional<String> graph, Optional<String> subquery, ImmutableSet<String> projectedVariables) {
+        QueryBuilder(String id, Optional<String> graph, Optional<String> subquery, ImmutableSet<String> projectedVariables) {
             this.id = id;
             this.graph = graph;
             this.projectedVariables = projectedVariables;
@@ -93,10 +88,6 @@ public class QueryGenerator {
             );
         }
 
-        void addVariables(ImmutableSet<String> variables) {
-            this.variables.addAll(variables);
-        }
-
         void addDatatypeFilter(String variable, String datatype, Boolean isPos) {
             String s = getDatatypeFilter(variable, datatype);
             filters.add(
@@ -110,13 +101,9 @@ public class QueryGenerator {
             return "datatype(?" + variable + ") = " + datatype;
         }
 
-//        void addRuleAtom(String v, String s, boolean idPos, Schema schema) {
-//            ruleBody.add(new Literal(s, v, idPos));
-//        }
-
         String getSparql(boolean includePrefixes) {
             return (includePrefixes?
-                    SPARQLPrefixHandler.getPrexixString():
+                    SPARQLPrefixHandler.getPrefixString():
                     "")+
                     getProjectionString()+
                     " WHERE{" +

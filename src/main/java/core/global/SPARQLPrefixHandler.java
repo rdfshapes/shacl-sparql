@@ -6,18 +6,18 @@ import java.util.stream.Collectors;
 
 public class SPARQLPrefixHandler {
 
-    static ImmutableMap<String, String> prefixes = ImmutableMap.of(
+    private static ImmutableMap<String, String> prefixes = ImmutableMap.of(
             "dbo", "<http://dbpedia.org/ontology/>",
             "dbr", "<http://dbpedia.org/resource/>",
             "yago", "<http://dbpedia.org/class/yago/>",
             "foaf", "<http://xmlns.com/foaf/0.1/>"
     );
-    static String prexixString = prefixes.entrySet().stream()
+    private static String prefixString = prefixes.entrySet().stream()
             .map(e -> "PREFIX " + e.getKey() + ":" + e.getValue())
             .collect(Collectors.joining("\n"))
             + "\n";
 
-    public static String getPrexixString() {
-        return prexixString;
+    public static String getPrefixString() {
+        return prefixString;
     }
 }

@@ -33,7 +33,6 @@ public class RuleBasedValidator implements Validator {
     private final Output invalidTargetsOuput;
     private final Output statsOutput;
     private final Stats stats;
-//    private int maxRuleNumber;
 
 
     public RuleBasedValidator(SPARQLEndpoint endpoint, Schema schema, Output logOutput, Output validTargetsOuput, Output invalidTargetsOuput, Output statsOuput) {
@@ -44,9 +43,8 @@ public class RuleBasedValidator implements Validator {
         this.logOutput = logOutput;
         targetShapes = extractTargetShapes();
         targetShapePredicates = targetShapes.stream()
-                .map(s -> s.getId())
+                .map(Shape::getId)
                 .collect(ImmutableCollectors.toSet());
-//        this.maxRuleNumber = 0;
         this.stats = new Stats();
         statsOutput = statsOuput;
     }
@@ -122,11 +120,6 @@ public class RuleBasedValidator implements Validator {
         logOutput.start("Starting validation at depth :" + depth);
         validateFocusShapes(state, focusShapes, depth);
 
-        // Set<Literal> assignment = state.assignment;
-
-        printLog(depth, state);
-
-
         validate(depth + 1, state, updateFocusShapes(state));
     }
 
@@ -139,11 +132,8 @@ public class RuleBasedValidator implements Validator {
                 .collect(ImmutableCollectors.toSet());
     }
 
-    private void printLog(int depth, EvalState assignment) {
-    }
-
     private void saturate(EvalState state, int depth, Shape s) {
-       boolean negated = negateUnMatchableHeads(state, depth, s);
+        boolean negated = negateUnMatchableHeads(state, depth, s);
         boolean inferred = applyRules(state, depth, s);
         if (negated || inferred) {
             saturate(state, depth, s);
@@ -168,14 +158,14 @@ public class RuleBasedValidator implements Validator {
                 .collect(ImmutableCollectors.toSet());
 
         Map<Boolean, List<Literal>> part1 = state.remainingTargets.stream()
-                .collect(Collectors.partitioningBy(a -> candidateValidTargets.contains(a)));
+                .collect(Collectors.partitioningBy(candidateValidTargets::contains));
 
         state.remainingTargets = ImmutableSet.copyOf(part1.get(false));
 
         stats.recordDecidedTargets(part1.get(true).size());
 
         Map<Boolean, List<Literal>> part2 = part1.get(true).stream()
-                .collect(Collectors.partitioningBy(a -> a.isPos()));
+                .collect(Collectors.partitioningBy(Literal::isPos));
 
         state.validTargets.addAll(part2.get(true));
         part2.get(true).forEach(t -> validTargetsOuput.write(t.toString() + ", depth " + depth + ", focus shape " + s.getId()));
@@ -184,14 +174,6 @@ public class RuleBasedValidator implements Validator {
 
         logOutput.write("Remaining targets :" + state.remainingTargets.size());
         return true;
-    }
-
-    private boolean isValid(Literal t, ImmutableList<Literal> freshLiterals) {
-        if (freshLiterals.contains(t)) {
-            validTargetsOuput.write(t.toString());
-            return true;
-        }
-        return false;
     }
 
     private Optional<Literal> applyRules(Literal head, Set<ImmutableSet<Literal>> bodies, EvalState state, RuleMap retainedRules) {
@@ -306,15 +288,12 @@ public class RuleBasedValidator implements Validator {
     }
 
     private Literal getNegatedAtom(Literal a) {
-        return a.isPos()?
-                a.getNegation():
+        return a.isPos() ?
+                a.getNegation() :
                 a;
     }
 
     private boolean isSatisfiable(Literal a, EvalState state, Set<Literal> ruleHeads) {
-       // boolean b = ruleHeads.contains(a);
-//        b = (!state.visitedShapes.contains(a.getPredicate())) || ruleHeads.contains(a);
-//        return b;
         return (!state.visitedShapes.contains(a.getPredicate())) || ruleHeads.contains(a.getAtom()) || state.assignment.contains(a);
     }
 
@@ -341,20 +320,21 @@ public class RuleBasedValidator implements Validator {
 
     private class Stats {
 
-        public void writeAll(Output statsOutput) {
-            statsOutput.write("targets:\n"+initialTargets);
-            statsOutput.write("max number of solution mappings for a query:\n"+maxSolutionMappings);
-            statsOutput.write("total number of solution mappings:\n"+totalSolutionMappings);
-            statsOutput.write("max number of rules in memory:\n"+maxRuleNumber);
-            statsOutput.write("number of queries:\n"+numberOfQueries);
-            statsOutput.write("max exec time for a query:\n"+maxQueryExectime);
-            statsOutput.write("total query exec time:\n"+totalQueryExectime);
-            statsOutput.write("max grounding time for a query:\n"+maxGroundingTime);
-            statsOutput.write("total grounding time:\n"+totalGroundingTime);
-            statsOutput.write("max saturation time:\n"+maxSaturationTime);
-            statsOutput.write("total saturation time:\n"+totalSaturationTime);
-            statsOutput.write("total time:\n"+totalTime);
+        void writeAll(Output statsOutput) {
+            statsOutput.write("targets:\n" + initialTargets);
+            statsOutput.write("max number of solution mappings for a query:\n" + maxSolutionMappings);
+            statsOutput.write("total number of solution mappings:\n" + totalSolutionMappings);
+            statsOutput.write("max number of rules in memory:\n" + maxRuleNumber);
+            statsOutput.write("number of queries:\n" + numberOfQueries);
+            statsOutput.write("max exec time for a query:\n" + maxQueryExectime);
+            statsOutput.write("total query exec time:\n" + totalQueryExectime);
+            statsOutput.write("max grounding time for a query:\n" + maxGroundingTime);
+            statsOutput.write("total grounding time:\n" + totalGroundingTime);
+            statsOutput.write("max saturation time:\n" + maxSaturationTime);
+            statsOutput.write("total saturation time:\n" + totalSaturationTime);
+            statsOutput.write("total time:\n" + totalTime);
         }
+
         private int initialTargets = 0;
 
         private int maxRuleNumber = 0;
@@ -369,53 +349,56 @@ public class RuleBasedValidator implements Validator {
         private long maxSaturationTime = 0;
         private int numberOfQueries = 0;
 
-
         private long totalTime = 0;
 
-        private Map<Integer,Integer> depth2DecidedTargets = new HashMap<>();
-
-        void recordInitialTargets(int k){
+        void recordInitialTargets(int k) {
             initialTargets = k;
         }
-        void recordGroundingTime(long ms){
-            if(ms > maxGroundingTime){
+
+        void recordGroundingTime(long ms) {
+            if (ms > maxGroundingTime) {
                 maxGroundingTime = ms;
             }
             totalGroundingTime += ms;
-        };
-        void recordQueryExecTime(long ms){
-            if(ms > maxQueryExectime){
+        }
+
+        void recordQueryExecTime(long ms) {
+            if (ms > maxQueryExectime) {
                 maxQueryExectime = ms;
             }
             totalQueryExectime += ms;
 
-        };
-        void recordSaturationTime(long ms){
-            if(ms > maxSaturationTime){
+        }
+
+        void recordSaturationTime(long ms) {
+            if (ms > maxSaturationTime) {
                 maxSaturationTime = ms;
             }
             totalSaturationTime += ms;
-        };
-        void recordNumberOfRules(int k){
-            if(k > maxRuleNumber){
+        }
+
+        void recordNumberOfRules(int k) {
+            if (k > maxRuleNumber) {
                 maxRuleNumber = k;
             }
-        };
-        void recordNumberOfSolutionMappings(int k){
-            if(k > maxSolutionMappings){
+        }
+
+        void recordNumberOfSolutionMappings(int k) {
+            if (k > maxSolutionMappings) {
                 maxSolutionMappings = k;
             }
             totalSolutionMappings += k;
-        };
-        void recordDecidedTargets(int numberOfargets){
+        }
 
+        void recordDecidedTargets(int numberOfargets) {
 
-        };
-        void recordTotalTime(long ms){
+        }
+
+        void recordTotalTime(long ms) {
             totalTime = ms;
-        };
+        }
 
-        void recordQuery(){
+        void recordQuery() {
             numberOfQueries++;
         }
 
