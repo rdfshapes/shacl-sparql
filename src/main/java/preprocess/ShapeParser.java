@@ -45,7 +45,7 @@ public class ShapeParser {
         return new SchemaImpl(
                 shapes.stream()
                         .collect(ImmutableCollectors.toMap(
-                                s -> s.getId(),
+                                Shape::getId,
                                 s -> s
                         )),
                 shapes.stream()
@@ -62,7 +62,7 @@ public class ShapeParser {
             if (targetDef != null) {
                 JsonElement query = targetDef.getAsJsonObject().get("query");
                 if (query != null) {
-                    targetQuery = Optional.of(SPARQLPrefixHandler.getPrexixString() + query.getAsString());
+                    targetQuery = Optional.of(SPARQLPrefixHandler.getPrefixString() + query.getAsString());
                 }
             }
             String name = obj.get("name").getAsString();

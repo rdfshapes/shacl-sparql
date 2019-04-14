@@ -24,7 +24,7 @@ import static ch.qos.logback.classic.Level.INFO;
 public class Eval {
 
 
-    static Logger log = (Logger) LoggerFactory.getLogger(Eval.class);
+    private static Logger log = (Logger) LoggerFactory.getLogger(Eval.class);
     private static final String usage =
             "USAGE: \n" + Eval.class.getSimpleName() +
                     "[-s shapeDir] [-q queryFile] [-t targetShape] [-g graphName] endpoint outputDir";
@@ -39,7 +39,7 @@ public class Eval {
     public static void main(String[] args) {
         setLoggers();
         parseArguments(args);
-        schema.ifPresent(s-> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
+        schema.ifPresent(s -> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
         try {
             Validator validator = singleQuery.isPresent() ?
                     new UnfoldingBasedValidator(

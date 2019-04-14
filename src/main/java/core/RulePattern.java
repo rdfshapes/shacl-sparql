@@ -13,7 +13,7 @@ public class RulePattern {
     private final ImmutableSet<String> variables;
 
     // If a value for each variable is produced (by a solution mapping), then the rule pattern can be instantiated.
-    // note that it may be the case that these variables do not appear in the the body of the rule (because there is no constraint to propagate on these values, they only need to exist)
+    // Note that it may be the case that these variables do not appear in the the body of the rule (because there is no constraint to propagate on these values, they only need to exist)
 
     public RulePattern(Literal head, ImmutableSet<Literal> body) {
         this.head = head;

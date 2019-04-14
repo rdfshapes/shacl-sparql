@@ -52,6 +52,5 @@ public class UnfoldingBasedValidator implements Validator {
         evalQuery(q);
         logOutput.close();
         violationOutput.close();
-
     }
 }
