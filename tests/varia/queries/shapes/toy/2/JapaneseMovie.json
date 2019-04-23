@@ -1,0 +1,14 @@
+{
+	"name": "JapaneseMovie",
+	"targetDef":{
+		"query":"SELECT ?x WHERE {?x a dbo:Film . ?x dbo:language dbr:Japanese_language.}"
+	},
+	"constraintDef":{
+		"conjunctions":[
+			[ 	
+				{ "path": "dbo:starring", "min": 1, "shape": "JapaneseStar" },
+				{ "path": "dbo:director", "min": 1, "value": "dbr:Akira_Kurosawa" }
+			]
+		]
+	}
+}

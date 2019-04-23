@@ -1,0 +1,24 @@
+targets:
+11063
+max number of solution mappings for a query:
+2
+total number of solution mappings:
+2
+max number of rules in memory:
+4
+number of queries:
+2
+max exec time for a query:
+13
+total query exec time:
+25
+max grounding time for a query:
+3
+total grounding time:
+3
+max saturation time:
+76
+total saturation time:
+76
+total time:
+831
