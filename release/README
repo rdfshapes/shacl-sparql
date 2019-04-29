@@ -18,4 +18,4 @@ Java 8 is required.
 For instance:
 java -jar validation-1.0-SNAPSHOT.jar -s ./data/shapes/nonRec/2/ "http://dbpedia.org/sparql"  ./shapes/nonRec/2/output
 
-Note that the validation results for the above command are erroneous, because the SPARQL endpoint "http://dbpedia.org/sparql" only returns the 10 000 first answers to a query.
+Note that the validation results for the above command are incorrect, because the SPARQL endpoint "http://dbpedia.org/sparql" only returns the 10 000 first answers to a query.
