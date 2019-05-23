@@ -38,6 +38,7 @@ public class Eval {
 
     public static void main(String[] args) {
         setLoggers();
+//        args = new String[]{"-s", "./release/data/shapes/nonRec/2/", "http://dbpedia.org/sparql","./release/data/shapes/nonRec/2/output"};
         parseArguments(args);
         schema.ifPresent(s -> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
         try {
@@ -79,12 +80,15 @@ public class Eval {
     private static void parseArguments(String[] args) {
         Optional<String> targetShapeName = Optional.empty();
         Optional<Path> shapeDir = Optional.empty();
+        graph = Optional.empty();
         Iterator<String> it = Stream.of(args).iterator();
         String currentOpt = it.next();
         while (currentOpt.startsWith("-")) {
             switch (currentOpt) {
                 case "-s":
-                    schema = Optional.of(ShapeParser.parseSchema(Paths.get(it.next())));
+                    Path path = Paths.get(it.next());
+                    shapeDir = Optional.of(path);
+                    schema = Optional.of(ShapeParser.parseSchema(path));
                     break;
                 case "-q":
                     singleQuery = Optional.of(Paths.get(it.next()));
@@ -103,7 +107,7 @@ public class Eval {
         endpoint = new SPARQLEndpoint(currentOpt);
         outputDir = Paths.get(it.next());
         log.info("endPoint: |" + endpoint.getURL() + "|");
-        log.info("shapeDir: |" + shapeDir + "|");
+        shapeDir.ifPresent(d -> log.info("shapeDir: |" + d + "|"));
         log.info("outputDir: |" + outputDir + "|");
         targetShapeName.ifPresent(n -> targetShape = Optional.of(schema.get().getShape(n).get()));
     }
