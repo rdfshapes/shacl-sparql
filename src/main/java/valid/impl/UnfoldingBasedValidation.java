@@ -3,18 +3,14 @@ package valid.impl;
 import core.Query;
 import endpoint.QueryEvaluation;
 import endpoint.SPARQLEndpoint;
-import shape.Schema;
-import shape.Shape;
 import util.Output;
-import valid.Validator;
+import valid.Validation;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
 
-public class UnfoldingBasedValidator implements Validator {
+public class UnfoldingBasedValidation implements Validation {
 
 
     private final Path query;
@@ -23,7 +19,7 @@ public class UnfoldingBasedValidator implements Validator {
     private final Output violationOutput;
 
 
-    public UnfoldingBasedValidator(Path query, SPARQLEndpoint endpoint, Output logOutput, Output violationOutput) {
+    public UnfoldingBasedValidation(Path query, SPARQLEndpoint endpoint, Output logOutput, Output violationOutput) {
         this.query = query;
         this.endpoint = endpoint;
         this.logOutput = logOutput;
@@ -41,7 +37,7 @@ public class UnfoldingBasedValidator implements Validator {
     }
 
     @Override
-    public void validate() throws IOException {
+    public void exec() throws IOException {
 
         Query q = new Query(
                 "q",
