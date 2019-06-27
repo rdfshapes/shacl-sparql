@@ -2,6 +2,7 @@ package eval;
 
 import ch.qos.logback.classic.Logger;
 import endpoint.SPARQLEndpoint;
+import es.weso.schema.Schemas;
 import org.slf4j.LoggerFactory;
 import preprocess.ShapeParser;
 import shape.Schema;
@@ -22,18 +23,16 @@ import static ch.qos.logback.classic.Level.INFO;
 
 public class Eval {
 
-    enum Format {
-        JSON,
-        SHACL
-    }
     private static Logger log = (Logger) LoggerFactory.getLogger(Eval.class);
     private static final String usage =
             "Usage: \n" + Eval.class.getSimpleName() +
-                    "[-s] [-j] [-d shapeDir] [-g graphName] endpoint outputDir\n" +
+                    "[-r] [-j] [-s schemaString] [-d schemaDir] [-g graphName] endpoint outputDir\n" +
                     "with:\n" +
-                    "- s\t\t             Shapes format: SHACL/RDF (Turtle)\n" +
+                    "- r\t\t             Shapes format: RDF (Turtle)\n" +
                     "- j\t\t             Shapes format: JSON\n" +
-                    "- shapeDir\t\t      Directory containing the shapes (one shape per file, extension \".ttl\" for SHACL/RDF format,\".json\" for JSON format)\n"+
+                    "- schemaString\t\t  Schema as a string (either a JSON array or RDF triples)\n" +
+                    "- schemaDir\t\t     Directory containing the schema (extension \".ttl\" for the RDF format,\".json\" for the JSON format." +
+                    "For the JSON format, each file should contain one shape.)\n"+
                     "- graphName\t\t     Name of the RDF graph to be validated (using the SPARQL \"GRAPH\" operator)\n" +
                     "- endpoint          SPARQL endpoint exposing the graph to be validated\n" +
                     "- outputDir\t\t     Output directory (validation results statistics and logs)\n" +
@@ -44,7 +43,7 @@ public class Eval {
     private static Optional<Path> singleQuery = Optional.empty();
     private static Optional<Schema> schema = Optional.empty();
     private static Path outputDir;
-    private static Format shapeFormat;
+    private static ShapeParser.Format shapeFormat;
 
     public static void main(String[] args) {
         setLoggers();
@@ -88,16 +87,18 @@ public class Eval {
     }
 
     private static void parseArguments(String[] args) {
-        Optional<Path> shapeDir = Optional.empty();
+        Optional<Path> schemaDir = Optional.empty();
+        Optional<String> schemaString = Optional.empty();
         graph = Optional.empty();
         Iterator<String> it = Stream.of(args).iterator();
         String currentOpt = it.next();
         while (currentOpt.startsWith("-")) {
             switch (currentOpt) {
                 case "-d":
-                    Path path = Paths.get(it.next());
-                    shapeDir = Optional.of(path);
-                    schema = Optional.of(ShapeParser.parseSchema(path));
+                    schemaDir = Optional.of(Paths.get(it.next()));
+                    break;
+                case "-s":
+                    schemaString = Optional.of(Paths.get(it.next()).toString());
                     break;
                 case "-q":
                     singleQuery = Optional.of(Paths.get(it.next()));
@@ -105,11 +106,11 @@ public class Eval {
                 case "-g":
                     graph = Optional.of(it.next());
                     break;
-                case "-s":
-                    shapeFormat = Format.SHACL;
+                case "-r":
+                    shapeFormat = ShapeParser.Format.RDF;
                     break;
                 case "-j":
-                    shapeFormat = Format.JSON;
+                    shapeFormat = ShapeParser.Format.JSON;
                     break;
                 default:
                     throw new RuntimeException("Invalid option " + currentOpt + "\n+" + usage);
@@ -118,8 +119,15 @@ public class Eval {
         }
         endpoint = new SPARQLEndpoint(currentOpt);
         outputDir = Paths.get(it.next());
+        if(schemaDir.isPresent()){
+            schema = Optional.of(ShapeParser.parseSchemaFromDir(schemaDir.get(), shapeFormat));
+        } else if(schemaString.isPresent()){
+            schema = Optional.of(ShapeParser.parseSchemaFromString(schemaString.get(), shapeFormat));
+        }
         log.info("endPoint: |" + endpoint.getURL() + "|");
-        shapeDir.ifPresent(d -> log.info("shapeDir: |" + d + "|"));
+        schemaDir.ifPresent(d -> log.info("schemaDir: |" + d + "|"));
         log.info("outputDir: |" + outputDir + "|");
     }
+
+
 }

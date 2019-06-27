@@ -33,13 +33,20 @@ import java.util.stream.Stream;
 
 public class ShapeParser {
 
-    public static Schema parseSchema(Path dir) {
+
+    public enum Format {
+        JSON,
+        RDF
+    }
+
+    public static Schema parseSchemaFromDir(Path dir, Format shapeFormat) {
+        String fileExtension = getFileExtension(shapeFormat);
         ImmutableSet<Shape> shapes = FileUtils.listFiles(
                 dir.toFile(),
-                new String[]{"json"},
+                new String[]{fileExtension},
                 false
         ).stream()
-                .map(f -> parse(Paths.get(f.getAbsolutePath())))
+                .map(f -> parse(Paths.get(f.getAbsolutePath()), shapeFormat))
                 .collect(ImmutableCollectors.toSet());
 
         return new SchemaImpl(
@@ -54,7 +61,29 @@ public class ShapeParser {
         );
     }
 
-    private static Shape parse(Path path) {
+    private static String getFileExtension(Format shapeFormat) {
+        switch (shapeFormat){
+            case RDF: return "ttl";
+            case JSON: return "json";
+        }
+        throw new RuntimeException("Unexpected format: "+shapeFormat);
+    }
+
+
+    public static Schema parseSchemaFromString(String s, Format shapeFormat) {
+        return null;
+    }
+
+    private static Shape parse(Path path, Format shapeFormat) {
+        switch (shapeFormat){
+            case RDF: return parseTtl(path);
+            case JSON: return parseJson(path);
+        }
+        throw new RuntimeException("Unexpected format: "+shapeFormat);
+
+    }
+
+    private static Shape parseJson(Path path) {
         Optional<String> targetQuery = Optional.empty();
         try {
             JsonObject obj = new JsonParser().parse(new FileReader(path.toFile())).getAsJsonObject();
@@ -75,6 +104,10 @@ public class ShapeParser {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static Shape parseTtl(Path path) {
+        return null;
     }
 
     private static ImmutableSet<ConstraintConjunction> parseConstraints(String shapeName, JsonArray array) {
