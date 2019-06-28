@@ -117,7 +117,15 @@ public class ShapeParser {
     }
 
     private static ConstraintConjunction parseDisjunct(JsonArray array, String id) {
+
         AtomicInteger i = new AtomicInteger(0);
+        ImmutableList<AtomicConstraint> constraints = StreamUt.toStream(array.iterator())
+                .map(JsonElement::getAsJsonObject)
+                .map(a -> parseConstraint(a, id + "_c" + i.incrementAndGet()))
+                // Duplicate the constraints that have both min and max
+                .flatMap(ShapeParser::duplicate)
+                .collect(ImmutableCollectors.toList());
+
         Map<Boolean, List<AtomicConstraint>> part = StreamUt.toStream(array.iterator())
                 .map(JsonElement::getAsJsonObject)
                 .map(a -> parseConstraint(a, id + "_c" + i.incrementAndGet()))
@@ -128,8 +136,18 @@ public class ShapeParser {
                 ));
         return new ConstraintConjunctionImpl(
                 id,
-                ImmutableList.copyOf(part.get(true)),
-                ImmutableList.copyOf(part.get(false))
+                constraints.stream()
+                        .filter(c -> c instanceof MinOnlyConstraint)
+                        .map(c -> (MinOnlyConstraint) c)
+                        .collect(ImmutableCollectors.toList()),
+                constraints.stream()
+                        .filter(c -> c instanceof MaxOnlyConstraint)
+                        .map(c -> (MaxOnlyConstraint) c)
+                        .collect(ImmutableCollectors.toList()),
+                constraints.stream()
+                        .filter(c -> c instanceof LocalConstraint)
+                        .map(c -> (LocalConstraint) c)
+                        .collect(ImmutableCollectors.toList())
         );
     }
 
@@ -172,7 +190,9 @@ public class ShapeParser {
         Optional<String> oPath = (path == null) ?
                 Optional.empty() :
                 Optional.of(path.getAsString());
-        boolean oNeg = (negated == null) || !negated.getAsBoolean();
+        boolean oNeg = (negated == null) ?
+                true :
+                !negated.getAsBoolean();
 
         if (oPath.isPresent()) {
             if (oMin.isPresent()) {
