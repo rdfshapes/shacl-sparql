@@ -8,14 +8,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import core.global.SPARQLPrefixHandler;
 import org.apache.commons.io.FileUtils;
-import shape.Constraint;
-import shape.ConstraintConjunction;
-import shape.Schema;
-import shape.Shape;
-import shape.impl.ConstraintConjunctionImpl;
-import shape.impl.ConstraintImpl;
-import shape.impl.SchemaImpl;
-import shape.impl.ShapeImpl;
+import shape.*;
+import shape.impl.*;
 import util.ImmutableCollectors;
 import util.StreamUt;
 
@@ -62,11 +56,13 @@ public class ShapeParser {
     }
 
     private static String getFileExtension(Format shapeFormat) {
-        switch (shapeFormat){
-            case RDF: return "ttl";
-            case JSON: return "json";
+        switch (shapeFormat) {
+            case RDF:
+                return "ttl";
+            case JSON:
+                return "json";
         }
-        throw new RuntimeException("Unexpected format: "+shapeFormat);
+        throw new RuntimeException("Unexpected format: " + shapeFormat);
     }
 
 
@@ -75,11 +71,13 @@ public class ShapeParser {
     }
 
     private static Shape parse(Path path, Format shapeFormat) {
-        switch (shapeFormat){
-            case RDF: return parseTtl(path);
-            case JSON: return parseJson(path);
+        switch (shapeFormat) {
+            case RDF:
+                return parseTtl(path);
+            case JSON:
+                return parseJson(path);
         }
-        throw new RuntimeException("Unexpected format: "+shapeFormat);
+        throw new RuntimeException("Unexpected format: " + shapeFormat);
 
     }
 
@@ -120,13 +118,13 @@ public class ShapeParser {
 
     private static ConstraintConjunction parseDisjunct(JsonArray array, String id) {
         AtomicInteger i = new AtomicInteger(0);
-        Map<Boolean, List<Constraint>> part = StreamUt.toStream(array.iterator())
+        Map<Boolean, List<AtomicConstraint>> part = StreamUt.toStream(array.iterator())
                 .map(JsonElement::getAsJsonObject)
                 .map(a -> parseConstraint(a, id + "_c" + i.incrementAndGet()))
                 // Duplicate the constraints that have both min and max
                 .flatMap(ShapeParser::duplicate)
                 .collect(Collectors.partitioningBy(
-                        c -> c.getMin().isPresent()
+                        c -> c instanceof MinOnlyConstraint
                 ));
         return new ConstraintConjunctionImpl(
                 id,
@@ -135,44 +133,59 @@ public class ShapeParser {
         );
     }
 
-    private static Stream<Constraint> duplicate(Constraint c) {
+    private static Stream<AtomicConstraint> duplicate(AtomicConstraint c) {
         return (c.getMin().isPresent()) && (c.getMax().isPresent()) ?
                 Stream.of(
-                        new ConstraintImpl(c.getId() + "_1", c.getPath(), c.getMin(), Optional.empty(), c.getDatatype(), c.getValue(), c.getShapeRef(), c.isPos()),
-                        new ConstraintImpl(c.getId() + "_2", c.getPath(), Optional.empty(), c.getMax(), c.getDatatype(), c.getValue(), c.getShapeRef(), c.isPos())
+                        new AtomicConstraintImpl(c.getId() + "_1", c.getPath(), c.getMin(), Optional.empty(), c.getDatatype(), c.getValue(), c.getShapeRef(), c.isPos()),
+                        new AtomicConstraintImpl(c.getId() + "_2", c.getPath(), Optional.empty(), c.getMax(), c.getDatatype(), c.getValue(), c.getShapeRef(), c.isPos())
                 ) :
                 Stream.of(c);
     }
 
-    private static Constraint parseConstraint(JsonObject obj, String id) {
+    private static AtomicConstraint parseConstraint(JsonObject obj, String id) {
+
         JsonElement min = obj.get("min");
         JsonElement max = obj.get("max");
         JsonElement shapeRef = obj.get("shape");
         JsonElement datatype = obj.get("datatype");
         JsonElement value = obj.get("value");
+        JsonElement path = obj.get("path");
         JsonElement negated = obj.get("negated");
 
-        return new ConstraintImpl(
-                id,
-                obj.get("path").getAsString(),
-                (min == null) ?
-                        Optional.empty() :
-                        Optional.of(min.getAsInt()),
-                (max == null) ?
-                        Optional.empty() :
-                        Optional.of(max.getAsInt()),
-                (datatype == null) ?
-                        Optional.empty() :
-                        Optional.of(datatype.getAsString()),
-                (value == null) ?
-                        Optional.empty() :
-                        Optional.of(value.getAsString()),
-                (shapeRef == null) ?
-                        Optional.empty() :
-                        Optional.of(shapeRef.getAsString()),
-                (negated == null) ?
-                        true :
-                        !negated.getAsBoolean()
-        );
+        Optional<Integer> oMin = (min == null) ?
+                Optional.empty() :
+                Optional.of(min.getAsInt());
+        Optional<Integer> oMax = (max == null) ?
+                Optional.empty() :
+                Optional.of(max.getAsInt());
+        Optional<String> oShapeRef = (shapeRef == null) ?
+                Optional.empty() :
+                Optional.of(shapeRef.getAsString());
+        Optional<String> oDatatype = (datatype == null) ?
+                Optional.empty() :
+                Optional.of(datatype.getAsString());
+        Optional<String> oValue = (value == null) ?
+                Optional.empty() :
+                Optional.of(value.getAsString());
+        Optional<String> oPath = (path == null) ?
+                Optional.empty() :
+                Optional.of(path.getAsString());
+        boolean oNeg = (negated == null) ?
+                true :
+                !negated.getAsBoolean();
+
+        if (oPath.isPresent()) {
+            if (oMin.isPresent()) {
+                if (oMax.isPresent()) {
+                    return new MinAndMaxConstraintImpl(id, oPath.get(), oMin.get(), oMax.get(), oDatatype, oValue, oShapeRef, oNeg);
+                }
+                return new MinOnlyConstraintImpl(id, oPath.get(), oMin.get(), oDatatype, oValue, oShapeRef, oNeg);
+            }
+            if (oMax.isPresent()) {
+                return new MaxOnlyConstraintImpl(id, oPath.get(), oMax.get(), oDatatype, oValue, oShapeRef, oNeg);
+            }
+            throw new RuntimeException("min or max cardinality expected with a path");
+        }
+        return new LocalConstraintImpl(id, oDatatype, oValue, oShapeRef, oNeg);
     }
 }

@@ -2,7 +2,6 @@ package eval;
 
 import ch.qos.logback.classic.Logger;
 import endpoint.SPARQLEndpoint;
-import es.weso.schema.Schemas;
 import org.slf4j.LoggerFactory;
 import preprocess.ShapeParser;
 import shape.Schema;
@@ -47,8 +46,8 @@ public class Eval {
 
     public static void main(String[] args) {
         setLoggers();
-//        args = new String[]{"-s", "./release/data/shapes/nonRec/2/", "http://dbpedia.org/sparql","./release/data/shapes/nonRec/2/output"};
-        parseArguments(args);
+        args = new String[]{"-s", "./release/data/shapes/nonRec/2/", "http://dbpedia.org/sparql","./release/data/shapes/nonRec/2/output"};
+//        parseArguments(args);
         schema.ifPresent(s -> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
         try {
             Validation validation = singleQuery.isPresent() ?

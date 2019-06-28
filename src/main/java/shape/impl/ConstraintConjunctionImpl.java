@@ -4,22 +4,20 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import core.Query;
 import preprocess.QueryGenerator;
-import shape.Constraint;
+import shape.AtomicConstraint;
 import shape.ConstraintConjunction;
-import shape.Schema;
 import util.ImmutableCollectors;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ConstraintConjunctionImpl implements ConstraintConjunction {
 
     private final String id;
-    private final ImmutableList<Constraint> minConstraints;
-    private final ImmutableList<Constraint> maxConstraints;
+    private final ImmutableList<AtomicConstraint> minConstraints;
+    private final ImmutableList<AtomicConstraint> maxConstraints;
     private final String minQueryPredicate;
     private final ImmutableList<String> maxQueryPredicates;
 
@@ -27,7 +25,7 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
     private ImmutableSet<Query> maxQueries;
 
 
-    public ConstraintConjunctionImpl(String id, ImmutableList<Constraint> minConstraints, ImmutableList<Constraint> maxConstraints) {
+    public ConstraintConjunctionImpl(String id, ImmutableList<AtomicConstraint> minConstraints, ImmutableList<AtomicConstraint> maxConstraints) {
         this.id = id;
         this.minConstraints = minConstraints;
         this.maxConstraints = maxConstraints;
