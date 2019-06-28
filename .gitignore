@@ -12,3 +12,8 @@ target
 **~
 \#*
 tmp.*
+
+# test data
+release/
+tests/
+        

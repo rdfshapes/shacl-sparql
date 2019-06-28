@@ -134,12 +134,14 @@ public class ShapeParser {
     }
 
     private static Stream<AtomicConstraint> duplicate(AtomicConstraint c) {
-        return (c.getMin().isPresent()) && (c.getMax().isPresent()) ?
-                Stream.of(
-                        new AtomicConstraintImpl(c.getId() + "_1", c.getPath(), c.getMin(), Optional.empty(), c.getDatatype(), c.getValue(), c.getShapeRef(), c.isPos()),
-                        new AtomicConstraintImpl(c.getId() + "_2", c.getPath(), Optional.empty(), c.getMax(), c.getDatatype(), c.getValue(), c.getShapeRef(), c.isPos())
-                ) :
-                Stream.of(c);
+        if(c instanceof MinAndMaxConstraint){
+            MinAndMaxConstraint cc = (MinAndMaxConstraint) c;
+            return Stream.of(
+                    new MinOnlyConstraintImpl(cc.getId() + "_1", cc.getPath(), cc.getMin(), cc.getDatatype(), cc.getValue(), cc.getShapeRef(), cc.isPos()),
+                    new MaxOnlyConstraintImpl(cc.getId() + "_2", cc.getPath(), cc.getMax(), cc.getDatatype(), cc.getValue(), cc.getShapeRef(), cc.isPos())
+            );
+        }
+        return Stream.of(c);
     }
 
     private static AtomicConstraint parseConstraint(JsonObject obj, String id) {
@@ -170,9 +172,7 @@ public class ShapeParser {
         Optional<String> oPath = (path == null) ?
                 Optional.empty() :
                 Optional.of(path.getAsString());
-        boolean oNeg = (negated == null) ?
-                true :
-                !negated.getAsBoolean();
+        boolean oNeg = (negated == null) || !negated.getAsBoolean();
 
         if (oPath.isPresent()) {
             if (oMin.isPresent()) {
