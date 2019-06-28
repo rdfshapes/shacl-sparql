@@ -27,7 +27,7 @@
               <transformers>
                 <transformer />
                 <transformer>
-                  <mainClass>eval.Eval</mainClass>
+                  <mainClass>unibz.shapes.eval.Eval</mainClass>
                 </transformer>
               </transformers>
             </configuration>

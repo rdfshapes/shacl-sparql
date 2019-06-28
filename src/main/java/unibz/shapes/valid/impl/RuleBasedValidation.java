@@ -9,12 +9,12 @@ import core.global.RuleMap;
 import unibz.shapes.endpoint.QueryEvaluation;
 import unibz.shapes.endpoint.SPARQLEndpoint;
 import org.eclipse.rdf4j.query.BindingSet;
-import shape.ConstraintConjunction;
-import shape.Schema;
-import shape.Shape;
+import unibz.shapes.shape.ConstraintConjunction;
+import unibz.shapes.shape.Schema;
+import unibz.shapes.shape.Shape;
 import util.ImmutableCollectors;
 import util.Output;
-import valid.Validator;
+import valid.Validation;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -22,7 +22,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class RuleBasedValidator implements Validator {
+public class RuleBasedValidation implements Validation {
 
     private final SPARQLEndpoint endpoint;
     private final Schema schema;
@@ -35,7 +35,7 @@ public class RuleBasedValidator implements Validator {
     private final Stats stats;
 
 
-    public RuleBasedValidator(SPARQLEndpoint endpoint, Schema schema, Output logOutput, Output validTargetsOuput, Output invalidTargetsOuput, Output statsOuput) {
+    public RuleBasedValidation(SPARQLEndpoint endpoint, Schema schema, Output logOutput, Output validTargetsOuput, Output invalidTargetsOuput, Output statsOuput) {
         this.endpoint = endpoint;
         this.schema = schema;
         this.validTargetsOuput = validTargetsOuput;
@@ -49,7 +49,7 @@ public class RuleBasedValidator implements Validator {
         statsOutput = statsOuput;
     }
 
-    public void validate() {
+    public void exec() {
         Instant start = Instant.now();
         Set<Literal> targets = extractTargetAtoms();
         stats.recordInitialTargets(targets.size());

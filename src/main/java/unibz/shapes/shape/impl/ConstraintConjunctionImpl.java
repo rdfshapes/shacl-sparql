@@ -1,36 +1,39 @@
-package shape.impl;
+package unibz.shapes.shape.impl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import core.Query;
 import unibz.shapes.shape.preprocess.QueryGenerator;
-import shape.Constraint;
-import shape.ConstraintConjunction;
-import shape.Schema;
+import unibz.shapes.shape.ConstraintConjunction;
+import unibz.shapes.shape.LocalConstraint;
+import unibz.shapes.shape.MaxOnlyConstraint;
+import unibz.shapes.shape.MinOnlyConstraint;
 import util.ImmutableCollectors;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ConstraintConjunctionImpl implements ConstraintConjunction {
 
     private final String id;
-    private final ImmutableList<Constraint> minConstraints;
-    private final ImmutableList<Constraint> maxConstraints;
+    private final ImmutableList<MinOnlyConstraint> minConstraints;
+    private final ImmutableList<MaxOnlyConstraint> maxConstraints;
     private final String minQueryPredicate;
+    private final ImmutableList<LocalConstraint> localConstraints;
     private final ImmutableList<String> maxQueryPredicates;
 
     private Query minQuery;
     private ImmutableSet<Query> maxQueries;
 
 
-    public ConstraintConjunctionImpl(String id, ImmutableList<Constraint> minConstraints, ImmutableList<Constraint> maxConstraints) {
+    public ConstraintConjunctionImpl(String id, ImmutableList<MinOnlyConstraint> minConstraints,
+                                     ImmutableList<MaxOnlyConstraint> maxConstraints, ImmutableList<LocalConstraint> localConstraints) {
         this.id = id;
         this.minConstraints = minConstraints;
         this.maxConstraints = maxConstraints;
+        this.localConstraints = localConstraints;
         minQueryPredicate = id + "_pos";
         maxQueryPredicates = IntStream.range(1, maxConstraints.size()+1).boxed()
                 .map(i -> id + "_max_" + i)
@@ -64,8 +67,14 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 
         // Create a subquery for all local (i.e. without shape propagation) and positive constraints
         // Every other query for this conjunct will contain this as a subquery.
-        // This is unnecessary in theory, but does not compromise soundness, and makes queries a lot more selective.
-        Optional<String> subquery = QueryGenerator.generateLocalSubquery(graphName,this.minConstraints);
+        // This is unnecessary in theory, but does not compromise soundness, and makes queries more selective.
+        Optional<String> subquery = QueryGenerator.generateLocalSubquery(
+                graphName,
+                Stream.concat(
+                        minConstraints.stream(),
+                        localConstraints.stream()
+                ).collect(ImmutableCollectors.toList())
+        );
 
         // Build a unique set of triples (+ filter) for all min constraints (note that the local ones are handled by the subquery)
         this.minQuery = QueryGenerator.generateQuery(

@@ -7,7 +7,9 @@ import core.Query;
 import core.RulePattern;
 import core.global.SPARQLPrefixHandler;
 import core.global.VariableGenerator;
-import shape.Constraint;
+import unibz.shapes.shape.AtomicConstraint;
+import unibz.shapes.shape.MaxOnlyConstraint;
+import unibz.shapes.shape.NeighborhoodConstraint;
 import util.ImmutableCollectors;
 
 import java.util.ArrayList;
@@ -17,9 +19,9 @@ import java.util.stream.Collectors;
 
 public class QueryGenerator {
 
-    public static Query generateQuery(String id, ImmutableList<Constraint> constraints, Optional<String> graph, Optional<String> subquery) {
-        if(constraints.size() > 1 && constraints
-                .stream().anyMatch(c -> c.getMax().isPresent())){
+    public static Query generateQuery(String id, ImmutableList<AtomicConstraint> constraints, Optional<String> graph, Optional<String> subquery) {
+        if (constraints.size() > 1 && constraints
+                .stream().anyMatch(c -> c instanceof MaxOnlyConstraint)) {
             throw new RuntimeException("Only one max constraint per query is allowed");
         }
         RulePattern rp = computeRulePattern(constraints, id);
@@ -30,7 +32,7 @@ public class QueryGenerator {
         return builder.buildQuery(rp);
     }
 
-    private static RulePattern computeRulePattern(ImmutableList<Constraint> constraints, String id) {
+    private static RulePattern computeRulePattern(ImmutableList<AtomicConstraint> constraints, String id) {
         return new RulePattern(
                 new Literal(
                         id,
@@ -38,18 +40,18 @@ public class QueryGenerator {
                         true
                 ),
                 constraints.stream()
-                .flatMap(c -> c.computeRulePatternBody().stream())
-                .collect(ImmutableCollectors.toSet())
+                        .flatMap(c -> c.computeRulePatternBody().stream())
+                        .collect(ImmutableCollectors.toSet())
         );
     }
 
-    public static Optional<String> generateLocalSubquery(Optional<String> graphName, ImmutableList<Constraint> posConstraints) {
+    public static Optional<String> generateLocalSubquery(Optional<String> graphName, ImmutableList<AtomicConstraint> posConstraints) {
 
-        ImmutableList<Constraint> localPosConstraints = posConstraints.stream()
-            .filter(c -> !c.getShapeRef().isPresent())
-            .collect(ImmutableCollectors.toList());
+        ImmutableList<AtomicConstraint> localPosConstraints = posConstraints.stream()
+                .filter(c -> !c.getShapeRef().isPresent())
+                .collect(ImmutableCollectors.toList());
 
-        if(localPosConstraints.isEmpty()){
+        if (localPosConstraints.isEmpty()) {
             return Optional.empty();
         }
         QueryBuilder builder = new QueryBuilder(
@@ -97,15 +99,24 @@ public class QueryGenerator {
             );
         }
 
+        void addConstantFilter(String variable, String constant, Boolean isPos) {
+            String s = variable + " = " + constant;
+            filters.add(
+                    (isPos) ?
+                            s :
+                            "!(" + s + ")"
+            );
+        }
+
         private String getDatatypeFilter(String variable, String datatype) {
             return "datatype(?" + variable + ") = " + datatype;
         }
 
         String getSparql(boolean includePrefixes) {
-            return (includePrefixes?
-                    SPARQLPrefixHandler.getPrefixString():
-                    "")+
-                    getProjectionString()+
+            return (includePrefixes ?
+                    SPARQLPrefixHandler.getPrefixString() :
+                    "") +
+                    getProjectionString() +
                     " WHERE{" +
                     (graph.map(s -> "\nGRAPH " + s + "{").orElse("")
                     ) +
@@ -113,7 +124,7 @@ public class QueryGenerator {
                     getTriplePatterns() +
                     "\n" +
                     (subQuery.isPresent() ?
-                            "{\n"+subQuery.get()+"\n}\n" :
+                            "{\n" + subQuery.get() + "\n}\n" :
                             ""
                     ) +
                     (graph.isPresent() ?
@@ -124,10 +135,10 @@ public class QueryGenerator {
         }
 
         private String getProjectionString() {
-            return "SELECT DISTINCT "+
+            return "SELECT DISTINCT " +
                     projectedVariables.stream()
-                    .map(v -> "?"+v)
-                    .collect(Collectors.joining(", "));
+                            .map(v -> "?" + v)
+                            .collect(Collectors.joining(", "));
         }
 
         String getTriplePatterns() {
@@ -163,18 +174,32 @@ public class QueryGenerator {
             }
         }
 
-        private void buildClause(Constraint c) {
-
-            if (c.getValue().isPresent()) {
-                addTriple(c.getPath(), c.getValue().get());
-                return;
-            }
+        private void buildClause(AtomicConstraint c) {
 
             ImmutableSet<String> variables = c.getVariables();
-            variables.forEach(v -> addTriple(c.getPath(), "?" + v));
+
+            if (c instanceof NeighborhoodConstraint) {
+                String path = ((NeighborhoodConstraint) c).getPath();
+
+                if (c.getValue().isPresent()) {
+                    addTriple(path, c.getValue().get());
+                    return;
+                }
+                variables.forEach(v -> addTriple(path, "?" + v));
+            } else if (c.getValue().isPresent()) {
+                addConstantFilter(
+                        variables.iterator().next(),
+                        c.getValue().get(),
+                        c.isPos()
+                );
+            }
 
             if (c.getDatatype().isPresent()) {
-                variables.forEach(v -> addDatatypeFilter(v, c.getDatatype().get(), c.isPos()));
+                variables.forEach(v -> addDatatypeFilter(
+                        v,
+                        c.getDatatype().get(),
+                        c.isPos()
+                ));
             }
 
             if (variables.size() > 1) {
