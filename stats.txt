@@ -1,6 +1,0 @@
-triples:
-12845254 labels_en.ttl
-5150434 instance_types_en.ttl
-14388539 mappingbased_literals_en.ttl
-18746176 mappingbased_objects_en.ttl
-10310107 persondata_en.ttl

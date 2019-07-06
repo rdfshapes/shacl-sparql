@@ -1,0 +1,248 @@
+
+4/9/19 1:22 PM:
+Starting validation at depth :0
+evaluating queries for shape MovieShape
+
+4/9/19 1:22 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX yago:<http://dbpedia.org/class/yago/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+
+{
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:writer ?p_4.
+?x dbo:musicComposer ?p_5.
+?x dbo:director ?p_6.
+?x dbo:imdbId ?p_7.
+
+}
+}
+}
+
+}
+}
+elapsed: 384 ms
+Number of solution mappings: 10775
+
+4/9/19 1:22 PM:
+Grounding rules ...
+elapsed: 97 ms
+
+4/9/19 1:22 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX yago:<http://dbpedia.org/class/yago/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:imdbId ?n_8.
+?x dbo:imdbId ?n_9.
+FILTER(
+?n_8 != ?n_9)
+{
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:writer ?p_4.
+?x dbo:musicComposer ?p_5.
+?x dbo:director ?p_6.
+?x dbo:imdbId ?p_7.
+
+}
+}
+}
+
+}
+}
+elapsed: 53 ms
+Number of solution mappings: 90
+
+4/9/19 1:22 PM:
+Grounding rules ...
+elapsed: 4 ms
+
+4/9/19 1:22 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX yago:<http://dbpedia.org/class/yago/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x, ?n_10 WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:starring ?n_10.
+{
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:writer ?p_4.
+?x dbo:musicComposer ?p_5.
+?x dbo:director ?p_6.
+?x dbo:imdbId ?p_7.
+
+}
+}
+}
+
+}
+}
+elapsed: 1197 ms
+Number of solution mappings: 37040
+
+4/9/19 1:22 PM:
+Grounding rules ...
+elapsed: 275 ms
+Number of rules 58680
+
+4/9/19 1:22 PM:
+saturation ...
+Remaining targets :10220
+Remaining targets :9653
+elapsed: 1031 ms
+
+valid targets: 987
+
+Invalid targets: 101331
+
+Remaining targets: 9620
+
+4/9/19 1:22 PM:
+Starting validation at depth :1
+evaluating queries for shape ActorShape
+
+4/9/19 1:22 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX yago:<http://dbpedia.org/class/yago/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x, ?p_11 WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:birthPlace ?p_11.
+{
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:activeYearsStartYear ?p_12.
+?x dbo:imdbId ?p_13.
+
+}
+}
+}
+
+}
+}
+elapsed: 811 ms
+Number of solution mappings: 24935
+
+4/9/19 1:22 PM:
+Grounding rules ...
+elapsed: 75 ms
+
+4/9/19 1:22 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX yago:<http://dbpedia.org/class/yago/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x, ?n_14 WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x ^dbo:starring ?n_14.
+{
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:activeYearsStartYear ?p_12.
+?x dbo:imdbId ?p_13.
+
+}
+}
+}
+
+}
+}
+elapsed: 1647 ms
+Number of solution mappings: 61355
+
+4/9/19 1:22 PM:
+Grounding rules ...
+elapsed: 109 ms
+Number of rules 146104
+
+4/9/19 1:22 PM:
+saturation ...
+Remaining targets :9620
+Remaining targets :906
+Remaining targets :139
+Remaining targets :4
+Remaining targets :2
+elapsed: 841 ms
+
+valid targets: 5144
+
+Invalid targets: 106792
+
+Remaining targets: 2
+
+4/9/19 1:22 PM:
+Starting validation at depth :2
+evaluating queries for shape LocationShape
+
+4/9/19 1:22 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX yago:<http://dbpedia.org/class/yago/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+
+{
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:country ?p_1.
+?x dbo:leaderTitle ?p_2.
+?x dbo:populationDensity ?p_3.
+
+}
+}
+}
+
+}
+}
+elapsed: 265 ms
+Number of solution mappings: 12187
+
+4/9/19 1:22 PM:
+Grounding rules ...
+elapsed: 26 ms
+Number of rules 54290
+
+4/9/19 1:22 PM:
+saturation ...
+Remaining targets :2
+Remaining targets :2
+Remaining targets :2
+Remaining targets :1
+elapsed: 144 ms
+
+valid targets: 5145
+
+Invalid targets: 106792
+
+Remaining targets: 1
+
+Maximal number or rules in memory: 146104

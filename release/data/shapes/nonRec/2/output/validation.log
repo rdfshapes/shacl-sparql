@@ -1,0 +1,125 @@
+
+6/28/19 10:27 PM:
+Starting validation at depth :0
+evaluating queries for shape MovieShape
+
+6/28/19 10:27 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX yago:<http://dbpedia.org/class/yago/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x, ?p_7 WHERE{
+
+?x dbo:starring ?p_7.
+{
+SELECT DISTINCT ?x WHERE{
+
+?x dbo:writer ?p_1.
+?x dbo:musicComposer ?p_2.
+?x dbo:director ?p_3.
+?x dbo:imdbId ?p_4.
+
+}
+}
+
+}
+elapsed: 1347 ms
+Number of solution mappings: 10000
+
+6/28/19 10:27 PM:
+Grounding rules ...
+elapsed: 154 ms
+
+6/28/19 10:27 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX yago:<http://dbpedia.org/class/yago/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x WHERE{
+
+?x dbo:imdbId ?n_5.
+?x dbo:imdbId ?n_6.
+FILTER(
+?n_5 != ?n_6)
+{
+SELECT DISTINCT ?x WHERE{
+
+?x dbo:writer ?p_1.
+?x dbo:musicComposer ?p_2.
+?x dbo:director ?p_3.
+?x dbo:imdbId ?p_4.
+
+}
+}
+
+}
+elapsed: 154 ms
+Number of solution mappings: 90
+
+6/28/19 10:27 PM:
+Grounding rules ...
+elapsed: 3 ms
+Number of rules 12757
+
+6/28/19 10:27 PM:
+saturation ...
+Remaining targets :845
+elapsed: 262 ms
+
+valid targets: 0
+
+Invalid targets: 9166
+
+Remaining targets: 834
+
+6/28/19 10:27 PM:
+Starting validation at depth :1
+evaluating queries for shape ActorShape
+
+6/28/19 10:27 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX yago:<http://dbpedia.org/class/yago/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x WHERE{
+
+
+{
+SELECT DISTINCT ?x WHERE{
+
+?x dbo:birthPlace ?p_8.
+?x dbo:activeYearsStartYear ?p_9.
+?x dbo:occupation dbr:Actor.
+?x dbo:imdbId ?p_11.
+?x ^dbo:starring ?p_12.
+
+}
+}
+
+}
+elapsed: 326 ms
+Number of solution mappings: 1309
+
+6/28/19 10:27 PM:
+Grounding rules ...
+elapsed: 10 ms
+Number of rules 15195
+
+6/28/19 10:27 PM:
+saturation ...
+Remaining targets :831
+Remaining targets :799
+Remaining targets :9
+Remaining targets :0
+elapsed: 78 ms
+
+valid targets: 83
+
+Invalid targets: 9917
+
+Remaining targets: 0
+
+Maximal number or rules in memory: 15195

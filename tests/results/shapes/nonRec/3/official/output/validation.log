@@ -1,0 +1,222 @@
+
+4/8/19 6:02 PM:
+Starting validation at depth :0
+evaluating queries for shape Movie
+
+4/8/19 6:02 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x, ?p_11 WHERE{
+
+?x dbo:director ?p_11.
+{
+SELECT DISTINCT ?x WHERE{
+
+?x dbo:imdbId ?p_12.
+?x dbo:starring ?p_15.
+
+}
+}
+
+}
+elapsed: 1511 ms
+Number of solution mappings: 10000
+
+4/8/19 6:02 PM:
+Grounding rules ...
+elapsed: 137 ms
+
+4/8/19 6:02 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x WHERE{
+
+?x dbo:imdbId ?n_13.
+?x dbo:imdbId ?n_14.
+FILTER(
+?n_13 != ?n_14)
+{
+SELECT DISTINCT ?x WHERE{
+
+?x dbo:imdbId ?p_12.
+?x dbo:starring ?p_15.
+
+}
+}
+
+}
+elapsed: 267 ms
+Number of solution mappings: 335
+
+4/8/19 6:02 PM:
+Grounding rules ...
+elapsed: 5 ms
+Number of rules 19257
+
+4/8/19 6:02 PM:
+saturation ...
+Remaining targets :707
+elapsed: 404 ms
+
+valid targets: 0
+
+Invalid targets: 9313
+
+Remaining targets: 687
+
+4/8/19 6:02 PM:
+Starting validation at depth :1
+evaluating queries for shape DirectorShape
+
+4/8/19 6:02 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x, ?p_1 WHERE{
+
+?x dbo:birthPlace ?p_1.
+{
+SELECT DISTINCT ?x WHERE{
+
+?x dbo:birthYear ?p_2.
+?x dbo:imdbId ?p_7.
+FILTER(
+datatype(?p_2) = xsd:gYear)
+
+}
+}
+
+}
+elapsed: 1475 ms
+Number of solution mappings: 10000
+
+4/8/19 6:02 PM:
+Grounding rules ...
+elapsed: 55 ms
+
+4/8/19 6:02 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x WHERE{
+
+?x dbo:birthYear ?n_3.
+?x dbo:birthYear ?n_4.
+FILTER(
+?n_3 != ?n_4)
+{
+SELECT DISTINCT ?x WHERE{
+
+?x dbo:birthYear ?p_2.
+?x dbo:imdbId ?p_7.
+FILTER(
+datatype(?p_2) = xsd:gYear)
+
+}
+}
+
+}
+elapsed: 112 ms
+Number of solution mappings: 7
+
+4/8/19 6:02 PM:
+Grounding rules ...
+elapsed: 1 ms
+
+4/8/19 6:02 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x WHERE{
+
+?x dbo:activeYearsSartYear ?n_5.
+?x dbo:activeYearsSartYear ?n_6.
+FILTER(
+?n_5 != ?n_6)
+{
+SELECT DISTINCT ?x WHERE{
+
+?x dbo:birthYear ?p_2.
+?x dbo:imdbId ?p_7.
+FILTER(
+datatype(?p_2) = xsd:gYear)
+
+}
+}
+
+}
+elapsed: 113 ms
+Number of solution mappings: 0
+
+4/8/19 6:02 PM:
+Grounding rules ...
+elapsed: 0 ms
+Number of rules 33579
+
+4/8/19 6:02 PM:
+saturation ...
+Remaining targets :687
+elapsed: 256 ms
+
+valid targets: 0
+
+Invalid targets: 9935
+
+Remaining targets: 65
+
+4/8/19 6:02 PM:
+Starting validation at depth :2
+evaluating queries for shape LocationShape
+
+4/8/19 6:02 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x WHERE{
+
+
+{
+SELECT DISTINCT ?x WHERE{
+
+?x dbo:country ?p_8.
+?x dbo:populationTotal ?p_9.
+?x foaf:name ?p_10.
+FILTER(
+datatype(?p_9) = xsd:nonNegativeInteger)
+
+}
+}
+
+}
+elapsed: 1138 ms
+Number of solution mappings: 10000
+
+4/8/19 6:02 PM:
+Grounding rules ...
+elapsed: 24 ms
+Number of rules 36740
+
+4/8/19 6:02 PM:
+saturation ...
+Remaining targets :65
+Remaining targets :65
+Remaining targets :65
+Remaining targets :65
+Remaining targets :0
+elapsed: 106 ms
+
+valid targets: 0
+
+Invalid targets: 10000
+
+Remaining targets: 0
+
+Maximal number or rules in memory: 36740

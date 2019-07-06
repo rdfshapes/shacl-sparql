@@ -1,0 +1,183 @@
+
+4/9/19 8:38 PM:
+Starting validation at depth :0
+evaluating queries for shape MovieShape
+
+4/9/19 8:38 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX yago:<http://dbpedia.org/class/yago/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x, ?p_15 WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:starring ?p_15.
+{
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:writer ?p_9.
+?x dbo:musicComposer ?p_10.
+?x dbo:director ?p_11.
+?x dbo:imdbId ?p_12.
+
+}
+}
+}
+
+}
+}
+elapsed: 1188 ms
+Number of solution mappings: 37040
+
+4/9/19 8:38 PM:
+Grounding rules ...
+elapsed: 265 ms
+
+4/9/19 8:38 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX yago:<http://dbpedia.org/class/yago/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:imdbId ?n_13.
+?x dbo:imdbId ?n_14.
+FILTER(
+?n_13 != ?n_14)
+{
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:writer ?p_9.
+?x dbo:musicComposer ?p_10.
+?x dbo:director ?p_11.
+?x dbo:imdbId ?p_12.
+
+}
+}
+}
+
+}
+}
+elapsed: 58 ms
+Number of solution mappings: 90
+
+4/9/19 8:38 PM:
+Grounding rules ...
+elapsed: 1 ms
+Number of rules 46840
+
+4/9/19 8:38 PM:
+saturation ...
+Remaining targets :9706
+elapsed: 856 ms
+
+valid targets: 0
+
+Invalid targets: 102318
+
+Remaining targets: 9620
+
+4/9/19 8:38 PM:
+Starting validation at depth :1
+evaluating queries for shape ActorShape
+
+4/9/19 8:38 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX yago:<http://dbpedia.org/class/yago/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x, ?p_16 WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:birthPlace ?p_16.
+{
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:activeYearsStartYear ?p_17.
+?x dbo:occupation dbr:Actor.
+?x dbo:imdbId ?p_19.
+?x ^dbo:starring ?p_20.
+
+}
+}
+}
+
+}
+}
+elapsed: 125 ms
+Number of solution mappings: 2805
+
+4/9/19 8:38 PM:
+Grounding rules ...
+elapsed: 25 ms
+Number of rules 50774
+
+4/9/19 8:38 PM:
+saturation ...
+elapsed: 240 ms
+
+valid targets: 0
+
+Invalid targets: 111113
+
+Remaining targets: 825
+
+4/9/19 8:38 PM:
+Starting validation at depth :2
+evaluating queries for shape LocationShape
+
+4/9/19 8:38 PM:
+Evaluating query
+PREFIX dbo:<http://dbpedia.org/ontology/>
+PREFIX dbr:<http://dbpedia.org/resource/>
+PREFIX yago:<http://dbpedia.org/class/yago/>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+
+{
+SELECT DISTINCT ?x WHERE{
+GRAPH <dbpedia-person.org>{
+
+?x dbo:country ?p_6.
+?x dbo:leaderTitle ?p_7.
+?x dbo:populationDensity ?p_8.
+
+}
+}
+}
+
+}
+}
+elapsed: 225 ms
+Number of solution mappings: 12187
+
+4/9/19 8:38 PM:
+Grounding rules ...
+elapsed: 21 ms
+Number of rules 30195
+
+4/9/19 8:38 PM:
+saturation ...
+Remaining targets :825
+Remaining targets :805
+Remaining targets :703
+Remaining targets :572
+Remaining targets :0
+elapsed: 95 ms
+
+valid targets: 309
+
+Invalid targets: 111629
+
+Remaining targets: 0
+
+Maximal number or rules in memory: 50774
