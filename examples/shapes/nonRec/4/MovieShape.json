@@ -1,0 +1,18 @@
+{
+	"name": "MovieShape",
+	"targetDef":{
+		"query":"SELECT ?x WHERE {?x a dbo:Film}"
+	},
+	"constraintDef":{
+		"conjunctions":[
+			[ 	
+				{ "path": "dbo:writer", "min": 1},
+				{ "path": "dbo:musicComposer", "min": 1},
+				{ "path": "dbo:director", "min": 1, "shape":"DirectorShape"},
+				{ "path": "dbo:imdbId", "min": 1 },
+				{ "path": "dbo:imdbId", "max": 1 },
+				{ "path": "dbo:starring", "min": 1, "shape":"ActorShape"}
+			]
+		]
+	}
+}
