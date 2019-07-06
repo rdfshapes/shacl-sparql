@@ -1,4 +1,4 @@
-#SHACL2SPARQL#
+# SHACL2SPARQL #
 
 SHACL2SPARQL is a prototpye implementation in Java of the algorithm described in *Validating SHACL constraints over a SPARQL endpoint* (Corman, FLorenzano, Reutter and Savkovic), ISWC 19 (to appear).
 It allows validating an RDF graph exposed via a SPARQL endpoint against a possibly recursive [SHACL](https://www.w3.org/TR/shacl/) schema,
