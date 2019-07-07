@@ -29,7 +29,7 @@ Java 8 is required.
 
 For instance (from this directory):
 ```
-java -jar compiled/validation-1.0-SNAPSHOT.jar -d ./ex/shapes/nonRec/2/ "http://dbpedia.org/sparql"  ./ex/shapes/nonRec/2/output
+java -jar compiled/validation-1.0-SNAPSHOT.jar -d ./ex/shapes/nonRec/2/ "http://dbpedia.org/sparql"  ./output/
 ```
 
 Note that the validation results for the above command are incorrect, because the SPARQL endpoint "http://dbpedia.org/sparql" only returns the 10 000 first answers to a query.

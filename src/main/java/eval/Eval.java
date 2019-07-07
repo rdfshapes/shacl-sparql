@@ -10,6 +10,7 @@ import valid.Validation;
 import valid.impl.RuleBasedValidation;
 import valid.impl.UnfoldingBasedValidation;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,6 +52,7 @@ public class Eval {
 //        args = new String[]{"-d", "./release/data/shapes/nonRec/2/", "http://dbpedia.org/sparql","./release/data/shapes/nonRec/2/output"};
         parseArguments(args);
         schema.ifPresent(s -> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
+        createOutputDir(outputDir);
         try {
             Validation validation = singleQuery.isPresent() ?
                     new UnfoldingBasedValidation(
@@ -75,6 +77,12 @@ public class Eval {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void createOutputDir(Path outputDir) {
+        File dir = outputDir.toFile();
+        if(!dir.exists())
+            dir.mkdirs();
     }
 
     private static void setLoggers() {
