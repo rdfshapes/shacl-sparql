@@ -13,7 +13,7 @@ based on the semantics for recursive SHACL shapes defined in
 To validate a graph with SHACL2SPARQL:
 
 ```
-java -jar <jar> [-g <graphName>] -s <shapeDirectory> <endpointUrl> <outputDirectory>
+java -jar <jar> [-g <graphName>] -d <shapeDirectory> <endpointUrl> <outputDirectory>
 ```
 
 where:
