@@ -5,7 +5,7 @@ SHACL2SPARQL is a prototype Java implementation of the algorithm described in
 
 It allows validating an RDF exposed as a SPARQL endpoint against a possibly recursive [SHACL](https://www.w3.org/TR/shacl/) schema,
 based on the semantics for recursive SHACL shapes defined in
-[Semantics and recursive SHACL](https://www.inf.unibz.it/krdb/KRDB%20files/tech-reports/KRDB18-01.pdf).
+[*Semantics and validation of recursive SHACL*](https://www.inf.unibz.it/krdb/KRDB%20files/tech-reports/KRDB18-01.pdf).
 
 
 ### Validate an RDF graph with SHACL2SPARQL ###
@@ -39,7 +39,7 @@ Note that the validation results for the above command are incorrect, because th
 
 Maven is required.
 
-* From the current directory (must contain the `pom.xml` file and `src` directory), execute:
+* From the current directory (must contain the `pom.xml` file and `src` directory):
 ```
 mvn package
 ```
