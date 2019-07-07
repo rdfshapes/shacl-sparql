@@ -21,6 +21,7 @@ where:
 * \<graphName\> is the (optional) name of the graph. If specified, the generated queries will use the SPARQL GRAPH keyword.
 * \<shapeDirectory\> is the path to a folder containing the shapes to be validated.
 There must be one json file per shape, following the syntax described in the document `doc/jsonSyntax.pdf`.
+Support for the RDF (Turtle) SHACL syntax will be available soon. 
 * \<shapeDirectory\> is the url of the sparql endpoint.
 * \<outputDirectory\> is the path to the output directory. It will contain logs and validation results.
 
