@@ -31,12 +31,12 @@ public class Eval {
             "Usage: \n" + Eval.class.getSimpleName() +
                     "[-s] [-j] [-d shapeDir] [-g graphName] endpoint outputDir\n" +
                     "with:\n" +
-                    "- s\t\t             Shapes format: SHACL/RDF (Turtle)\n" +
-                    "- j\t\t             Shapes format: JSON\n" +
-                    "- shapeDir\t\t      Directory containing the shapes (one shape per file, extension \".ttl\" for SHACL/RDF format,\".json\" for JSON format)\n"+
-                    "- graphName\t\t     Name of the RDF graph to be validated (using the SPARQL \"GRAPH\" operator)\n" +
-                    "- endpoint          SPARQL endpoint exposing the graph to be validated\n" +
-                    "- outputDir\t\t     Output directory (validation results statistics and logs)\n" +
+                    "-s\t\t             Shapes format: SHACL/RDF (Turtle)\n" +
+                    "-j\t\t             Shapes format: JSON (default format if none of -s or -j is specified)\n" +
+                    "-shapeDir\t\t      Directory containing the shapes (one shape per file, extension \".ttl\" for SHACL/RDF format,\".json\" for JSON format)\n"+
+                    "-graphName\t\t     Name of the RDF graph to be validated (using the SPARQL \"GRAPH\" operator)\n" +
+                    "-endpoint          SPARQL endpoint exposing the graph to be validated\n" +
+                    "-outputDir\t\t     Output directory (validation results statistics and logs)\n" +
                     "";
 
     private static SPARQLEndpoint endpoint;
@@ -48,7 +48,7 @@ public class Eval {
 
     public static void main(String[] args) {
         setLoggers();
-//        args = new String[]{"-s", "./release/data/shapes/nonRec/2/", "http://dbpedia.org/sparql","./release/data/shapes/nonRec/2/output"};
+//        args = new String[]{"-d", "./release/data/shapes/nonRec/2/", "http://dbpedia.org/sparql","./release/data/shapes/nonRec/2/output"};
         parseArguments(args);
         schema.ifPresent(s -> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
         try {
@@ -90,6 +90,7 @@ public class Eval {
     private static void parseArguments(String[] args) {
         Optional<Path> shapeDir = Optional.empty();
         graph = Optional.empty();
+        shapeFormat = Format.JSON;
         Iterator<String> it = Stream.of(args).iterator();
         String currentOpt = it.next();
         while (currentOpt.startsWith("-")) {
@@ -108,9 +109,9 @@ public class Eval {
                 case "-s":
                     shapeFormat = Format.SHACL;
                     break;
-                case "-j":
-                    shapeFormat = Format.JSON;
-                    break;
+////                case "-j":
+////                    shapeFormat = Format.JSON;
+//                    break;
                 default:
                     throw new RuntimeException("Invalid option " + currentOpt + "\n+" + usage);
             }
@@ -119,7 +120,7 @@ public class Eval {
         endpoint = new SPARQLEndpoint(currentOpt);
         outputDir = Paths.get(it.next());
         log.info("endPoint: |" + endpoint.getURL() + "|");
-        shapeDir.ifPresent(d -> log.info("shapeDir: |" + d + "|"));
-        log.info("outputDir: |" + outputDir + "|");
+        shapeDir.ifPresent(d -> log.info("shape directory: |" + d + "|"));
+        log.info("output directory: |" + outputDir + "|");
     }
 }
