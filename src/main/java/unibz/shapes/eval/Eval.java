@@ -47,7 +47,7 @@ public class Eval {
 
     public static void main(String[] args) {
         setLoggers();
-        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql","./ex/shapes/nonRec/2/output"};
+//        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql","./ex/shapes/nonRec/2/output"};
         parseArguments(args);
         schema.ifPresent(s -> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
         createOutputDir(outputDir);
@@ -71,7 +71,7 @@ public class Eval {
             validation.exec();
             Instant finish = Instant.now();
             long elapsed = Duration.between(start, finish).toMillis();
-            System.out.println("Total execution time: " + elapsed);
+            log.info("Total execution time: " + elapsed);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
