@@ -20,22 +20,22 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static ch.qos.logback.classic.Level.INFO;
+import static unibz.shapes.shape.preprocess.ShapeParser.*;
 
 public class Eval {
 
     private static Logger log = (Logger) LoggerFactory.getLogger(Eval.class);
     private static final String usage =
             "Usage: \n" + Eval.class.getSimpleName() +
-                    "[-r] [-j] [-s schemaString] [-d schemaDir] [-g graphName] endpoint outputDir\n" +
+                    "[-r] [-j] [-d schemaDir] [-s schemaString] [-g graphName] endpoint outputDir\n" +
                     "with:\n" +
-                    "- r\t\t             Shapes format: RDF (Turtle)\n" +
-                    "- j\t\t             Shapes format: JSON\n" +
-                    "- schemaString\t\t  Schema as a string (either a JSON array or RDF triples)\n" +
-                    "- schemaDir\t\t     Directory containing the schema (extension \".ttl\" for the RDF format,\".json\" for the JSON format." +
-                    "For the JSON format, each file should contain one shape.)\n"+
-                    "- graphName\t\t     Name of the RDF graph to be validated (using the SPARQL \"GRAPH\" operator)\n" +
-                    "- endpoint          SPARQL endpoint exposing the graph to be validated\n" +
-                    "- outputDir\t\t     Output directory (validation results statistics and logs)\n" +
+                    "-s\t\t             Shapes format: SHACL/RDF (Turtle)\n" +
+                    "-j\t\t             Shapes format: JSON (default format if none of -s or -j is specified)\n" +
+                    "-schemaDir\t\t     Directory containing the shape schema (one shape per file, extension \".ttl\" for SHACL/RDF format,\".json\" for JSON format)\n"+
+                    "-schemaString\t\t  Shape schema as a string (SHACL/RDF Turtle syntax only)\n"+
+                    "-graphName\t\t     Name of the RDF graph to be validated (using the SPARQL \"GRAPH\" operator)\n" +
+                    "-endpoint          SPARQL endpoint exposing the graph to be validated\n" +
+                    "-outputDir\t\t     Output directory (validation results statistics and logs)\n" +
                     "";
 
     private static SPARQLEndpoint endpoint;
@@ -47,7 +47,7 @@ public class Eval {
 
     public static void main(String[] args) {
         setLoggers();
-        args = new String[]{"-j", "-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql","./ex/shapes/nonRec/2/output"};
+        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql","./ex/shapes/nonRec/2/output"};
         parseArguments(args);
         schema.ifPresent(s -> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
         createOutputDir(outputDir);
@@ -97,6 +97,7 @@ public class Eval {
         Optional<Path> schemaDir = Optional.empty();
         Optional<String> schemaString = Optional.empty();
         graph = Optional.empty();
+        shapeFormat = ShapeParser.Format.JSON;
         Iterator<String> it = Stream.of(args).iterator();
         String currentOpt = it.next();
         while (currentOpt.startsWith("-")) {
@@ -114,7 +115,7 @@ public class Eval {
                     graph = Optional.of(it.next());
                     break;
                 case "-r":
-                    shapeFormat = ShapeParser.Format.RDF;
+                    shapeFormat = Format.SHACL;
                     break;
                 case "-j":
                     shapeFormat = ShapeParser.Format.JSON;
@@ -132,8 +133,8 @@ public class Eval {
             schema = Optional.of(ShapeParser.parseSchemaFromString(schemaString.get(), shapeFormat));
         }
         log.info("endPoint: |" + endpoint.getURL() + "|");
-        schemaDir.ifPresent(d -> log.info("schemaDir: |" + d + "|"));
-        log.info("outputDir: |" + outputDir + "|");
+        schemaDir.ifPresent(d -> log.info("shape directory: |" + d + "|"));
+        log.info("output directory: |" + outputDir + "|");
     }
 
 

@@ -30,7 +30,7 @@ public class ShapeParser {
 
     public enum Format {
         JSON,
-        RDF
+        SHACL
     }
 
     public static Schema parseSchemaFromDir(Path dir, Format shapeFormat) {
@@ -57,7 +57,7 @@ public class ShapeParser {
 
     private static String getFileExtension(Format shapeFormat) {
         switch (shapeFormat) {
-            case RDF:
+            case SHACL:
                 return "ttl";
             case JSON:
                 return "json";
@@ -72,7 +72,7 @@ public class ShapeParser {
 
     private static Shape parse(Path path, Format shapeFormat) {
         switch (shapeFormat) {
-            case RDF:
+            case SHACL:
                 return parseTtl(path);
             case JSON:
                 return parseJson(path);
