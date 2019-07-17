@@ -47,7 +47,7 @@ public class Eval {
 
     public static void main(String[] args) {
         setLoggers();
-//        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql","./ex/shapes/nonRec/2/output"};
+//        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql","./output"};
         parseArguments(args);
         schema.ifPresent(s -> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
         createOutputDir(outputDir);
