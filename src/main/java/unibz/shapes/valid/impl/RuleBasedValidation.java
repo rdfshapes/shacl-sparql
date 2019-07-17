@@ -1,20 +1,20 @@
-package valid.impl;
+package unibz.shapes.valid.impl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import core.Literal;
-import core.Query;
-import core.RulePattern;
-import core.global.RuleMap;
+import unibz.shapes.core.Literal;
+import unibz.shapes.core.Query;
+import unibz.shapes.core.RulePattern;
+import unibz.shapes.core.global.RuleMap;
 import unibz.shapes.endpoint.QueryEvaluation;
 import unibz.shapes.endpoint.SPARQLEndpoint;
 import org.eclipse.rdf4j.query.BindingSet;
 import unibz.shapes.shape.ConstraintConjunction;
 import unibz.shapes.shape.Schema;
 import unibz.shapes.shape.Shape;
-import util.ImmutableCollectors;
-import util.Output;
-import valid.Validation;
+import unibz.shapes.util.ImmutableCollectors;
+import unibz.shapes.util.Output;
+import unibz.shapes.valid.Validation;
 
 import java.io.IOException;
 import java.time.Duration;

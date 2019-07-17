@@ -1,0 +1,3 @@
+17:46:39.823 INFO  unibz.shapes.eval.Eval - endPoint: |http://dbpedia.org/sparql|
+17:46:39.829 INFO  unibz.shapes.eval.Eval - schemaDir: |./ex/shapes/nonRec/2|
+17:46:39.829 INFO  unibz.shapes.eval.Eval - outputDir: |./ex/shapes/nonRec/2/output|

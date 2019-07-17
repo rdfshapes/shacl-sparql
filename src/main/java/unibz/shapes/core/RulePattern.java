@@ -1,8 +1,8 @@
-package core;
+package unibz.shapes.core;
 
 import com.google.common.collect.ImmutableSet;
 import org.eclipse.rdf4j.query.BindingSet;
-import util.ImmutableCollectors;
+import unibz.shapes.util.ImmutableCollectors;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

@@ -1,13 +1,13 @@
 package unibz.shapes.shape.impl;
 
 import com.google.common.collect.ImmutableSet;
-import core.Literal;
-import core.RulePattern;
-import core.global.VariableGenerator;
+import unibz.shapes.core.Literal;
+import unibz.shapes.core.RulePattern;
+import unibz.shapes.core.global.VariableGenerator;
 import unibz.shapes.shape.ConstraintConjunction;
 import unibz.shapes.shape.Schema;
 import unibz.shapes.shape.Shape;
-import util.ImmutableCollectors;
+import unibz.shapes.util.ImmutableCollectors;
 
 import java.util.Optional;
 import java.util.stream.Stream;

@@ -5,10 +5,10 @@ import unibz.shapes.endpoint.SPARQLEndpoint;
 import org.slf4j.LoggerFactory;
 import unibz.shapes.shape.preprocess.ShapeParser;
 import unibz.shapes.shape.Schema;
-import util.Output;
-import valid.Validation;
-import valid.impl.RuleBasedValidation;
-import valid.impl.UnfoldingBasedValidation;
+import unibz.shapes.util.Output;
+import unibz.shapes.valid.Validation;
+import unibz.shapes.valid.impl.RuleBasedValidation;
+import unibz.shapes.valid.impl.UnfoldingBasedValidation;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class Eval {
 
     public static void main(String[] args) {
         setLoggers();
-//        args = new String[]{"-j", "-d", "./release/data/shapes/nonRec/2/", "http://dbpedia.org/sparql","./release/data/shapes/nonRec/2/output"};
+        args = new String[]{"-j", "-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql","./ex/shapes/nonRec/2/output"};
         parseArguments(args);
         schema.ifPresent(s -> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
         createOutputDir(outputDir);

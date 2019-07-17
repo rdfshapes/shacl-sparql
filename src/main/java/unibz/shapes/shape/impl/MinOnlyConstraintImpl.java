@@ -1,7 +1,7 @@
 package unibz.shapes.shape.impl;
 
 import com.google.common.collect.ImmutableSet;
-import core.global.VariableGenerator;
+import unibz.shapes.core.global.VariableGenerator;
 import unibz.shapes.shape.MinOnlyConstraint;
 
 import java.util.Optional;

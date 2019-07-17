@@ -1,7 +1,7 @@
 package unibz.shapes.shape;
 
 import com.google.common.collect.ImmutableSet;
-import core.RulePattern;
+import unibz.shapes.core.RulePattern;
 
 import java.util.Optional;
 

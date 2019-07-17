@@ -6,12 +6,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import core.global.SPARQLPrefixHandler;
 import org.apache.commons.io.FileUtils;
+import unibz.shapes.core.global.SPARQLPrefixHandler;
 import unibz.shapes.shape.*;
 import unibz.shapes.shape.impl.*;
-import util.ImmutableCollectors;
-import util.StreamUt;
+import unibz.shapes.util.ImmutableCollectors;
+import unibz.shapes.util.StreamUt;
 
 import java.io.FileReader;
 import java.io.IOException;

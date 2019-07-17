@@ -1,16 +1,16 @@
 package unibz.shapes.shape.impl;
 
 import com.google.common.collect.ImmutableSet;
-import core.Literal;
-import core.RulePattern;
-import core.global.VariableGenerator;
+import unibz.shapes.core.Literal;
+import unibz.shapes.core.RulePattern;
+import unibz.shapes.core.global.VariableGenerator;
 import unibz.shapes.shape.AtomicConstraint;
-import util.ImmutableCollectors;
+import unibz.shapes.util.ImmutableCollectors;
 
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import static core.global.VariableGenerator.VariableType;
+import static unibz.shapes.core.global.VariableGenerator.VariableType;
 
 public abstract class AtomicConstraintImpl implements AtomicConstraint {
 

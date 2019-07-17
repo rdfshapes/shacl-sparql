@@ -2,8 +2,7 @@ package unibz.shapes.shape;
 
 
 import com.google.common.collect.ImmutableSet;
-import com.sun.org.apache.xpath.internal.operations.Variable;
-import core.Literal;
+import unibz.shapes.core.Literal;
 
 import java.util.Optional;
 

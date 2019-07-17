@@ -2,13 +2,13 @@ package unibz.shapes.shape.impl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import core.Query;
+import unibz.shapes.core.Query;
 import unibz.shapes.shape.preprocess.QueryGenerator;
 import unibz.shapes.shape.ConstraintConjunction;
 import unibz.shapes.shape.LocalConstraint;
 import unibz.shapes.shape.MaxOnlyConstraint;
 import unibz.shapes.shape.MinOnlyConstraint;
-import util.ImmutableCollectors;
+import unibz.shapes.util.ImmutableCollectors;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;

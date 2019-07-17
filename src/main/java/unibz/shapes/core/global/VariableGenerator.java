@@ -1,4 +1,4 @@
-package core.global;
+package unibz.shapes.core.global;
 
 
 import java.util.concurrent.atomic.AtomicInteger;

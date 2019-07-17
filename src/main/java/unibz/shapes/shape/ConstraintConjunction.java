@@ -1,7 +1,7 @@
 package unibz.shapes.shape;
 
 import com.google.common.collect.ImmutableSet;
-import core.Query;
+import unibz.shapes.core.Query;
 
 import java.util.Optional;
 import java.util.stream.Stream;

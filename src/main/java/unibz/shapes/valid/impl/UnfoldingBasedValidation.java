@@ -1,10 +1,10 @@
-package valid.impl;
+package unibz.shapes.valid.impl;
 
-import core.Query;
+import unibz.shapes.core.Query;
 import unibz.shapes.endpoint.QueryEvaluation;
 import unibz.shapes.endpoint.SPARQLEndpoint;
-import util.Output;
-import valid.Validation;
+import unibz.shapes.util.Output;
+import unibz.shapes.valid.Validation;
 
 import java.io.IOException;
 import java.nio.file.Files;

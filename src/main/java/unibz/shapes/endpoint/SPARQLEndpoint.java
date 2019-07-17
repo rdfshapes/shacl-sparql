@@ -2,7 +2,6 @@ package unibz.shapes.endpoint;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import core.Query;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.repository.Repository;
@@ -10,7 +9,8 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.ImmutableCollectors;
+import unibz.shapes.core.Query;
+import unibz.shapes.util.ImmutableCollectors;
 
 import java.time.Instant;
 

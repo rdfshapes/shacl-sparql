@@ -1,2 +1,0 @@
-JapaneseMovie(http://dbpedia.org/resource/Rashomon), depth 1, focus shape JapaneseStar
-JapaneseMovie(http://dbpedia.org/resource/The_Idiot_(1951_film)), depth 1, focus shape JapaneseStar

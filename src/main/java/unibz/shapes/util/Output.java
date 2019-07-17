@@ -1,4 +1,4 @@
-package util;
+package unibz.shapes.util;
 
 import java.io.BufferedWriter;
 import java.io.File;

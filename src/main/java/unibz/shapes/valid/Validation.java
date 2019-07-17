@@ -1,4 +1,4 @@
-package valid;
+package unibz.shapes.valid;
 
 import java.io.IOException;
 

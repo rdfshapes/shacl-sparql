@@ -1,4 +1,4 @@
-package core;
+package unibz.shapes.core;
 
 import java.util.Objects;
 

@@ -2,15 +2,15 @@ package unibz.shapes.shape.preprocess;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import core.Literal;
-import core.Query;
-import core.RulePattern;
-import core.global.SPARQLPrefixHandler;
-import core.global.VariableGenerator;
+import unibz.shapes.core.Literal;
+import unibz.shapes.core.Query;
+import unibz.shapes.core.RulePattern;
+import unibz.shapes.core.global.SPARQLPrefixHandler;
+import unibz.shapes.core.global.VariableGenerator;
 import unibz.shapes.shape.AtomicConstraint;
 import unibz.shapes.shape.MaxOnlyConstraint;
 import unibz.shapes.shape.NeighborhoodConstraint;
-import util.ImmutableCollectors;
+import unibz.shapes.util.ImmutableCollectors;
 
 import java.util.ArrayList;
 import java.util.List;

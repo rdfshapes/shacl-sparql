@@ -1,4 +1,4 @@
-package util;
+package unibz.shapes.util;
 
 import java.util.Iterator;
 import java.util.Spliterator;

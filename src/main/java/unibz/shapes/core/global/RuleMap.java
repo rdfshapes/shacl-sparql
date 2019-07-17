@@ -1,7 +1,7 @@
-package core.global;
+package unibz.shapes.core.global;
 
 import com.google.common.collect.ImmutableSet;
-import core.Literal;
+import unibz.shapes.core.Literal;
 
 import java.util.*;
 import java.util.stream.Stream;
