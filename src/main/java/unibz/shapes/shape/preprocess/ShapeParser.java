@@ -35,23 +35,13 @@ public class ShapeParser {
 
     public static Schema parseSchemaFromDir(Path dir, Format shapeFormat) {
         String fileExtension = getFileExtension(shapeFormat);
-        ImmutableSet<Shape> shapes = FileUtils.listFiles(
+        return new SchemaImpl(FileUtils.listFiles(
                 dir.toFile(),
                 new String[]{fileExtension},
                 false
         ).stream()
                 .map(f -> parse(Paths.get(f.getAbsolutePath()), shapeFormat))
-                .collect(ImmutableCollectors.toSet());
-
-        return new SchemaImpl(
-                shapes.stream()
-                        .collect(ImmutableCollectors.toMap(
-                                Shape::getId,
-                                s -> s
-                        )),
-                shapes.stream()
-                        .flatMap(s -> s.computePredicateSet().stream())
-                        .collect(ImmutableCollectors.toSet())
+                .collect(ImmutableCollectors.toSet())
         );
     }
 
