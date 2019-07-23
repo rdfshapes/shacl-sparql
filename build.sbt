@@ -1,4 +1,4 @@
-name := "rdfparser"
+name := "shacl_sparql"
 
 version := "0.1"
 
