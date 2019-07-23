@@ -1,8 +1,9 @@
 package unibz.shapes.eval;
 
-import ch.qos.logback.classic.Logger;
-import unibz.shapes.endpoint.SPARQLEndpoint;
+//import ch.qos.logback.classic.Logger;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unibz.shapes.endpoint.SPARQLEndpoint;
 import unibz.shapes.shape.preprocess.ShapeParser;
 import unibz.shapes.shape.Schema;
 import unibz.shapes.util.Output;
@@ -19,7 +20,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static ch.qos.logback.classic.Level.INFO;
+//import static ch.qos.logback.classic.Level.INFO;
 import static unibz.shapes.shape.preprocess.ShapeParser.*;
 
 public class Eval {
@@ -46,7 +47,7 @@ public class Eval {
     private static ShapeParser.Format shapeFormat;
 
     public static void main(String[] args) {
-        setLoggers();
+//        setLoggers();
 //        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql","./output"};
         parseArguments(args);
         schema.ifPresent(s -> s.getShapes().forEach(sh -> sh.computeConstraintQueries(s, graph)));
@@ -83,15 +84,15 @@ public class Eval {
             dir.mkdirs();
     }
 
-    private static void setLoggers() {
-        Set<String> loggers = new HashSet<>(Arrays.asList("org.apache.http", "o.e.r.q.r"));
-
-        for (String log : loggers) {
-            Logger logger = (Logger) LoggerFactory.getLogger(log);
-            logger.setLevel(INFO);
-            logger.setAdditive(false);
-        }
-    }
+//    private static void setLoggers() {
+//        Set<String> loggers = new HashSet<>(Arrays.asList("org.apache.http", "o.e.r.q.r"));
+//
+//        for (String log : loggers) {
+//            Logger logger = (Logger) LoggerFactory.getLogger(log);
+//            logger.setLevel(INFO);
+//            logger.setAdditive(false);
+//        }
+//    }
 
     private static void parseArguments(String[] args) {
         Optional<Path> schemaDir = Optional.empty();
