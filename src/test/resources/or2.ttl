@@ -1,0 +1,21 @@
+@prefix ex: <http://example.org/>
+@prefix sh: <http://www.w3.org/ns/shacl#>
+
+		ex:OrConstraintExampleShape
+	a sh:NodeShape ;
+	sh:targetNode ex:Bob ;
+	sh:or (
+		[
+			sh:path ex:firstName ;
+			sh:minCount 1 ;
+		]
+		[
+			sh:path ex:givenName ;
+			sh:minCount 1 ;
+		]
+		[
+			sh:path ex:otherName ;
+			sh:minCount 1 ;
+		]
+	)
+	.
