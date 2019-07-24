@@ -13,23 +13,26 @@ based on the semantics for recursive SHACL shapes defined in
 To validate a graph with SHACL2SPARQL:
 
 ```
-java -jar <jar> [-g <graphName>] -d <shapeDirectory> <endpointUrl> <outputDirectory>
+java -jar <jarPath> [-r] [-j] [-d schemaDir] [-f schemaFile] [-s schemaString] [-g graphName] endpoint outputDir
 ```
 
-where:
-* \<jar\> is the path to the .jar `build/validation-1.0-SNAPSHOT.jar`
-* \<graphName\> is the (optional) name of the graph. If specified, the generated queries will use the SPARQL GRAPH keyword.
-* \<shapeDirectory\> is the path to a folder containing the shapes to be validated.
-There must be one json file per shape, following the syntax described in the document `doc/jsonSyntax.pdf`.
-Support for the RDF (Turtle) SHACL syntax will be available soon. 
-* \<shapeDirectory\> is the url of the sparql endpoint.
-* \<outputDirectory\> is the path to the output directory. It will contain logs and validation results.
+where `<jarPath>` is the path to the .jar `build/valid<version>.jar`
 
+with:
+* `-s`: Select the SHACL/RDF (Turtle) input shape format
+* `-j`: Select the JSON input shape format, described in the document `doc/jsonSyntax.pdf` (default format if none of -s or -j is specified).
+* `schemaDir`: Directory containing the shape schema (for the JSON format only, one shape per file, extension ".json")
+* `schemaFile`: File containing the shape schema (for the SHACL/RDF format only, extension ".ttl")
+* `schemaStringShape`: Shape schema as a string (for the SHACL/RDF format only)
+* `graphName`: Name of the RDF graph to be validated (using the SPARQL "GRAPH" operator)
+* `endpoint`: SPARQL endpoint exposing the graph to be validated
+* `outputDir`: Output directory (validation results, statistics and logs)
+ 
 Java 8 is required.
 
-For instance (from this directory):
+For instance (from the current directory):
 ```
-java -jar build/validation-1.0-SNAPSHOT.jar -d ./ex/shapes/nonRec/2/ "http://dbpedia.org/sparql"  ./output/
+java -jar build/valid-1.0-SNAPSHOT.jar -d ./ex/shapes/nonRec/2/ "http://dbpedia.org/sparql"  ./output/
 ```
 
 Note that the validation results for the above command are incorrect, because the SPARQL endpoint "http://dbpedia.org/sparql" only returns the 10 000 first answers to a query.
@@ -41,21 +44,21 @@ Maven 3 is required.
 
 ### Build the validation engine only (Java source)
 
-This is the recommended build.
+This is the recommended build.\
 All features will be available, but the SHACL parser (written in Scala) will not be rebuilt. 
 
-* From the current directory (must contain the `pom.xml` file and `src` directory):
+From the current directory (must contain the `pom.xml` file and `src` directory):
 ```
-mvn clean package
+./build.sh
 ```
-* The jar is `src/target/validation-1.0-SNAPSHOT.jar`.
+The jar is `build/valid<version>.jar`.
 
 
 ### Build the SHACL parser (Scala source) and validation engine (Java source)
 
 SBT is required.
 
-* From the current directory (must contain the `pom.xml` file, `build.sbt` file and `src` directory):
+From the current directory (must contain the `pom.xml` file, `build.sbt` file and `src` directory):
 ```
 ./build_full.sh
 ```
