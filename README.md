@@ -1,4 +1,4 @@
-# SHACL2SPARQL #
+# SHACL2SPARQL
 
 SHACL2SPARQL is a prototype Java implementation of the algorithm described in
 *Validating SHACL constraints over a SPARQL endpoint* (Corman, FLorenzano, Reutter and Savkovic), ISWC 19 (to appear).
@@ -8,7 +8,7 @@ based on the semantics for recursive SHACL shapes defined in
 [*Semantics and validation of recursive SHACL*](https://www.inf.unibz.it/krdb/KRDB%20files/tech-reports/KRDB18-01.pdf).
 
 
-### Validate an RDF graph with SHACL2SPARQL ###
+## Validate an RDF graph with SHACL2SPARQL ##
 
 To validate a graph with SHACL2SPARQL:
 
@@ -35,12 +35,27 @@ java -jar compiled/validation-1.0-SNAPSHOT.jar -d ./ex/shapes/nonRec/2/ "http://
 Note that the validation results for the above command are incorrect, because the SPARQL endpoint "http://dbpedia.org/sparql" only returns the 10 000 first answers to a query.
 
 
-### Build from source ###
+## Build from source (Linux or Mac OS)
 
-Maven is required.
+Maven 3 is required.
+
+### Build the validation engine only (Java source)
+
+This is the recommended build.
+All features will be available, but the SHACL parser (written in Scala) will not be rebuilt. 
 
 * From the current directory (must contain the `pom.xml` file and `src` directory):
 ```
-mvn package
+mvn clean package
 ```
 * The jar is `src/target/validation-1.0-SNAPSHOT.jar`.
+
+
+### Build the SHACL parser (Scala source) and validation engine (Java source)
+
+SBT is required.
+
+* From the current directory (must contain the `pom.xml` file, `build.sbt` file and `src` directory):
+```
+./build_full.sh
+```

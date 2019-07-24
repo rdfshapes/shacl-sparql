@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.io.FileUtils;
+import unibz.shapes.convert.Parser;
 import unibz.shapes.core.global.SPARQLPrefixHandler;
 import unibz.shapes.shape.*;
 import unibz.shapes.shape.impl.*;
@@ -57,7 +58,9 @@ public class ShapeParser {
 
 
     public static Schema parseSchemaFromString(String s, Format shapeFormat) {
-        return null;
+        if(shapeFormat == Format.SHACL)
+            return Parser.parse(s);
+        throw new RuntimeException("Only SHACL/RDF (Turtle) format supported when the input schema is given as a string: ");
     }
 
     private static Shape parse(Path path, Format shapeFormat) {
