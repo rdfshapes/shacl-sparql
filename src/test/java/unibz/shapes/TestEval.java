@@ -16,7 +16,7 @@ public class TestEval {
 
     @Test
     public void nonRec2_shacl() {
-        Eval.main(new String[]{"-d", "ex/shapes/nonRec/2/", "http://dbpedia.org/sparql","./output"});
+        Eval.main(new String[]{"-r", "-d", "ex/shapes/nonRec/2/shacl", "http://dbpedia.org/sparql","./output"});
     }
     @Test
     public void rdf() {

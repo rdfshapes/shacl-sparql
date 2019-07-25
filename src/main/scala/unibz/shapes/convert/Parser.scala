@@ -33,11 +33,14 @@ object Parser {
     }
   }
 
-  private[this] def translateTargetNodeDefs(s: Seq[TargetNode]): String = {
-    "VALUES (?x) {\n" +
-      s
+  private[this] def translateTargetNodeDefs(s: Seq[TargetNode]): Option[String] =
+    s.isEmpty match {
+      case true => None
+      case false => Some("VALUES (?x) {\n" +
+        s
         .map(e => "(" + e.node.toString + ")")
         .reduce((s1, s2) => s1 + "\n" + s2) + "\n}"
+    )
   }
 
   private[this] def getTargetQuery(shape: NodeShape): Optional[String] = {
@@ -46,15 +49,16 @@ object Parser {
 
     val (targetNodeDefs, otherTargetDefs) = shape.targets
       .partition(t => t.isInstanceOf[TargetNode])
-    val s: String = translateTargetNodeDefs(targetNodeDefs
+    val s: Option[String] = translateTargetNodeDefs(targetNodeDefs
       .map(e => e.asInstanceOf[TargetNode])
     )
-    val triplePatterns: Seq[String] = otherTargetDefs
-      .map(t => translateTargetDef(t))
-      .flatten :+ s
-    Optional.of(
+    val triplePatterns: Seq[Option[String]] = otherTargetDefs
+      .map(t => translateTargetDef(t)) :+ s
+
+    return Optional.of(
       "SELECT ?x WHERE {\n" +
         triplePatterns
+          .flatten
           .reduce((s1, s2) => "{\n " + s1 + "\n} UNION {\n" + s2 + " \n}")
         + "\n}")
   }
@@ -96,10 +100,10 @@ object Parser {
       throw new RDFParserException("Only one sh:minCount is expected\n" + s.toString)
     if (minSeq.size == 1)
       return Some(minSeq.head.asInstanceOf[MinCount].value)
-    val minQualSeq = s.components
-      .filter(c => c.isInstanceOf[QualifiedValueShape])
-      .map(c => c.asInstanceOf[QualifiedValueShape].qualifiedMinCount)
-    minQualSeq.head
+    getUniqueQual(s.components) match {
+      case Some(q: QualifiedValueShape) => q.qualifiedMinCount
+      case None => None
+    }
   }
 
   private[this] def getMaxCard(s: PropertyShape, anonNodeShapes: Map[RefNode, NodeShape]): Option[Int] = {
@@ -109,11 +113,10 @@ object Parser {
       throw new RDFParserException("Only one sh:maxCount is expected\n" + s.toString)
     if (maxSeq.size == 1)
       return Some(maxSeq.head.asInstanceOf[MaxCount].value)
-    val maxQualSeq = s.components
-      .filter(c => c.isInstanceOf[QualifiedValueShape])
-      .map(c => c.asInstanceOf[QualifiedValueShape].qualifiedMaxCount)
-    maxQualSeq.head
-
+    getUniqueQual(s.components) match {
+      case Some(q: QualifiedValueShape) => q.qualifiedMaxCount
+      case None => None
+    }
   }
 
   private[this] def isForAll(s: PropertyShape, anonNodeShapes: Map[RefNode, NodeShape]): Boolean =
@@ -173,7 +176,7 @@ object Parser {
     }
 
   private[this] def getMaxConstraints(id: String, s: PropertyShape, anonNodeShapes: Map[RefNode, NodeShape]): Iterable[MaxOnlyConstraint] = {
-    return getMaxConstraint(id, s, anonNodeShapes) ++ getForAllConstraint(id, s, anonNodeShapes)
+    getMaxConstraint(id, s, anonNodeShapes) ++ getForAllConstraint(id, s, anonNodeShapes)
   }
 
   private[this] def getMaxConstraint(id: String, s: PropertyShape, anonNodeShapes: Map[RefNode, NodeShape]): Option[MaxOnlyConstraint] =
@@ -407,7 +410,7 @@ object Parser {
     val schema: ShaclexSchema = Schemas.fromString(
       schemaString,
       "TURTLE",
-      "schaclex"
+      "shaclex"
     ) match {
       case Right(schema: ShaclexSchema) => schema
       case _ => throw new RuntimeException("The schema cannot be parsed")
