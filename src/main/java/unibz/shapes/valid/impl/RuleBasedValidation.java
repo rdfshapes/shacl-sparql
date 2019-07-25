@@ -2,13 +2,13 @@ package unibz.shapes.valid.impl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.eclipse.rdf4j.query.BindingSet;
 import unibz.shapes.core.Literal;
 import unibz.shapes.core.Query;
 import unibz.shapes.core.RulePattern;
 import unibz.shapes.core.global.RuleMap;
 import unibz.shapes.endpoint.QueryEvaluation;
 import unibz.shapes.endpoint.SPARQLEndpoint;
-import org.eclipse.rdf4j.query.BindingSet;
 import unibz.shapes.shape.ConstraintConjunction;
 import unibz.shapes.shape.Schema;
 import unibz.shapes.shape.Shape;
@@ -51,7 +51,10 @@ public class RuleBasedValidation implements Validation {
 
     public void exec() {
         Instant start = Instant.now();
+        logOutput.write("Retrieving targets ...");
         Set<Literal> targets = extractTargetAtoms();
+        logOutput.write("\nTargets retrieved.");
+        logOutput.write("Number of targets:\n" + targets.size());
         stats.recordInitialTargets(targets.size());
         validate(
                 0,
@@ -90,10 +93,13 @@ public class RuleBasedValidation implements Validation {
     }
 
     private Set<Literal> extractTargetAtoms(Shape shape) {
-        return endpoint.runQuery(
+        logOutput.start("Evaluating query:\n" + shape.getTargetQuery().get());
+        QueryEvaluation eval = endpoint.runQuery(
                 shape.getId(),
                 shape.getTargetQuery().get()
-        ).getBindingSets().stream()
+        );
+        logOutput.elapsed();
+        return eval.getBindingSets().stream()
                 .map(b -> b.getBinding("x").getValue().stringValue())
                 .map(i -> new Literal(shape.getId(), i, true))
                 .collect(Collectors.toSet());
@@ -228,7 +234,7 @@ public class RuleBasedValidation implements Validation {
     }
 
     private void evalQuery(EvalState state, Query q, Shape s) {
-        logOutput.start("Evaluating query\n" + q.getSparql());
+        logOutput.start("Evaluating query:\n" + q.getSparql());
         QueryEvaluation eval = endpoint.runQuery(q.getId(), q.getSparql());
         stats.recordQueryExecTime(logOutput.elapsed());
         logOutput.write("Number of solution mappings: " + eval.getBindingSets().size());

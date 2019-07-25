@@ -10,7 +10,8 @@ public class SPARQLPrefixHandler {
             "dbo", "<http://dbpedia.org/ontology/>",
             "dbr", "<http://dbpedia.org/resource/>",
             "yago", "<http://dbpedia.org/class/yago/>",
-            "foaf", "<http://xmlns.com/foaf/0.1/>"
+            "foaf", "<http://xmlns.com/foaf/0.1/>",
+            "", "<http://example.org/>"
     );
     private static String prefixString = prefixes.entrySet().stream()
             .map(e -> "PREFIX " + e.getKey() + ":" + e.getValue())
