@@ -34,11 +34,13 @@ public class Eval {
                     "\t java -jar valid-<version>.jar "+
                     "[-r] [-j] [-d schemaDir] [-f schemaFile] [-s schemaString] [-g graphName] endpoint outputDir\n\n" +
                     "with:\n\n" +
-                    "-s:                     Shapes format: SHACL/RDF (Turtle)\n" +
-                    "-j:                     Shapes format: JSON (default format if none of -s or -j is specified)\n" +
-                    "schemaDir:             Directory containing the shape schema (for the JSON format only, one shape per file, extension \".json\")\n" +
+                    "-s:                    Shapes format: SHACL/RDF (Turtle)\n" +
+                    "-j:                    Shapes format: JSON (default format if none of -s or -j is specified)\n" +
+                    "schemaDir:             Directory containing the shape schema:\n" +
+                    "\t\t\t\t\t\t\tJSON format: one shape per file, extension \".json\"\n" +
+                    "\t\t\t\t\t\t\tSHACL/RDF format: extension \".ttl\"\n" +
                     "schemaFile:            File containing the shape schema (for the SHACL/RDF format only, extension \".ttl\")\n" +
-                    "schemaStringShape:     Shape schema as a string (for the SHACL/RDF format only)\n" +
+                    "schemaString:          Shape schema as a string (for the SHACL/RDF format only)\n" +
                     "graphName:             Name of the RDF graph to be validated (using the SPARQL \"GRAPH\" operator)\n" +
                     "endpoint:              SPARQL endpoint exposing the graph to be validated\n" +
                     "outputDir:             Output directory (validation results statistics and logs)\n" +
@@ -52,7 +54,7 @@ public class Eval {
     private static ShapeParser.Format shapeFormat;
 
     public static void main(String[] args) {
-        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql"};
+//        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql"};
 //        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql", "output/"};
         parseArguments(args);
         schema.getShapes()

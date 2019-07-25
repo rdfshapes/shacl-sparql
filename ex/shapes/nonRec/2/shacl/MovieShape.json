@@ -1,0 +1,28 @@
+@prefix : <http://example.org/>
+@prefix sh: <http://www.w3.org/ns/shacl#>
+
+:S a sh:NodeShape;
+   sh:targetNode :x, :y ;
+   sh:property [
+     sh:path :p;
+     sh:minCount 1 ;
+     sh:maxCount 2 ;
+   ] .
+{
+	"name": "MovieShape",
+	"targetDef":{
+		"query":"SELECT ?x WHERE {?x a dbo:Film}"
+	},
+	"constraintDef":{
+		"conjunctions":[
+			[ 	
+				{ "path": "dbo:writer", "min": 1},
+				{ "path": "dbo:musicComposer", "min": 1},
+				{ "path": "dbo:director", "min": 1},
+				{ "path": "dbo:imdbId", "min": 1 },
+				{ "path": "dbo:imdbId", "max": 1 },
+				{ "path": "dbo:starring", "min": 1, "shape":"ActorShape"}
+			]
+		]
+	}
+}

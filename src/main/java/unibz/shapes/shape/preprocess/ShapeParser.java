@@ -14,8 +14,10 @@ import unibz.shapes.shape.impl.*;
 import unibz.shapes.util.ImmutableCollectors;
 import unibz.shapes.util.StreamUt;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -24,6 +26,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static unibz.shapes.shape.preprocess.ShapeParser.Format.JSON;
 
 
 public class ShapeParser {
@@ -36,14 +40,39 @@ public class ShapeParser {
 
     public static Schema parseSchemaFromDir(Path dir, Format shapeFormat) {
         String fileExtension = getFileExtension(shapeFormat);
-        return new SchemaImpl(FileUtils.listFiles(
-                dir.toFile(),
-                new String[]{fileExtension},
-                false
-        ).stream()
-                .map(f -> parse(Paths.get(f.getAbsolutePath()), shapeFormat))
-                .collect(ImmutableCollectors.toSet())
-        );
+        switch (shapeFormat) {
+            case JSON:
+                return new SchemaImpl(
+                        FileUtils.listFiles(
+                                dir.toFile(),
+                                new String[]{fileExtension},
+                                false
+                        ).stream()
+                                .map(f -> parse(Paths.get(f.getAbsolutePath()), shapeFormat))
+                                .collect(ImmutableCollectors.toSet())
+                );
+            case SHACL:
+                return parseSchemaFromString(
+                        FileUtils.listFiles(
+                                dir.toFile(),
+                                new String[]{fileExtension},
+                                false
+                        ).stream()
+                                .map(f -> read(f))
+                                .collect(Collectors.joining( "\n" )),
+                        shapeFormat
+                );
+                default:
+                    throw new RuntimeException("Unexpected format: " + shapeFormat);
+        }
+    }
+
+    private static String read(File f) {
+        try {
+            return new String(Files.readAllBytes(Paths.get(f.getAbsolutePath())));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static String getFileExtension(Format shapeFormat) {
