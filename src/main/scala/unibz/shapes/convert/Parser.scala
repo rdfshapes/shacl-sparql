@@ -71,7 +71,7 @@ object Parser {
       case x if x.isEmpty =>
         None
       case x if x.size > 1 =>
-        throw new RDFParserException("Multiple Not components within :\n" + components.toString)
+        throw new RDFParserException("Multiple sh:not components within :\n" + components.toString)
       case x =>
         Some(x.head.asInstanceOf[Not])
     }
@@ -83,7 +83,7 @@ object Parser {
       case x if x.isEmpty =>
         None
       case x if x.size > 1 =>
-        throw new RDFParserException("Multiple QualifiedValueShape components within :\n" + components.toString)
+        throw new RDFParserException("Multiple sh:qualifiedValueShape components within :\n" + components.toString)
       case x =>
         Some(x.head.asInstanceOf[QualifiedValueShape])
     }
@@ -218,6 +218,7 @@ object Parser {
 
   private[this] def getLocalConstraint(id: String, components: Seq[Component], anonNodeShapes: Map[RefNode, NodeShape]): Option[LocalConstraint] = {
     val (datatype, constant, shaperef, isPos) = getLocalConstraintComponents(components, anonNodeShapes)
+    if(datatype.isPresent || constant.isPresent || shaperef.isPresent)
     Some(new LocalConstraintImpl(
       id,
       datatype,
@@ -225,6 +226,8 @@ object Parser {
       shaperef,
       isPos
     ))
+    else
+      None
   }
 
 

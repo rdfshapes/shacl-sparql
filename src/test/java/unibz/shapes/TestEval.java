@@ -9,11 +9,15 @@ import java.io.File;
 
 public class TestEval {
 
-//    @Test
-//    public void nonRec2() {
-//            Eval.main(new String[]{"d", "ex/shapes/nonRec/2/", "http://dbpedia.org/sparql","./output"});
-//    }
-//
+    @Test
+    public void nonRec2_json() {
+            Eval.main(new String[]{"-d", "ex/shapes/nonRec/2/", "http://dbpedia.org/sparql","./output"});
+    }
+
+    @Test
+    public void nonRec2_shacl() {
+        Eval.main(new String[]{"-d", "ex/shapes/nonRec/2/", "http://dbpedia.org/sparql","./output"});
+    }
     @Test
     public void rdf() {
 

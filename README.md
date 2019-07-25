@@ -22,8 +22,10 @@ with:
 * `-s`: Select the SHACL/RDF (Turtle) input shape format
 * `-j`: Select the JSON input shape format, described in the document `doc/jsonSyntax.pdf` (default format if none of -s or -j is specified).
 * `schemaDir`: Directory containing the shape schema (for the JSON format only, one shape per file, extension ".json")
+    - JSON format: one shape per file, extension ".json"
+    - SHACL/RDF format: extension ".ttl"
 * `schemaFile`: File containing the shape schema (for the SHACL/RDF format only, extension ".ttl")
-* `schemaStringShape`: Shape schema as a string (for the SHACL/RDF format only)
+* `schemaString`: Shape schema as a string (for the SHACL/RDF format only)
 * `graphName`: Name of the RDF graph to be validated (using the SPARQL "GRAPH" operator)
 * `endpoint`: SPARQL endpoint exposing the graph to be validated
 * `outputDir`: Output directory (validation results, statistics and logs)
