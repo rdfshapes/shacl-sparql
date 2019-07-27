@@ -1,0 +1,25 @@
+@prefix dbo: <http://dbpedia.org/ontology/>
+@prefix dbr: <http://dbpedia.org/resource/>
+@prefix sh: <http://www.w3.org/ns/shacl#>
+@prefix : <http://example.org/>
+
+:ActorShape a sh:NodeShape;
+   sh:property [
+     sh:path dbo:birthPlace;
+     sh:minCount 1
+   ] ;
+   sh:property [
+     sh:path dbo:activeYearsStartYear;
+     sh:minCount 1
+   ] ;
+   sh:property [
+     sh:path dbo:occupation;
+	 sh:qualifiedValueShape [
+	   sh:hasValue dbr:Actor ;
+     ];
+     sh:qualifiedMinCount 1
+   ]; 
+   sh:property [
+     sh:path dbo:imdbId;
+     sh:minCount 1
+   ] .
