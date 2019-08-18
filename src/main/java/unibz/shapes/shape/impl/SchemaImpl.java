@@ -2,6 +2,7 @@ package unibz.shapes.shape.impl;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import unibz.shapes.shape.DependencyGraph;
 import unibz.shapes.shape.Schema;
 import unibz.shapes.shape.Shape;
 import unibz.shapes.util.ImmutableCollectors;
@@ -12,6 +13,7 @@ public class SchemaImpl implements Schema {
 
     private final ImmutableMap<String, Shape> shapeMap;
     private final ImmutableSet<String> shapeNames;
+    private final DependencyGraph dependencyGraph;
 
     public SchemaImpl(ImmutableSet<Shape> shapes) {
 
@@ -23,6 +25,7 @@ public class SchemaImpl implements Schema {
         this.shapeNames = shapes.stream()
                 .flatMap(s -> s.computePredicateSet().stream())
                 .collect(ImmutableCollectors.toSet());
+        dependencyGraph = DependencyGraph.computeDependecyGraph(shapeMap);
     }
 
     @Override

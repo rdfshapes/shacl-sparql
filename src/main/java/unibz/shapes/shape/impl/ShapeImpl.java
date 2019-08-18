@@ -9,6 +9,7 @@ import unibz.shapes.shape.Schema;
 import unibz.shapes.shape.Shape;
 import unibz.shapes.util.ImmutableCollectors;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -65,6 +66,16 @@ public class ShapeImpl implements Shape {
         return predicates;
     }
 
+    @Override
+    public ImmutableSet<String> getPosShapeReferences() {
+        return ;
+    }
+
+    @Override
+    public ImmutableSet<String> getNegShapeReferences() {
+        return ;
+    }
+
     private ImmutableSet<RulePattern> computeRulePatterns() {
         String focusNodeVar = VariableGenerator.getFocusNodeVar();
         Literal head = new Literal(id, focusNodeVar, true);
@@ -93,5 +104,18 @@ public class ShapeImpl implements Shape {
                                 false
                         ))
         ).collect(ImmutableCollectors.toSet());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShapeImpl shape = (ShapeImpl) o;
+        return id.equals(shape.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

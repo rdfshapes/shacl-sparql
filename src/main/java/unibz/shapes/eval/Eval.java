@@ -9,7 +9,7 @@ import unibz.shapes.shape.Schema;
 import unibz.shapes.shape.preprocess.ShapeParser;
 import unibz.shapes.util.Output;
 import unibz.shapes.valid.Validation;
-import unibz.shapes.valid.impl.RuleBasedValidation;
+import unibz.shapes.valid.rule.RuleBasedValidation;
 import unibz.shapes.valid.impl.UnfoldingBasedValidation;
 
 import java.io.File;
@@ -72,8 +72,8 @@ public class Eval {
                             endpoint,
                             schema,
                             new Output(Paths.get(outputDir.toString(), "validation.log").toFile()),
-                            new Output(Paths.get(outputDir.toString(), "targets_valid.txt").toFile()),
-                            new Output(Paths.get(outputDir.toString(), "targets_violated.txt").toFile()),
+                            new Output(Paths.get(outputDir.toString(), "targets_valid.log").toFile()),
+                            new Output(Paths.get(outputDir.toString(), "targets_violated.log").toFile()),
                             new Output(Paths.get(outputDir.toString(), "stats.txt").toFile())
                     );
             Instant start = Instant.now();
