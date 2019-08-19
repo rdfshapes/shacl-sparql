@@ -11,6 +11,7 @@ import unibz.shapes.util.ImmutableCollectors;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ShapeImpl implements Shape {
@@ -67,13 +68,17 @@ public class ShapeImpl implements Shape {
     }
 
     @Override
-    public ImmutableSet<String> getPosShapeReferences() {
-        return ;
+    public ImmutableSet<String> getPosShapeRefs() {
+        return disjuncts.stream()
+                .flatMap(d -> d.getPosShapeRefs())
+                .collect(ImmutableCollectors.toSet());
     }
 
     @Override
-    public ImmutableSet<String> getNegShapeReferences() {
-        return ;
+    public ImmutableSet<String> getNegShapeRefs() {
+        return disjuncts.stream()
+                .flatMap(d -> d.getNegShapeRefs())
+                .collect(ImmutableCollectors.toSet());
     }
 
     private ImmutableSet<RulePattern> computeRulePatterns() {

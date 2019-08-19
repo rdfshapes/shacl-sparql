@@ -14,4 +14,10 @@ public interface ConstraintConjunction {
     ImmutableSet<Query> getMaxQueries();
 
     Stream<String> getPredicates();
+
+    Stream<String> getPosShapeRefs();
+
+    Stream<String> getNegShapeRefs();
+
+    Stream<? extends AtomicConstraint> getConjuncts();
 }

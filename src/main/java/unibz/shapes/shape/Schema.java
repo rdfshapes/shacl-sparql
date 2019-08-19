@@ -10,7 +10,5 @@ public interface Schema {
 
     ImmutableSet<Shape> getShapes();
 
-    ImmutableSet<String> getShapeNames();
-
     ImmutableSet<Shape> getShapesReferencedBy(Shape s);
 }

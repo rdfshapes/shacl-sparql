@@ -1,13 +1,12 @@
 package unibz.shapes.shape;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.stream.Stream;
 
 public interface DependencyGraph {
 
+    Stream<Shape> getPosReferences(Shape shape);
 
-    static DependencyGraph computeDependecyGraph(ImmutableMap<String, Shape> shapeMap) {
+    Stream<Shape> getNegReferences(Shape shape);
 
-    }
-
-
+    Stream<Shape> getAllReferences(Shape shape);
 }

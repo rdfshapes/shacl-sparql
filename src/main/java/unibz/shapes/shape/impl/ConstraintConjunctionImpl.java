@@ -3,17 +3,17 @@ package unibz.shapes.shape.impl;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import unibz.shapes.core.Query;
+import unibz.shapes.shape.*;
 import unibz.shapes.shape.preprocess.QueryGenerator;
-import unibz.shapes.shape.ConstraintConjunction;
-import unibz.shapes.shape.LocalConstraint;
-import unibz.shapes.shape.MaxOnlyConstraint;
-import unibz.shapes.shape.MinOnlyConstraint;
 import unibz.shapes.util.ImmutableCollectors;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static javafx.scene.input.KeyCode.P;
 
 public class ConstraintConjunctionImpl implements ConstraintConjunction {
 
@@ -63,6 +63,49 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
             ).flatMap(s -> s);
     }
 
+    @Override
+    public Stream<String> getPosShapeRefs() {
+        return getShapeRefs(true);
+    }
+
+    @Override
+    public Stream<String> getNegShapeRefs() {
+        return getShapeRefs(false);
+    }
+
+    private Stream<String> getShapeRefs(boolean posRefs) {
+        Predicate<AtomicConstraint> filterCondidion = posRefs?
+                posRefFilter():
+                negRefFilter();
+
+        return getConjuncts()
+                .filter(filterCondidion)
+                .map(c -> c.getShapeRef().get());
+    }
+
+    private static Predicate<AtomicConstraint> posRefFilter(){
+        return c -> c.getShapeRef().isPresent() &&
+                c.isPos() &&
+                !(c instanceof MaxOnlyConstraint);
+    }
+
+    private static Predicate<AtomicConstraint> negRefFilter(){
+        return c -> c.getShapeRef().isPresent() &&
+                (
+                        !c.isPos() || c instanceof MaxOnlyConstraint
+                );
+    }
+
+    @Override
+    public Stream<? extends AtomicConstraint> getConjuncts() {
+        return Stream.concat(
+                localConstraints.stream(),
+                Stream.concat(
+                        minConstraints.stream(),
+                        maxConstraints.stream()
+                ));
+    }
+
     public void computeQueries(Optional<String> graphName) {
 
         // Create a subquery for all local (i.e. without shape propagation) and positive constraints
@@ -97,5 +140,7 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
                 ))
                 .collect(ImmutableCollectors.toSet());
     }
+
+
 }
 

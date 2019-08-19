@@ -18,7 +18,7 @@ public interface Shape {
 
     ImmutableSet<String> computePredicateSet();
 
-    ImmutableSet<String> getPosShapeReferences();
+    ImmutableSet<String> getPosShapeRefs();
 
-    ImmutableSet<String> getNegShapeReferences();
+    ImmutableSet<String> getNegShapeRefs();
 }

@@ -12,7 +12,6 @@ import java.util.Optional;
 public class SchemaImpl implements Schema {
 
     private final ImmutableMap<String, Shape> shapeMap;
-    private final ImmutableSet<String> shapeNames;
     private final DependencyGraph dependencyGraph;
 
     public SchemaImpl(ImmutableSet<Shape> shapes) {
@@ -22,10 +21,7 @@ public class SchemaImpl implements Schema {
                         Shape::getId,
                         s -> s
                 ));
-        this.shapeNames = shapes.stream()
-                .flatMap(s -> s.computePredicateSet().stream())
-                .collect(ImmutableCollectors.toSet());
-        dependencyGraph = DependencyGraph.computeDependecyGraph(shapeMap);
+        dependencyGraph = DependencyGraphImpl.computeDependencyGraph(shapeMap);
     }
 
     @Override
@@ -42,7 +38,8 @@ public class SchemaImpl implements Schema {
     }
 
     @Override
-    public ImmutableSet<String> getShapeNames() {
-        return shapeNames;
+    public ImmutableSet<Shape> getShapesReferencedBy(Shape s) {
+        return dependencyGraph.getAllReferences(s)
+                .collect(ImmutableCollectors.toSet());
     }
 }
