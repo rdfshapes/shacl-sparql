@@ -8,20 +8,20 @@ import java.util.stream.Stream;
 
 public class EvalPath {
 
-        private final ImmutableList<Shape> shapeNames;
+        private final ImmutableList<Shape> shapes;
 
-        public EvalPath(Shape shape) {
-            shapeNames = ImmutableList.of(shape);
+        public EvalPath() {
+            shapes = ImmutableList.of();
         }
 
         public EvalPath(Shape shape, EvalPath path) {
-            shapeNames = Stream.concat(
-                    Stream.of(shape),
-                    path.getShapes()
+            shapes = Stream.concat(
+                    path.getShapes(),
+                    Stream.of(shape)
             ).collect(ImmutableCollectors.toList());
         }
 
         private Stream<Shape> getShapes(){
-            return shapeNames.stream();
+            return shapes.stream();
         }
 }

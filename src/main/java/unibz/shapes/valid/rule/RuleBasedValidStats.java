@@ -74,9 +74,9 @@ public class RuleBasedValidStats {
             totalSolutionMappings += k;
         }
 
-        void recordDecidedTargets(int numberOfargets) {
-
-        }
+//        void recordDecidedTargets(int numberOfargets) {
+//
+//        }
 
         void recordTotalTime(long ms) {
             totalTime = ms;

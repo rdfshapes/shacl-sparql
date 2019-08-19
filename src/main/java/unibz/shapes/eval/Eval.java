@@ -1,7 +1,5 @@
 package unibz.shapes.eval;
 
-//import ch.qos.logback.classic.Logger;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unibz.shapes.endpoint.SPARQLEndpoint;
@@ -24,7 +22,6 @@ import java.util.stream.Stream;
 
 import static unibz.shapes.shape.preprocess.ShapeParser.Format;
 
-//import static ch.qos.logback.classic.Level.INFO;
 
 public class Eval {
 

@@ -3,6 +3,8 @@ package unibz.shapes.valid.rule;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.eclipse.rdf4j.query.BindingSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unibz.shapes.core.Literal;
 import unibz.shapes.core.Query;
 import unibz.shapes.core.RulePattern;
@@ -23,6 +25,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class RuleBasedValidation implements Validation {
+
+    private static Logger log = (Logger) LoggerFactory.getLogger(RuleBasedValidation.class);
 
     private final SPARQLEndpoint endpoint;
     private final Schema schema;
@@ -59,13 +63,13 @@ public class RuleBasedValidation implements Validation {
         stats.recordInitialTargets(targets.size());
         validate(
                 0,
-                EvalState.init(targets),
+                EvalState.init(targetShapes, targets),
                 targetShapes
         );
         Instant finish = Instant.now();
         long elapsed = Duration.between(start, finish).toMillis();
         stats.recordTotalTime(elapsed);
-        System.out.println("Total execution time: " + elapsed);
+        log.info("Total execution time: " + elapsed);
         logOutput.write("\nMaximal number or rules in memory: " + stats.maxRuleNumber);
         stats.writeAll(statsOutput);
 
@@ -193,7 +197,7 @@ public class RuleBasedValidation implements Validation {
 
         state.remainingTargets = ImmutableSet.copyOf(part1.get(false));
 
-        stats.recordDecidedTargets(part1.get(true).size());
+//        stats.recordDecidedTargets(part1.get(true).size());
 
         Map<Boolean, List<Literal>> part2 = part1.get(true).stream()
                 .collect(Collectors.partitioningBy(Literal::isPos));
@@ -213,7 +217,7 @@ public class RuleBasedValidation implements Validation {
     private Optional<Literal> applyRules(Literal head, Set<ImmutableSet<Literal>> bodies, EvalState state, RuleMap retainedRules) {
         if (bodies.stream()
                 .anyMatch(b -> applyRule(head, b, state, retainedRules))) {
-            state.assignment.add(head);
+//            state.assignment.add(head);
             return Optional.of(head);
         }
         return Optional.empty();
@@ -349,7 +353,7 @@ public class RuleBasedValidation implements Validation {
         //Map from shape name to a set of evaluation paths
         Map<Shape, ImmutableSet<EvalPath>> evalPathsMap;
 
-        static EvalState init(Set<Literal> targets) {
+        static EvalState init(ImmutableSet<Shape> targetShapes, Set<Literal> targets) {
             return new EvalState(
                     targets,
                     new RuleMap(),
@@ -357,7 +361,13 @@ public class RuleBasedValidation implements Validation {
                     new HashSet<>(),
                     new HashSet<>(),
                     new HashSet<>(),
-                    new HashMap<>()
+                    targetShapes.stream()
+                            .collect(Collectors.toMap(
+                                    s -> s,
+                                    s -> ImmutableSet.of(
+                                            new EvalPath()
+                                    )
+                    ))
             );
         }
 
