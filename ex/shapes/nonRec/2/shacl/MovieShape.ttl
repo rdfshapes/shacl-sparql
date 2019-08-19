@@ -6,6 +6,10 @@
 :MovieShape a sh:NodeShape;
    sh:targetClass dbo:Film;	
    sh:property [
+     sh:path dbo:writer;
+     sh:minCount 1
+   ] ;
+   sh:property [
      sh:path dbo:musicComposer;
      sh:minCount 1
    ] ;
@@ -17,4 +21,11 @@
      sh:path dbo:imdbId;
      sh:minCount 1;
      sh:maxCount 1
+   ];
+   sh:property [
+     sh:path dbo:starring;
+	 sh:qualifiedValueShape [
+        sh:node :ActorShape
+     ] ;
+     sh:qualifiedMinCount 1
    ] .
