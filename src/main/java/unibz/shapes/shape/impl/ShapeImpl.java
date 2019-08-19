@@ -9,7 +9,9 @@ import unibz.shapes.shape.Schema;
 import unibz.shapes.shape.Shape;
 import unibz.shapes.util.ImmutableCollectors;
 
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ShapeImpl implements Shape {
@@ -24,6 +26,7 @@ public class ShapeImpl implements Shape {
         this.id = id;
         this.targetQuery = targetQuery;
         this.disjuncts = disjuncts;
+        computePredicateSet();
     }
 
     public String getId() {
@@ -65,6 +68,20 @@ public class ShapeImpl implements Shape {
         return predicates;
     }
 
+    @Override
+    public ImmutableSet<String> getPosShapeRefs() {
+        return disjuncts.stream()
+                .flatMap(d -> d.getPosShapeRefs())
+                .collect(ImmutableCollectors.toSet());
+    }
+
+    @Override
+    public ImmutableSet<String> getNegShapeRefs() {
+        return disjuncts.stream()
+                .flatMap(d -> d.getNegShapeRefs())
+                .collect(ImmutableCollectors.toSet());
+    }
+
     private ImmutableSet<RulePattern> computeRulePatterns() {
         String focusNodeVar = VariableGenerator.getFocusNodeVar();
         Literal head = new Literal(id, focusNodeVar, true);
@@ -93,5 +110,18 @@ public class ShapeImpl implements Shape {
                                 false
                         ))
         ).collect(ImmutableCollectors.toSet());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShapeImpl shape = (ShapeImpl) o;
+        return id.equals(shape.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

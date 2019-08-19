@@ -21,7 +21,6 @@ public class Output {
 
     public Output(File outputFile) throws IOException {
         writer = new BufferedWriter(new FileWriter(outputFile));
-
     }
 
     public void close() throws IOException {

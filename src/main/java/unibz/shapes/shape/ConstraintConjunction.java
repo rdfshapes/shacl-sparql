@@ -9,9 +9,18 @@ import java.util.stream.Stream;
 public interface ConstraintConjunction {
 
     String getId();
+
     void computeQueries(Optional<String> graph);
+
     Query getMinQuery();
+
     ImmutableSet<Query> getMaxQueries();
 
     Stream<String> getPredicates();
+
+    Stream<String> getPosShapeRefs();
+
+    Stream<String> getNegShapeRefs();
+
+    Stream<? extends AtomicConstraint> getConjuncts();
 }
