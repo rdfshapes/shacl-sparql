@@ -57,10 +57,10 @@ public class ConstraintConjunctionImpl implements ConstraintConjunction {
 
     @Override
     public Stream<String> getPredicates() {
-            return Stream.of(
+            return Stream.concat(
                     Stream.of(id, minQueryPredicate),
                     maxQueryPredicates.stream()
-            ).flatMap(s -> s);
+            );
     }
 
     @Override

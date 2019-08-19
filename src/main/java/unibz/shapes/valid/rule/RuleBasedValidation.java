@@ -241,7 +241,7 @@ public class RuleBasedValidation implements Validation {
     private void evalShape(EvalState state, Shape s, int depth) {
         logOutput.write("evaluating queries for shape " + s.getId());
         s.getDisjuncts().forEach(d -> evalDisjunct(state, d, s));
-//        state.visitedShapes.addAll(s.getPredicates());
+        state.evaluatedPredicates.addAll(s.getPredicates());
         state.addVisitedShape(s);
         saveRuleNumber(state);
 
@@ -336,13 +336,14 @@ public class RuleBasedValidation implements Validation {
     }
 
     private boolean isSatisfiable(Literal a, EvalState state, Set<Literal> ruleHeads) {
-        return (!state.visitedShapes.contains(a.getPredicate())) || ruleHeads.contains(a.getAtom()) || state.assignment.contains(a);
+        return (!state.evaluatedPredicates.contains(a.getPredicate())) || ruleHeads.contains(a.getAtom()) || state.assignment.contains(a);
     }
 
 
     private static class EvalState {
 
         private Set<Shape> visitedShapes;
+        private Set<String> evaluatedPredicates;
 
         RuleMap ruleMap;
         Set<Literal> remainingTargets;
@@ -361,6 +362,7 @@ public class RuleBasedValidation implements Validation {
                     new HashSet<>(),
                     new HashSet<>(),
                     new HashSet<>(),
+                    new HashSet<>(),
                     targetShapes.stream()
                             .collect(Collectors.toMap(
                                     s -> s,
@@ -372,11 +374,12 @@ public class RuleBasedValidation implements Validation {
         }
 
         private EvalState(Set<Literal> targetLiterals, RuleMap ruleMap, Set<Literal> assignment, Set<Shape> visitedShapes,
-                          Set<Literal> validTargets, Set<Literal> invalidTargets, Map<Shape, ImmutableSet<EvalPath>> evalPathsMap) {
+                          Set<String> evaluatedPredicates, Set<Literal> validTargets, Set<Literal> invalidTargets, Map<Shape, ImmutableSet<EvalPath>> evalPathsMap) {
             this.remainingTargets = targetLiterals;
             this.ruleMap = ruleMap;
             this.assignment = assignment;
             this.visitedShapes = visitedShapes;
+            this.evaluatedPredicates = evaluatedPredicates;
             this.validTargets = validTargets;
             this.invalidTargets = invalidTargets;
             this.evalPathsMap = evalPathsMap;
@@ -384,6 +387,10 @@ public class RuleBasedValidation implements Validation {
 
         void addVisitedShape(Shape shape) {
             visitedShapes.add(shape);
+        }
+
+        void addEvaluatedPredicates(ImmutableSet<String> predicates) {
+            evaluatedPredicates.addAll(predicates);
         }
 
         public void updateEvalPathMap(Shape shape, ImmutableSet<Shape> referencedShapes) {

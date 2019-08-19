@@ -26,6 +26,7 @@ public class ShapeImpl implements Shape {
         this.id = id;
         this.targetQuery = targetQuery;
         this.disjuncts = disjuncts;
+        computePredicateSet();
     }
 
     public String getId() {
