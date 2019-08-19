@@ -20,14 +20,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static unibz.shapes.shape.preprocess.ShapeParser.Format.JSON;
 
 
 public class ShapeParser {
@@ -53,17 +52,46 @@ public class ShapeParser {
                 );
             case SHACL:
                 return parseSchemaFromString(
-                        FileUtils.listFiles(
-                                dir.toFile(),
-                                new String[]{fileExtension},
-                                false
-                        ).stream()
-                                .map(f -> read(f))
-                                .collect(Collectors.joining( "\n" )),
+                        concatenateTtlShapesDefs(
+                                FileUtils.listFiles(
+                                        dir.toFile(),
+                                        new String[]{fileExtension},
+                                        false
+                                )),
                         shapeFormat
                 );
-                default:
-                    throw new RuntimeException("Unexpected format: " + shapeFormat);
+            default:
+                throw new RuntimeException("Unexpected format: " + shapeFormat);
+        }
+    }
+
+    private static String concatenateTtlShapesDefs(Collection<File> files) {
+        return files.stream()
+                .flatMap(f -> getPrefixDeclarations(f))
+                .distinct()
+                .collect(Collectors.joining("\n"))
+                + "\n" +
+                files.stream()
+                        .map(f -> getShapeDeclaration(f))
+                        .collect(Collectors.joining("\n"));
+    }
+
+    private static Stream<String> getPrefixDeclarations(File f) {
+        try {
+            return Files.lines(Paths.get(f.getAbsolutePath()))
+                    .filter(l -> l.contains("@prefix"));
+        } catch (IOException e) {
+            throw new RuntimeException("cannot read file : " + f.getAbsolutePath(), e);
+        }
+    }
+
+    private static String getShapeDeclaration(File f) {
+        try {
+            return Files.lines(Paths.get(f.getAbsolutePath()))
+                    .filter(l -> !l.contains("@prefix"))
+                    .collect(Collectors.joining("\n"));
+        } catch (IOException e) {
+            throw new RuntimeException("cannot read file : " + f.getAbsolutePath(), e);
         }
     }
 
@@ -87,9 +115,9 @@ public class ShapeParser {
 
 
     public static Schema parseSchemaFromString(String s, Format shapeFormat) {
-        if(shapeFormat == Format.SHACL)
+        if (shapeFormat == Format.SHACL)
             return Parser.parse(s);
-        throw new RuntimeException("Only SHACL/RDF (Turtle) format supported when the input schema is given as a string: ");
+        throw new RuntimeException("Unexpected schema format : " + shapeFormat);
     }
 
     private static Shape parse(Path path, Format shapeFormat) {
@@ -174,7 +202,7 @@ public class ShapeParser {
     }
 
     private static Stream<AtomicConstraint> duplicate(AtomicConstraint c) {
-        if(c instanceof MinAndMaxConstraint){
+        if (c instanceof MinAndMaxConstraint) {
             MinAndMaxConstraint cc = (MinAndMaxConstraint) c;
             return Stream.of(
                     new MinOnlyConstraintImpl(cc.getId() + "_1", cc.getPath(), cc.getMin(), cc.getDatatype(), cc.getValue(), cc.getShapeRef(), cc.isPos()),
