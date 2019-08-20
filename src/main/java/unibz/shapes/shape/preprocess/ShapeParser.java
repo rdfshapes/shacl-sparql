@@ -21,8 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -47,7 +45,7 @@ public class ShapeParser {
                                 new String[]{fileExtension},
                                 false
                         ).stream()
-                                .map(f -> parse(Paths.get(f.getAbsolutePath()), shapeFormat))
+                                .map(f -> parseJson(Paths.get(f.getAbsolutePath())))
                                 .collect(ImmutableCollectors.toSet())
                 );
             case SHACL:
@@ -67,12 +65,12 @@ public class ShapeParser {
 
     private static String concatenateTtlShapesDefs(Collection<File> files) {
         return files.stream()
-                .flatMap(f -> getPrefixDeclarations(f))
+                .flatMap(ShapeParser::getPrefixDeclarations)
                 .distinct()
                 .collect(Collectors.joining("\n"))
                 + "\n" +
                 files.stream()
-                        .map(f -> getShapeDeclaration(f))
+                        .map(ShapeParser::getShapeDeclaration)
                         .collect(Collectors.joining("\n"));
     }
 
@@ -95,14 +93,6 @@ public class ShapeParser {
         }
     }
 
-    private static String read(File f) {
-        try {
-            return new String(Files.readAllBytes(Paths.get(f.getAbsolutePath())));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private static String getFileExtension(Format shapeFormat) {
         switch (shapeFormat) {
             case SHACL:
@@ -118,17 +108,6 @@ public class ShapeParser {
         if (shapeFormat == Format.SHACL)
             return Parser.parse(s);
         throw new RuntimeException("Unexpected schema format : " + shapeFormat);
-    }
-
-    private static Shape parse(Path path, Format shapeFormat) {
-        switch (shapeFormat) {
-            case SHACL:
-                return parseTtl(path);
-            case JSON:
-                return parseJson(path);
-        }
-        throw new RuntimeException("Unexpected format: " + shapeFormat);
-
     }
 
     private static Shape parseJson(Path path) {
@@ -154,9 +133,6 @@ public class ShapeParser {
         }
     }
 
-    private static Shape parseTtl(Path path) {
-        return null;
-    }
 
     private static ImmutableSet<ConstraintConjunction> parseConstraints(String shapeName, JsonArray array) {
         AtomicInteger i = new AtomicInteger(0);
@@ -176,14 +152,6 @@ public class ShapeParser {
                 .flatMap(ShapeParser::duplicate)
                 .collect(ImmutableCollectors.toList());
 
-        Map<Boolean, List<AtomicConstraint>> part = StreamUt.toStream(array.iterator())
-                .map(JsonElement::getAsJsonObject)
-                .map(a -> parseConstraint(a, id + "_c" + i.incrementAndGet()))
-                // Duplicate the constraints that have both min and max
-                .flatMap(ShapeParser::duplicate)
-                .collect(Collectors.partitioningBy(
-                        c -> c instanceof MinOnlyConstraint
-                ));
         return new ConstraintConjunctionImpl(
                 id,
                 constraints.stream()
