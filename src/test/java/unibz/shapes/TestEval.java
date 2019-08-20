@@ -29,6 +29,11 @@ public class TestEval {
         int i = 1;
     }
     @Test
+    public void tmp3() {
+        Schema schema = Parser.parse(new File("/home/julien/workspace/shapes/implem/valid/mvn/src/test/resources/good1.ttl"));
+        int i = 1;
+    }
+    @Test
     public void rdf() {
 
         Schema schema = Parser.parse(new File("src/test/resources/good1.ttl"));
