@@ -19,6 +19,16 @@ public class TestEval {
         Eval.main(new String[]{"-r", "-d", "ex/shapes/nonRec/2/shacl", "http://dbpedia.org/sparql","./output"});
     }
     @Test
+    public void tmp() {
+        Eval.main(new String[]{"-r", "-d", "ex/shapes/nonRec/2/tmp", "http://dbpedia.org/sparql","./output"});
+    }
+    @Test
+    public void tmp2() {
+
+        Schema schema = Parser.parse(new File("ex/shapes/nonRec/2/tmp/Actor.ttl"));
+        int i = 1;
+    }
+    @Test
     public void rdf() {
 
         Schema schema = Parser.parse(new File("src/test/resources/good1.ttl"));
