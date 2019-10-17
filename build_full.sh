@@ -7,7 +7,7 @@ mvn org.apache.maven.plugins:maven-install-plugin:2.3.1:install-file \
 	-DartifactId="convert" \
 	-Dversion="1.0" \
 	-Dpackaging="jar" \
-	-DlocalRepositoryPath="`pwd`/build/repo/"
+	-DlocalRepositoryPath="`pwd`build/repo/"
 mvn package
 mv target/valid-1.0-SNAPSHOT.jar build/
 mvn clean
