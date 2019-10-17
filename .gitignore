@@ -19,3 +19,6 @@ tmp.*
 release/
 tests/
 output/       
+
+**.jar
+
