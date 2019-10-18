@@ -18,4 +18,15 @@ public class RuleBasedInvalidTargetResult extends RuleBasedResult implements Inv
     public Shape getFocusShape() {
         return focusShape;
     }
+
+    @Override
+    public String toString() {
+        return getTarget() +
+                ", violated at depth "+
+                getDepth()+
+                ", focus shape: "+
+                getFocusShape()+
+                ", path: "+
+                getEvalPaths().iterator().next();
+    }
 }

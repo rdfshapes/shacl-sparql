@@ -10,6 +10,7 @@ import unibz.shapes.valid.rule.EvalPath;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class RuleBasedResultSet implements ResultSet {
 
@@ -37,5 +38,12 @@ public class RuleBasedResultSet implements ResultSet {
     }
     public ImmutableList<RuleBasedInvalidTargetResult> getInValidTargetResults(){
         return ImmutableList.copyOf(invalidTargetResults);
+    }
+
+    @Override
+    public String toString() {
+        return invalidTargetResults.stream()
+                .map(r -> r.toString())
+                .collect(Collectors.joining("\n"));
     }
 }

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import unibz.shapes.endpoint.SPARQLEndpoint;
 import unibz.shapes.shape.Schema;
 import unibz.shapes.shape.preprocess.ShapeParser;
+import unibz.shapes.util.FileOutput;
 import unibz.shapes.util.Output;
 import unibz.shapes.valid.Validation;
 import unibz.shapes.valid.rule.RuleBasedValidation;
@@ -62,16 +63,16 @@ public class Eval {
                     new RewritingBasedValidation(
                             singleQuery.get(),
                             endpoint,
-                            new Output(Paths.get(outputDir.toString(), "validation.log").toFile()),
-                            new Output(Paths.get(outputDir.toString(), "targets_violated.txt").toFile())
+                            new FileOutput(Paths.get(outputDir.toString(), "validation.log").toFile()),
+                            new FileOutput(Paths.get(outputDir.toString(), "targets_violated.txt").toFile())
                     ) :
                     new RuleBasedValidation(
                             endpoint,
                             schema,
-                            new Output(Paths.get(outputDir.toString(), "validation.log").toFile()),
-                            new Output(Paths.get(outputDir.toString(), "targets_valid.log").toFile()),
-                            new Output(Paths.get(outputDir.toString(), "targets_violated.log").toFile()),
-                            new Output(Paths.get(outputDir.toString(), "stats.txt").toFile())
+                            new FileOutput(Paths.get(outputDir.toString(), "validation.log").toFile()),
+                            new FileOutput(Paths.get(outputDir.toString(), "targets_valid.log").toFile()),
+                            new FileOutput(Paths.get(outputDir.toString(), "targets_violated.log").toFile()),
+                            new FileOutput(Paths.get(outputDir.toString(), "stats.txt").toFile())
                     );
             Instant start = Instant.now();
             validation.exec();
