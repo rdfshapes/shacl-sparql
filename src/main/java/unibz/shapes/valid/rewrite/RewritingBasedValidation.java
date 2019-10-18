@@ -1,16 +1,17 @@
-package unibz.shapes.valid.impl;
+package unibz.shapes.valid.rewrite;
 
 import unibz.shapes.core.Query;
 import unibz.shapes.endpoint.QueryEvaluation;
 import unibz.shapes.endpoint.SPARQLEndpoint;
 import unibz.shapes.util.Output;
 import unibz.shapes.valid.Validation;
+import unibz.shapes.valid.result.ResultSet;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class UnfoldingBasedValidation implements Validation {
+public class RewritingBasedValidation implements Validation {
 
 
     private final Path query;
@@ -19,7 +20,7 @@ public class UnfoldingBasedValidation implements Validation {
     private final Output violationOutput;
 
 
-    public UnfoldingBasedValidation(Path query, SPARQLEndpoint endpoint, Output logOutput, Output violationOutput) {
+    public RewritingBasedValidation(Path query, SPARQLEndpoint endpoint, Output logOutput, Output violationOutput) {
         this.query = query;
         this.endpoint = endpoint;
         this.logOutput = logOutput;
@@ -37,7 +38,7 @@ public class UnfoldingBasedValidation implements Validation {
     }
 
     @Override
-    public void exec() throws IOException {
+    public ResultSet exec() throws IOException {
 
         Query q = new Query(
                 "q",
@@ -48,5 +49,7 @@ public class UnfoldingBasedValidation implements Validation {
         evalQuery(q);
         logOutput.close();
         violationOutput.close();
+
+        return new RewritingBasedResultSet();
     }
 }

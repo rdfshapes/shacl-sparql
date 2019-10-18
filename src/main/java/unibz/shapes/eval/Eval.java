@@ -8,7 +8,7 @@ import unibz.shapes.shape.preprocess.ShapeParser;
 import unibz.shapes.util.Output;
 import unibz.shapes.valid.Validation;
 import unibz.shapes.valid.rule.RuleBasedValidation;
-import unibz.shapes.valid.impl.UnfoldingBasedValidation;
+import unibz.shapes.valid.rewrite.RewritingBasedValidation;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class Eval {
         createOutputDir(outputDir);
         try {
             Validation validation = singleQuery.isPresent() ?
-                    new UnfoldingBasedValidation(
+                    new RewritingBasedValidation(
                             singleQuery.get(),
                             endpoint,
                             new Output(Paths.get(outputDir.toString(), "validation.log").toFile()),
@@ -82,6 +82,8 @@ public class Eval {
             throw new RuntimeException(e);
         }
     }
+
+
 
     private static void createOutputDir(Path outputDir) {
         File dir = outputDir.toFile();

@@ -1,12 +1,10 @@
 package unibz.shapes.valid;
 
+import unibz.shapes.valid.result.ResultSet;
+
 import java.io.IOException;
 
 public interface Validation {
 
-
-    void exec() throws IOException;
-
-
-
+    ResultSet exec() throws IOException;
 }
