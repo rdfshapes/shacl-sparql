@@ -20,5 +20,11 @@ release/
 tests/
 output/       
 
+<<<<<<< HEAD
 **.jar
 
+=======
+
+**.jar
+**maven-metadata-local.xml
+>>>>>>> d30f3cafc7c5ac4ae7b7b7b58ece0fa02ef17fe9
