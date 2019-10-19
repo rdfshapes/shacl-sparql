@@ -5,10 +5,11 @@ import org.slf4j.LoggerFactory;
 import unibz.shapes.endpoint.SPARQLEndpoint;
 import unibz.shapes.shape.Schema;
 import unibz.shapes.shape.preprocess.ShapeParser;
+import unibz.shapes.util.FileOutput;
 import unibz.shapes.util.Output;
 import unibz.shapes.valid.Validation;
 import unibz.shapes.valid.rule.RuleBasedValidation;
-import unibz.shapes.valid.impl.UnfoldingBasedValidation;
+import unibz.shapes.valid.rewrite.RewritingBasedValidation;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,19 +60,19 @@ public class Eval {
         createOutputDir(outputDir);
         try {
             Validation validation = singleQuery.isPresent() ?
-                    new UnfoldingBasedValidation(
+                    new RewritingBasedValidation(
                             singleQuery.get(),
                             endpoint,
-                            new Output(Paths.get(outputDir.toString(), "validation.log").toFile()),
-                            new Output(Paths.get(outputDir.toString(), "targets_violated.txt").toFile())
+                            new FileOutput(Paths.get(outputDir.toString(), "validation.log").toFile()),
+                            new FileOutput(Paths.get(outputDir.toString(), "targets_violated.txt").toFile())
                     ) :
                     new RuleBasedValidation(
                             endpoint,
                             schema,
-                            new Output(Paths.get(outputDir.toString(), "validation.log").toFile()),
-                            new Output(Paths.get(outputDir.toString(), "targets_valid.log").toFile()),
-                            new Output(Paths.get(outputDir.toString(), "targets_violated.log").toFile()),
-                            new Output(Paths.get(outputDir.toString(), "stats.txt").toFile())
+                            new FileOutput(Paths.get(outputDir.toString(), "validation.log").toFile()),
+                            new FileOutput(Paths.get(outputDir.toString(), "targets_valid.log").toFile()),
+                            new FileOutput(Paths.get(outputDir.toString(), "targets_violated.log").toFile()),
+                            new FileOutput(Paths.get(outputDir.toString(), "stats.txt").toFile())
                     );
             Instant start = Instant.now();
             validation.exec();
@@ -82,6 +83,8 @@ public class Eval {
             throw new RuntimeException(e);
         }
     }
+
+
 
     private static void createOutputDir(Path outputDir) {
         File dir = outputDir.toFile();

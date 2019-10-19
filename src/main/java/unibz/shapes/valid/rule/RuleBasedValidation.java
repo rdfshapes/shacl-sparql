@@ -16,7 +16,9 @@ import unibz.shapes.shape.Schema;
 import unibz.shapes.shape.Shape;
 import unibz.shapes.util.ImmutableCollectors;
 import unibz.shapes.util.Output;
+import unibz.shapes.valid.result.ResultSet;
 import unibz.shapes.valid.Validation;
+import unibz.shapes.valid.rule.result.RuleBasedResultSet;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -37,7 +39,7 @@ public class RuleBasedValidation implements Validation {
     private final Output invalidTargetsOuput;
     private final Output statsOutput;
     private final RuleBasedValidStats stats;
-    private final RuleBasedValidResult result;
+    private final RuleBasedResultSet resultSet;
 
     public RuleBasedValidation(SPARQLEndpoint endpoint, Schema schema, Output logOutput, Output validTargetsOuput, Output invalidTargetsOuput, Output statsOuput) {
         this.endpoint = endpoint;
@@ -50,11 +52,12 @@ public class RuleBasedValidation implements Validation {
                 .map(Shape::getId)
                 .collect(ImmutableCollectors.toSet());
         this.stats = new RuleBasedValidStats();
-        this.result = new RuleBasedValidResult();
+        this.resultSet = new RuleBasedResultSet();
         statsOutput = statsOuput;
+
     }
 
-    public void exec() {
+    public ResultSet exec() {
         Instant start = Instant.now();
         logOutput.write("Retrieving targets ...");
         Set<Literal> targets = extractTargetAtoms();
@@ -81,6 +84,7 @@ public class RuleBasedValidation implements Validation {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return resultSet;
     }
 
     private Set<Literal> extractTargetAtoms() {
@@ -126,7 +130,6 @@ public class RuleBasedValidation implements Validation {
 
         validateFocusShapes(state, focusShapes, depth);
 
-        result.incrementDepth();
         validate(depth + 1, state, updateFocusShapes(state, focusShapes));
     }
 
@@ -135,14 +138,18 @@ public class RuleBasedValidation implements Validation {
                 ", depth " + depth +
                 (focusShape.map(shape -> ", focus shape " + shape).orElse("")) +
                 ", " + logMessage;
-
+        ImmutableSet<EvalPath> evalPaths;
         if (isValid) {
             validTargetsOuput.write(log);
-            result.addValidTarget(t);
-        } else {
-            invalidTargetsOuput.write(log);
-            result.addInValidTarget(t, state.getEvalPaths(focusShape.get()));
+            evalPaths = focusShape.isPresent()?
+                    state.getEvalPaths(focusShape.get()):
+                    ImmutableSet.of();
+            resultSet.registerValidTarget(t,depth, focusShape, evalPaths);
         }
+       invalidTargetsOuput.write(log);
+       Shape shape =  focusShape.orElseThrow(
+               () -> new RuntimeException("A violation result must have a focus shape"));
+       resultSet.registerInvalidTarget(t,depth, shape, state.getEvalPaths(shape));
     }
 
     private ImmutableSet<Shape> updateFocusShapes(EvalState state, ImmutableSet<Shape> focusShapes) {
