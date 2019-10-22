@@ -63,7 +63,7 @@ public class ShapeParser {
         }
     }
 
-    private static String concatenateTtlShapesDefs(Collection<File> files) {
+    public static String concatenateTtlShapesDefs(Collection<File> files) {
         return files.stream()
                 .flatMap(ShapeParser::getPrefixDeclarations)
                 .distinct()
@@ -226,4 +226,5 @@ public class ShapeParser {
         }
         return new LocalConstraintImpl(id, oDatatype, oValue, oShapeRef, oNeg);
     }
+
 }

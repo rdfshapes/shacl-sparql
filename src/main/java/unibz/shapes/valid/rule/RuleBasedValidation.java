@@ -145,11 +145,12 @@ public class RuleBasedValidation implements Validation {
                     state.getEvalPaths(focusShape.get()):
                     ImmutableSet.of();
             resultSet.registerValidTarget(t,depth, focusShape, evalPaths);
+        } else {
+            invalidTargetsOuput.write(log);
+            Shape shape = focusShape.orElseThrow(
+                    () -> new RuntimeException("A violation result must have a focus shape"));
+            resultSet.registerInvalidTarget(t, depth, shape, state.getEvalPaths(shape));
         }
-       invalidTargetsOuput.write(log);
-       Shape shape =  focusShape.orElseThrow(
-               () -> new RuntimeException("A violation result must have a focus shape"));
-       resultSet.registerInvalidTarget(t,depth, shape, state.getEvalPaths(shape));
     }
 
     private ImmutableSet<Shape> updateFocusShapes(EvalState state, ImmutableSet<Shape> focusShapes) {

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import unibz.shapes.shape.Shape;
 import unibz.shapes.util.ImmutableCollectors;
 
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EvalPath {
@@ -24,4 +25,11 @@ public class EvalPath {
         private Stream<Shape> getShapes(){
             return shapes.stream();
         }
+
+    @Override
+    public String toString() {
+            return shapes.stream()
+                    .map(s -> s.getId())
+                    .collect(Collectors.joining("\n"));
+    }
 }

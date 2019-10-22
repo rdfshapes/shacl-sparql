@@ -6,9 +6,9 @@ import unibz.shapes.valid.rule.EvalPath;
 
 abstract class RuleBasedResult {
 
-    private final Literal target;
-    private final ImmutableSet<EvalPath> evalPaths;
-    private final int depth;
+    protected final Literal target;
+    protected final ImmutableSet<EvalPath> evalPaths;
+    protected final int depth;
 
     public RuleBasedResult(Literal target, int depth, ImmutableSet<EvalPath> evalPaths){
         this.target = target;

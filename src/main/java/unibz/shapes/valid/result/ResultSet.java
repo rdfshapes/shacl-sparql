@@ -6,4 +6,5 @@ public interface ResultSet {
 
     ImmutableList<? extends ValidTargetResult> getValidTargetResults();
     ImmutableList<? extends InvalidTargetResult> getInValidTargetResults();
+
 }

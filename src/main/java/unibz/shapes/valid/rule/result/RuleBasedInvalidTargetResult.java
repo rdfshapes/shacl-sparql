@@ -27,6 +27,12 @@ public class RuleBasedInvalidTargetResult extends RuleBasedResult implements Inv
                 ", focus shape: "+
                 getFocusShape()+
                 ", path: "+
-                getEvalPaths().iterator().next();
+                displayFirstEvalpath();
+    }
+
+    private String displayFirstEvalpath() {
+        return evalPaths.isEmpty()?
+                focusShape.toString():
+                focusShape + " -> "+ evalPaths.iterator().next();
     }
 }
