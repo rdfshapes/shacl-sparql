@@ -1,28 +1,21 @@
 package unibz.shapes.util;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 
-public class Output {
+public abstract class Output {
 
-    private final BufferedWriter writer;
+    Writer writer;
     private Instant previous;
     private final DateTimeFormatter formatter = DateTimeFormatter
             .ofLocalizedDateTime( FormatStyle.SHORT )
 //            .withLocale( Locale.UK )
             .withZone( ZoneId.systemDefault() );
 
-    public Output(File outputFile) throws IOException {
-        writer = new BufferedWriter(new FileWriter(outputFile));
-
-    }
 
     public void close() throws IOException {
         writer.close();
@@ -61,4 +54,5 @@ public class Output {
         }
         return elapsed;
     }
+
 }
