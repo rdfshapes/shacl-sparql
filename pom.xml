@@ -11,20 +11,20 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>repo</id>
-            <url>file://${basedir}/build/repo</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>repo</id>
+			<url>file://${basedir}/build/repo</url>
+		</repository>
+	</repositories>
 
     <dependencies>
-        <dependency>
-            <groupId>unibz.shapes</groupId>
-            <artifactId>convert</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-        </dependency>
+		<dependency>
+			<groupId>unibz.shapes</groupId>
+			<artifactId>convert</artifactId>
+			<version>1.0</version>
+			<scope>compile</scope>
+		</dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
