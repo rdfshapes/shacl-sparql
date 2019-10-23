@@ -3,6 +3,7 @@ package unibz.shapes;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import unibz.shapes.eval.EvalGUI;
+import unibz.shapes.eval.EvalGUIJson;
 import unibz.shapes.shape.preprocess.ShapeParser;
 import unibz.shapes.valid.result.gui.GUIOutput;
 
@@ -34,10 +35,25 @@ public class TestEvalGUI {
 
     private String readFile(Path p) {
         try {
-            return Files.readAllBytes(p).toString();
+            return new String(Files.readAllBytes(p));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+    }
+
+    @Test
+    public void json() {
+        Path file = Paths.get("ex/shapes/nonRec/1/MovieShape.json");
+        String jsonString = readFile(file);
+        GUIOutput output = EvalGUIJson.eval(jsonString, "http://dbpedia.org/sparql");
+
+        System.out.println(output.getStats()+"\n");
+        System.out.println(output.getTargetViolations());
+        System.out.println(output.getLog());
+        System.out.println(output.isValid());
+        System.out.println(output.numberOfValidTargets());
+        System.out.println(output.numberOfInValidTargets());
 
     }
 }

@@ -9,27 +9,31 @@ import java.util.stream.Stream;
 
 public class EvalPath {
 
-        private final ImmutableList<Shape> shapes;
+    private final ImmutableList<Shape> shapes;
 
-        public EvalPath() {
-            shapes = ImmutableList.of();
-        }
+    public EvalPath() {
+        shapes = ImmutableList.of();
+    }
 
-        public EvalPath(Shape shape, EvalPath path) {
-            shapes = Stream.concat(
-                    path.getShapes(),
-                    Stream.of(shape)
-            ).collect(ImmutableCollectors.toList());
-        }
+    public EvalPath(Shape shape, EvalPath path) {
+        shapes = Stream.concat(
+                path.getShapeStream(),
+                Stream.of(shape)
+        ).collect(ImmutableCollectors.toList());
+    }
 
-        private Stream<Shape> getShapes(){
-            return shapes.stream();
-        }
+    private Stream<Shape> getShapeStream() {
+        return shapes.stream();
+    }
+
+    public ImmutableList<Shape> getShapes() {
+        return shapes;
+    }
 
     @Override
     public String toString() {
-            return shapes.stream()
-                    .map(s -> s.getId())
-                    .collect(Collectors.joining("\n"));
+        return shapes.stream()
+                .map(s -> s.getId())
+                .collect(Collectors.joining("\n"));
     }
 }

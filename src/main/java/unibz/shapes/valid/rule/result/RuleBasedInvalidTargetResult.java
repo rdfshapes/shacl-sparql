@@ -1,10 +1,14 @@
 package unibz.shapes.valid.rule.result;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import unibz.shapes.core.Literal;
 import unibz.shapes.shape.Shape;
+import unibz.shapes.util.ImmutableCollectors;
 import unibz.shapes.valid.result.InvalidTargetResult;
 import unibz.shapes.valid.rule.EvalPath;
+
+import java.util.stream.Stream;
 
 public class RuleBasedInvalidTargetResult extends RuleBasedResult implements InvalidTargetResult {
 
@@ -31,8 +35,10 @@ public class RuleBasedInvalidTargetResult extends RuleBasedResult implements Inv
     }
 
     private String displayFirstEvalpath() {
-        return evalPaths.isEmpty()?
+        EvalPath path = evalPaths.iterator().next();
+
+        return path.getShapes().size() == 0?
                 focusShape.toString():
-                focusShape + " -> "+ evalPaths.iterator().next();
+                focusShape + " -> "+path.toString();
     }
 }
