@@ -227,9 +227,6 @@ object Parser {
           return Some(new MaxOnlyConstraintImpl(
           id,
             getPathString(s.path),
-//            s.path.predicate.getOrElse(
-//              throw new RDFParserException("Property paths not supported yet:\n" + s.path.toString)
-//            ).toString(),
             0,
             datatype,
             constant,
