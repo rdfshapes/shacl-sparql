@@ -32,8 +32,8 @@ public class Eval {
                     "\t java -jar valid-<version>.jar "+
                     "[-r] [-j] [-d schemaDir] [-f schemaFile] [-s schemaString] [-g graphName] endpoint outputDir\n\n" +
                     "with:\n\n" +
-                    "-s:                    Shapes format: SHACL/RDF (Turtle)\n" +
-                    "-j:                    Shapes format: JSON (default format if none of -s or -j is specified)\n" +
+                    "-r:                    Shapes format: SHACL/RDF (Turtle)\n" +
+                    "-j:                    Shapes format: JSON (default format if none of -r or -j is specified)\n" +
                     "schemaDir:             Directory containing the shape schema:\n" +
                     "\t\t\t\t\t\t\tJSON format: one shape per file, extension \".json\"\n" +
                     "\t\t\t\t\t\t\tSHACL/RDF format: extension \".ttl\"\n" +
@@ -119,7 +119,7 @@ public class Eval {
                         shapeFormat = Format.SHACL;
                         break;
                     case "-j":
-                        shapeFormat = ShapeParser.Format.JSON;
+                        shapeFormat = Format.JSON;
                         break;
                     default:
                         throw new RuntimeException("Invalid option " + currentOpt + "\n+" + usage);
