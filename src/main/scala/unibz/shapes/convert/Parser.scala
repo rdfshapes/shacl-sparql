@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import com.google.common.collect.{ImmutableList, ImmutableSet}
 import es.weso.rdf.nodes.{IRI, RDFNode}
+import es.weso.rdf.path.{AlternativePath, InversePath, PredicatePath, SHACLPath, SequencePath, ZeroOrMorePath}
 import es.weso.schema.{Schemas, ShaclexSchema}
 import es.weso.shacl._
 import unibz.shapes.shape.impl._
@@ -198,6 +199,25 @@ object Parser {
         ))
     }
 
+  def getPathString(path: SHACLPath): String =
+    path match {
+      case _: PredicatePath =>
+        path.predicate.getOrElse(
+          throw new RDFParserException("A PredicatePath is expected to have a predicate")
+        ).toString()
+      case _: InversePath =>
+        "^"+getPathString(path.asInstanceOf[InversePath].path)
+      case _: ZeroOrMorePath =>
+        getPathString(path.asInstanceOf[ZeroOrMorePath].path)+"*"
+      case _:  SequencePath =>
+        path.asInstanceOf[SequencePath].paths.map(x => getPathString(x)).mkString("/")
+      case _: AlternativePath  =>
+        path.asInstanceOf[AlternativePath].paths.map(x => getPathString(x)).mkString("|")
+      case _ =>
+        throw new RDFParserException("Unexpected property path:\n" + path.toString)
+    }
+
+
   private[this] def getForAllConstraint(id: String, s: PropertyShape, anonNodeShapes: Map[RefNode, NodeShape]): Option[MaxOnlyConstraint] =
     isForAll(s, anonNodeShapes) match {
       case false => None
@@ -206,9 +226,10 @@ object Parser {
         if(datatype.isPresent || constant.isPresent || shaperef.isPresent)
           return Some(new MaxOnlyConstraintImpl(
           id,
-            s.path.predicate.getOrElse(
-              throw new RDFParserException("Property paths not supported yet:\n" + s.path.toString)
-            ).toString(),
+            getPathString(s.path),
+//            s.path.predicate.getOrElse(
+//              throw new RDFParserException("Property paths not supported yet:\n" + s.path.toString)
+//            ).toString(),
             0,
             datatype,
             constant,
