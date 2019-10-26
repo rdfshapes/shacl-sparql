@@ -1,7 +1,7 @@
 # SHACL2SPARQL
 
 SHACL2SPARQL is a prototype Java implementation of the algorithm described in
-*Validating SHACL constraints over a SPARQL endpoint* (Corman, FLorenzano, Reutter and Savkovic), ISWC 19 (to appear).
+*Validating SHACL constraints over a SPARQL endpoint* (Corman, FLorenzano, Reutter and Savkovic), ISWC 19.
 
 It allows validating an RDF exposed as a SPARQL endpoint against a possibly recursive [SHACL](https://www.w3.org/TR/shacl/) schema,
 based on the semantics for recursive SHACL shapes defined in
@@ -13,26 +13,26 @@ based on the semantics for recursive SHACL shapes defined in
 To validate a graph with SHACL2SPARQL:
 
 ```
-java -jar <jarPath> [-r] [-j] [-d schemaDir] [-f schemaFile] [-s schemaString] [-g graphName] endpoint outputDir
+java -jar <jarPath> [-j] [-r] [-d schemaDir] [-f schemaFile] [-s schemaString] [-g graphName] endpoint outputDir
 ```
 
 where `<jarPath>` is the path to the .jar `build/valid<version>.jar`
 
 with:
-* `-s`: Select the SHACL/RDF (Turtle) input shape format
 * `-j`: Select the JSON input shape format, described in the document `doc/jsonSyntax.pdf` (default format if none of -s or -j is specified).
-* `schemaDir`: Directory containing the shape schema (for the JSON format only, one shape per file, extension ".json")
-    - JSON format: one shape per file, extension ".json"
+* `-r`: Select the SHACL/RDF (Turtle) input shape format
+* `schemaDir`: Directory containing the shape schema (one shape per file)
     - SHACL/RDF format: extension ".ttl"
-* `schemaFile`: File containing the shape schema (for the SHACL/RDF format only, extension ".ttl")
-* `schemaString`: Shape schema as a string (for the SHACL/RDF format only)
+    - JSON format: one shape per file, extension ".json"
+* `schemaFile`: Unique file containing the whole schema (for the SHACL/RDF format only, extension ".ttl")
+* `schemaString`: Whole schema as a string (for the SHACL/RDF format only)
 * `graphName`: Name of the RDF graph to be validated (using the SPARQL "GRAPH" operator)
 * `endpoint`: SPARQL endpoint exposing the graph to be validated
 * `outputDir`: Output directory (validation results, statistics and logs)
  
 Java 8 is required.
 
-For instance (from the current directory):
+For instance (from the current directory, after building the source):
 ```
 java -jar build/valid-1.0-SNAPSHOT.jar -d ./ex/shapes/nonRec/2/ "http://dbpedia.org/sparql"  ./output/
 ```
@@ -46,8 +46,7 @@ Maven 3 is required.
 
 ### Build the validation engine only (Java source)
 
-This is the recommended build.\
-All features will be available, but the SHACL parser (written in Scala) will not be rebuilt. 
+The SHACL parser (written in Scala) will not be rebuilt. 
 
 From the current directory (must contain the `pom.xml` file and `src` directory):
 ```
