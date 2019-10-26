@@ -23,7 +23,6 @@
 			<groupId>unibz.shapes</groupId>
 			<artifactId>convert</artifactId>
 			<version>1.0</version>
-			<scope>compile</scope>
 		</dependency>
 
         <dependency>

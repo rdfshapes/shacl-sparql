@@ -6,10 +6,9 @@ import unibz.shapes.endpoint.SPARQLEndpoint;
 import unibz.shapes.shape.Schema;
 import unibz.shapes.shape.preprocess.ShapeParser;
 import unibz.shapes.util.FileOutput;
-import unibz.shapes.util.Output;
 import unibz.shapes.valid.Validation;
-import unibz.shapes.valid.rule.RuleBasedValidation;
 import unibz.shapes.valid.rewrite.RewritingBasedValidation;
+import unibz.shapes.valid.rule.RuleBasedValidation;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +51,7 @@ public class Eval {
     private static ShapeParser.Format shapeFormat;
 
     public static void main(String[] args) {
+
 //        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql"};
 //        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql", "output/"};
         parseArguments(args);

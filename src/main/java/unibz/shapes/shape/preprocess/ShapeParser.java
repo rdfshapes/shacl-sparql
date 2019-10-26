@@ -105,6 +105,10 @@ public class ShapeParser {
 
 
     public static Schema parseSchemaFromString(String s, Format shapeFormat) {
+//        JenaSystem.init();
+        // Avoids a bug when exporting the project as a single jar
+        org.apache.jena.query.ARQ.init();
+
         if (shapeFormat == Format.SHACL)
             return Parser.parse(s);
         throw new RuntimeException("Unexpected schema format : " + shapeFormat);
@@ -135,20 +139,20 @@ public class ShapeParser {
 
     public static Shape parseJson(String jsonString) {
         Optional<String> targetQuery = Optional.empty();
-            JsonObject obj = new JsonParser().parse(jsonString).getAsJsonObject();
-            JsonElement targetDef = obj.get("targetDef");
-            if (targetDef != null) {
-                JsonElement query = targetDef.getAsJsonObject().get("query");
-                if (query != null) {
-                    targetQuery = Optional.of(SPARQLPrefixHandler.getPrefixString() + query.getAsString());
-                }
+        JsonObject obj = new JsonParser().parse(jsonString).getAsJsonObject();
+        JsonElement targetDef = obj.get("targetDef");
+        if (targetDef != null) {
+            JsonElement query = targetDef.getAsJsonObject().get("query");
+            if (query != null) {
+                targetQuery = Optional.of(SPARQLPrefixHandler.getPrefixString() + query.getAsString());
             }
-            String name = obj.get("name").getAsString();
-            return new ShapeImpl(
-                    name,
-                    targetQuery,
-                    parseConstraints(name, obj.get("constraintDef").getAsJsonObject().get("conjunctions").getAsJsonArray())
-            );
+        }
+        String name = obj.get("name").getAsString();
+        return new ShapeImpl(
+                name,
+                targetQuery,
+                parseConstraints(name, obj.get("constraintDef").getAsJsonObject().get("conjunctions").getAsJsonArray())
+        );
     }
 
     private static ImmutableSet<ConstraintConjunction> parseConstraints(String shapeName, JsonArray array) {

@@ -20,15 +20,14 @@ libraryDependencies += "com.google.code.gson" % "gson" % "2.8.5"
 // https://mvnrepository.com/artifact/junit/junit
 libraryDependencies += "junit" % "junit" % "4.10" % Test
 
-//mainClass in (Compile, run) := Some("unibz.shapes.eval.Eval")
 
-//addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.6")
-//resolvers in Global ++= Seq(
-//  "Sbt plugins"                   at "https://dl.bintray.com/sbt/sbt-plugin-releases",
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.6")
+resolvers in Global ++= Seq(
+  "Sbt plugins"                   at "https://dl.bintray.com/sbt/sbt-plugin-releases"
 //  "Maven Central Server"          at "http://repo1.maven.org/maven2",
 //  "TypeSafe Repository Releases"  at "http://repo.typesafe.com/typesafe/releases/",
 //  "TypeSafe Repository Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/"
-//)
+)
 
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
