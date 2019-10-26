@@ -4,6 +4,7 @@ target
 **.releaseBackup
 **release.properties
 dependency-reduced-pom.xml
+build/repo*
 
 # Intellij generated files
 **.iml
