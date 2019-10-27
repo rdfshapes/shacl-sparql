@@ -1,0 +1,14 @@
+@prefix dbo: <http://dbpedia.org/ontology/>
+@prefix dbr: <http://dbpedia.org/resource/>
+@prefix sh: <http://www.w3.org/ns/shacl#>
+@prefix : <http://example.org/>
+
+
+:MovieShape a sh:NodeShape;
+   sh:targetSubjectsOf dbo:director;
+   sh:property [
+     sh:path dbo:director;
+     sh:minCount 1
+   ] .
+
+

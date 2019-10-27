@@ -39,7 +39,6 @@ public class TestEvalGUI {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @Test
@@ -63,6 +62,70 @@ public class TestEvalGUI {
         String jsonString = readFile(file);
         //GUIOutput output = EvalGUIJson.eval(jsonString, "http://dbpedia.org/sparql");
         GUIOutput output = EvalGUIJson.eval(jsonString, "http://shacl.inf.unibz.it:8443/sparql");
+
+        System.out.println(output.getStats()+"\n");
+        System.out.println(output.getTargetViolations());
+        System.out.println(output.getLog());
+        System.out.println(output.isValid());
+        System.out.println(output.numberOfValidTargets());
+        System.out.println(output.numberOfInValidTargets());
+    }
+
+    @Test
+    public void evalSingleString1() {
+        Path file = Paths.get("src/test/resources/nonRec/1/shacl/MovieShapeInvalid.ttl");
+        String schemaString = readFile(file);
+        //GUIOutput output = EvalGUIJson.eval(jsonString, "");
+        GUIOutput output = EvalGUI.eval(schemaString, "http://dbpedia.org/sparql");
+
+        System.out.println(output.getStats()+"\n");
+        System.out.println(output.getTargetViolations());
+        System.out.println(output.getLog());
+        System.out.println(output.isValid());
+        System.out.println(output.numberOfValidTargets());
+        System.out.println(output.numberOfInValidTargets());
+
+    }
+
+
+    @Test
+    public void evalSingleString2() {
+        Path file = Paths.get("src/test/resources/nonRec/1/shacl/MovieShapeValid.ttl");
+        String schemaString = readFile(file);
+        //GUIOutput output = EvalGUIJson.eval(jsonString, "");
+        GUIOutput output = EvalGUI.eval(schemaString, "http://dbpedia.org/sparql");
+
+        System.out.println(output.getStats()+"\n");
+        System.out.println(output.getTargetViolations());
+        System.out.println(output.getLog());
+        System.out.println(output.isValid());
+        System.out.println(output.numberOfValidTargets());
+        System.out.println(output.numberOfInValidTargets());
+
+    }
+
+    @Test
+    public void evalSingleString3() {
+        Path file = Paths.get("src/test/resources/nonRec/2/shacl/ActorMovieShapes.ttl");
+        String schemaString = readFile(file);
+        //GUIOutput output = EvalGUIJson.eval(jsonString, "");
+        GUIOutput output = EvalGUI.eval(schemaString, "http://dbpedia.org/sparql");
+
+        System.out.println(output.getStats()+"\n");
+        System.out.println(output.getTargetViolations());
+        System.out.println(output.getLog());
+        System.out.println(output.isValid());
+        System.out.println(output.numberOfValidTargets());
+        System.out.println(output.numberOfInValidTargets());
+
+    }
+
+    @Test
+    public void evalSingleString4() {
+        Path file = Paths.get("src/test/resources/rec/2/shacl/ActorMovieShapes.ttl");
+        String schemaString = readFile(file);
+        //GUIOutput output = EvalGUIJson.eval(jsonString, "");
+        GUIOutput output = EvalGUI.eval(schemaString, "http://dbpedia.org/sparql");
 
         System.out.println(output.getStats()+"\n");
         System.out.println(output.getTargetViolations());

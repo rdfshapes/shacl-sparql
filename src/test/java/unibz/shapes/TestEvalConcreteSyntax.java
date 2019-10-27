@@ -11,7 +11,7 @@ public class TestEvalConcreteSyntax {
 
     @Test
     public void nonRec_2_shacl() {
-        Eval.main(new String[]{"-r", "-d", "ex/shapes/nonRec/2/shacl", "http://shacl.inf.unibz.it:8443/sparql","./output"});
+        Eval.main(new String[]{"-r", "-d", "ex/shapes/nonRec/2/shacl", "http://dbpedia.org/sparql","./output"});
     }
 
     @Test
@@ -19,9 +19,11 @@ public class TestEvalConcreteSyntax {
         Eval.main(new String[]{"-r", "-d", "ex/shapes/rec/2/shacl", "http://dbpedia.org/sparql","./output"});
     }
 
-
     @Test
     public void rec_3_shacl() {
         Eval.main(new String[]{"-r", "-d", "ex/shapes/rec/3/shacl", "http://dbpedia.org/sparql","./output"});
     }
+
+
+
 }
