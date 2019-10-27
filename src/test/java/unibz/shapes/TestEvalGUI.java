@@ -56,4 +56,20 @@ public class TestEvalGUI {
         System.out.println(output.numberOfInValidTargets());
 
     }
+
+    @Test
+    public void json2() {
+        Path file = Paths.get("ex/shapes/varia/DirectorShape.json");
+        String jsonString = readFile(file);
+        //GUIOutput output = EvalGUIJson.eval(jsonString, "http://dbpedia.org/sparql");
+        GUIOutput output = EvalGUIJson.eval(jsonString, "http://shacl.inf.unibz.it:8443/sparql");
+
+        System.out.println(output.getStats()+"\n");
+        System.out.println(output.getTargetViolations());
+        System.out.println(output.getLog());
+        System.out.println(output.isValid());
+        System.out.println(output.numberOfValidTargets());
+        System.out.println(output.numberOfInValidTargets());
+
+    }
 }

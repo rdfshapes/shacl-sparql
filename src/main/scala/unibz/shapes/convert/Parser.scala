@@ -57,7 +57,7 @@ object Parser {
       .map(t => translateTargetDef(t)) :+ s
 
     return Optional.of(
-      "SELECT ?x WHERE {\n" +
+      "SELECT DISTINCT ?x WHERE {\n" +
         triplePatterns
           .flatten
           .reduce((s1, s2) => "{\n " + s1 + "\n} UNION {\n" + s2 + " \n}")
