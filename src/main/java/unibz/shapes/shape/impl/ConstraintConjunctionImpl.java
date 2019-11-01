@@ -13,8 +13,6 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static javafx.scene.input.KeyCode.P;
-
 public class ConstraintConjunctionImpl implements ConstraintConjunction {
 
     private final String id;

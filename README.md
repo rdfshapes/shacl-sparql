@@ -58,8 +58,8 @@ The jar is `build/valid<version>.jar`.
 ### Build the SHACL parser (Scala source) and validation engine (Java source)
 
 SBT is required.
-
 From the current directory (must contain the `pom.xml` file, `build.sbt` file and `src` directory):
 ```
 ./build_full.sh
 ```
+The parser depends on Shaclex [Shaclex](https://github.com/weso/shaclex) version 0.1.20, available on Bintray: [https://bintray.com/labra/maven/shaclex](https://bintray.com/labra/maven/shaclex).
