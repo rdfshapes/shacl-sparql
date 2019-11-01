@@ -1,7 +1,7 @@
-@prefix dbo: <http://dbpedia.org/ontology/>
-@prefix dbr: <http://dbpedia.org/resource/>
-@prefix sh: <http://www.w3.org/ns/shacl#>
-@prefix : <http://example.org/>
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix dbr: <http://dbpedia.org/resource/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <http://example.org/> .
 
 :MovieShape a sh:NodeShape;
    sh:targetClass dbo:Film;	

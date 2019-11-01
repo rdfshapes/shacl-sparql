@@ -3,16 +3,16 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix : <http://example.org/> .
 
-:LocationShape a sh:NodeShape;
+:DirectorShape a sh:NodeShape;
    sh:property [
-     sh:path dbo:country;
+     sh:path dbo:birthPlace;
+	 sh:node :LocationShape
+   ] ;
+   sh:property [
+     sh:path dbo:imdbId;
      sh:minCount 1
    ] ;
    sh:property [
-     sh:path dbo:leaderTitle;
-     sh:minCount 1
-   ] ;
-   sh:property [
-     sh:path dbo:populationDensity;
+     sh:path [ sh:inversePath dbo:director ];
      sh:minCount 1
    ] .

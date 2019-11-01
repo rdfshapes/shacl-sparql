@@ -3,7 +3,7 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix : <http://example.org/> .
 
-:ActorShape a sh:NodeShape;
+:DirectorShape a sh:NodeShape;
    sh:property [
      sh:path dbo:birthPlace;
 	 sh:qualifiedValueShape [
@@ -12,21 +12,18 @@
      sh:qualifiedMinCount 1
    ] ;
    sh:property [
+     sh:path dbo:birthDate;
+     sh:minCount 1
+   ] ;
+   sh:property [
      sh:path dbo:activeYearsStartYear;
      sh:minCount 1
    ] ;
    sh:property [
-     sh:path dbo:occupation;
-	 sh:qualifiedValueShape [
-	   sh:hasValue dbr:Actor ;
-     ];
-     sh:qualifiedMinCount 1
-   ]; 
-   sh:property [
      sh:path dbo:imdbId;
      sh:minCount 1
-   ];
+   ] ;
    sh:property [
-     sh:path [ sh:inversePath dbo:starring ];
+     sh:path [ sh:inversePath dbo:director ];
      sh:node :MovieShape
    ] .

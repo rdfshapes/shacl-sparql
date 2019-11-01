@@ -21,12 +21,12 @@
 	   sh:hasValue dbr:Actor ;
      ];
      sh:qualifiedMinCount 1
-   ]; 
+   ];
    sh:property [
      sh:path dbo:imdbId;
      sh:minCount 1
-   ];
+   ] ;
    sh:property [
      sh:path [ sh:inversePath dbo:starring ];
-     sh:node :MovieShape
+     sh:minCount 1
    ] .

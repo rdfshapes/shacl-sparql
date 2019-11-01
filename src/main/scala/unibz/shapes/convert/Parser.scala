@@ -165,9 +165,7 @@ object Parser {
         val (datatype, constant, shaperef, isPos) = getLocalConstraintComponents(s.components, anonNodeShapes)
         Some(new MinOnlyConstraintImpl(
           id,
-          s.path.predicate.getOrElse(
-            throw new RDFParserException("Property paths not supported yet:\n" + s.path.toString)
-          ).toString(),
+          getPathString(s.path),
           card,
           datatype,
           constant,
@@ -188,9 +186,7 @@ object Parser {
         val (datatype, constant, shaperef, isPos) = getLocalConstraintComponents(s.components, anonNodeShapes)
         Some(new MaxOnlyConstraintImpl(
           id,
-          s.path.predicate.getOrElse(
-            throw new RDFParserException("Property paths not supported yet:\n" + s.path.toString)
-          ).toString(),
+          getPathString(s.path),
           card,
           datatype,
           constant,
