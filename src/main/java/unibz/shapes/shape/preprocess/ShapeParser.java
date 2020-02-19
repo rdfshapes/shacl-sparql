@@ -29,10 +29,26 @@ import java.util.stream.Stream;
 
 public class ShapeParser {
 
-
     public enum Format {
         JSON,
         SHACL
+    }
+
+    public static Schema parseSchemaFromFile(Path path, Format shapeFormat) {
+        switch (shapeFormat) {
+            case SHACL:
+                try {
+                    return parseSchemaFromString(
+                            Files.lines(path)
+                                    .collect(Collectors.joining(System.lineSeparator())),
+                            shapeFormat
+                );
+                } catch (IOException e) {
+                    throw new RuntimeException("cannot read file : " + path, e);
+                }
+            default:
+                throw new RuntimeException("Unexpected format for single file input: " + shapeFormat);
+        }
     }
 
     public static Schema parseSchemaFromDir(Path dir, Format shapeFormat) {

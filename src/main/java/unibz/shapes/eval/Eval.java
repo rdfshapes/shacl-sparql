@@ -52,8 +52,10 @@ public class Eval {
 
     public static void main(String[] args) {
 
+
 //        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql"};
 //        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql", "output/"};
+//        args = new String[]{"-r", "-f", "./ex/shapes/nonRec/2/shacl/concat.ttl", "http://dbpedia.org/sparql",  "./output/"};
         parseArguments(args);
         schema.getShapes()
                 .forEach(sh -> sh.computeConstraintQueries(schema, graph));
@@ -145,7 +147,7 @@ public class Eval {
         return schemaDir.isPresent() ?
                 ShapeParser.parseSchemaFromDir(schemaDir.get(), shapeFormat) :
                 schemaFile.isPresent() ?
-                        ShapeParser.parseSchemaFromDir(schemaFile.get(), shapeFormat) :
+                        ShapeParser.parseSchemaFromFile(schemaFile.get(), shapeFormat) :
                         ShapeParser.parseSchemaFromString(schemaString.get(), shapeFormat);
     }
 }
