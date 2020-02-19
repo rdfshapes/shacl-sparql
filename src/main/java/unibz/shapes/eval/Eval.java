@@ -103,6 +103,9 @@ public class Eval {
             String currentOpt = it.next();
             while (currentOpt.startsWith("-")) {
                 switch (currentOpt) {
+                    case "-f":
+                        schemaFile = Optional.of(Paths.get(it.next()));
+                        break;
                     case "-d":
                         schemaDir = Optional.of(Paths.get(it.next()));
                         break;
