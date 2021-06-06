@@ -28,6 +28,8 @@ Alternatively, scripts are provided to build:
 
 ## Validate an RDF graph with SHACL2SPARQL ##
 
+Java 8 is required.
+
 To validate a graph with SHACL2SPARQL:
 
 ```
@@ -48,8 +50,6 @@ with:
 * `endpoint`: SPARQL endpoint exposing the graph to be validated
 * `outputDir`: Output directory (validation results, statistics and logs)
  
-Java 8 is required.
-
 For instance (from the current directory, assuming that the jar is in the `build` directory):
 ```
 java -jar build/valid-1.0-SNAPSHOT.jar -d ./ex/shapes/nonRec/2/ "http://dbpedia.org/sparql"  ./output/
