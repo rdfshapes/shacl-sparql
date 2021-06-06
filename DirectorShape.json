@@ -1,0 +1,13 @@
+{
+	"name": "DirectorShape",
+	"targetDef":{
+		"query":"SELECT ?x WHERE {?x dbo:director ?y}"
+	},
+	"constraintDef":{
+		"conjunctions":[
+			[
+				{ "path": "dbo:director", "min":1}
+			]
+		]
+	}
+}
