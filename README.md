@@ -14,7 +14,7 @@ SHACL2SPARQL is primarily meant to be used with a dedicated JSON syntax for inpu
 
 Alternatively, it offers a limited support for SHACL's (ttl) syntax, namely the fragment that corresponds to the JSON syntax.  
 Among other restrictions, shape constraints are assumed to be in conjunctive normal form, and constraints on SHACL "value nodes" are limited to string equality and xsd datatypes.  
-The SHACL parser is written in Scala, because it relies on ([Shaclex](https://github.com/weso/shaclex)).
+The SHACL parser is written in Scala, because it relies on [Shaclex](https://github.com/weso/shaclex).
 
 
 ## Installation ##
