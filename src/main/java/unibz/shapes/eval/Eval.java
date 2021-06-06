@@ -53,9 +53,8 @@ public class Eval {
     public static void main(String[] args) {
 
 
-//        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql"};
 //        args = new String[]{"-d", "./ex/shapes/nonRec/2/", "http://dbpedia.org/sparql", "output/"};
-//        args = new String[]{"-r", "-f", "./ex/shapes/nonRec/2/shacl/concat.ttl", "http://dbpedia.org/sparql",  "./output/"};
+//        args = new String[]{"-r", "-f", "./ex/shapes/nonRec/2/shacl/ActorShape.ttl", "http://dbpedia.org/sparql",  "./output/"};
         parseArguments(args);
         schema.getShapes()
                 .forEach(sh -> sh.computeConstraintQueries(schema, graph));
