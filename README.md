@@ -77,7 +77,8 @@ The jar is `build/valid<version>.jar`.
 
 ### Build the SHACL parser (Scala source) and validation engine (Java source)
 
-SBT 1.2.6 is required (or modify the version in `project/build.properties`). 
+SBT 1.2.6 is required (or modify the version in `project/build.properties`).
+
 From the current directory (must contain the `pom.xml` file, `build.sbt` file and `src` directory):
 ```
 ./build_full.sh
