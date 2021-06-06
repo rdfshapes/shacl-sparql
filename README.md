@@ -19,7 +19,7 @@ java -jar <jarPath> [-j] [-r] [-d schemaDir] [-f schemaFile] [-s schemaString] [
 where `<jarPath>` is the path to the .jar `build/valid<version>.jar`
 
 with:
-* `-j`: Select the JSON input shape format, described in the document `doc/jsonSyntax.pdf` (default format if none of -s or -j is specified).
+* `-j`: Select the JSON input shape format, described in the document `doc/jsonSyntax.pdf` (default format if none of -j or -r is specified).
 * `-r`: Select the SHACL/RDF (Turtle) input shape format
 * `schemaDir`: Directory containing the shape schema (one shape per file)
     - SHACL/RDF format: extension ".ttl"
@@ -38,6 +38,14 @@ java -jar build/valid-1.0-SNAPSHOT.jar -d ./ex/shapes/nonRec/2/ "http://dbpedia.
 ```
 
 Note that the validation results for the above command are incorrect, because the SPARQL endpoint "http://dbpedia.org/sparql" only returns the 10 000 first answers to a query.
+
+
+### Notes about the SHACL parser ###
+
+SHACL2SPARQL is primarily meant to be used with the JSON format for input shapes (documented in `doc/jsonSyntax.pdf`).
+
+The SHACL parser relies on an external library ([Shaclex](https://github.com/weso/shaclex)), and suports only the fragment of SHACL that corresponds to the JSON syntax.
+Among other restrictions, shapes constraints are assumed to be in conjunctive normal form, and constraints on SHACL "value nodes" are limited to string equality and xsd datatypes.  
 
 
 ## Build from source (Linux or Mac OS)
@@ -62,4 +70,4 @@ From the current directory (must contain the `pom.xml` file, `build.sbt` file an
 ```
 ./build_full.sh
 ```
-The parser depends on Shaclex [Shaclex](https://github.com/weso/shaclex) version 0.1.20, available on Bintray: [https://bintray.com/labra/maven/shaclex](https://bintray.com/labra/maven/shaclex).
+The parser depends on [Shaclex version 0.1.24](https://github.com/weso/shaclex/releases/tag/0.1.24) (the release contains compilation instructions).
