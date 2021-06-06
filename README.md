@@ -12,7 +12,7 @@ based on the semantics for recursive SHACL shapes defined in
 
 SHACL2SPARQL is primarily meant to be used with a dedicated JSON syntax for input shapes (documented in `doc/jsonSyntax.pdf`).
 
-Alternatively, it offers a limited support for SHACL's (ttl) syntax, namely the fragment that corresponds to the JSON syntax.  
+Alternatively, it offers a limited support for shapes in RDF, namely the fragment of SHACL that corresponds to the JSON syntax.  
 Among other restrictions, shape constraints are assumed to be in conjunctive normal form, and constraints on SHACL "value nodes" are limited to string equality and xsd datatypes.  
 The SHACL parser is written in Scala, because it relies on [Shaclex](https://github.com/weso/shaclex).
 
