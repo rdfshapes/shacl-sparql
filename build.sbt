@@ -2,11 +2,13 @@ name := "unibz.shapes.convert"
 
 version := "1.0"
 
-scalaVersion := "2.12.8"
+scalaVersion := "2.13.6"
 
 
-libraryDependencies += "es.weso" %% "schema" % "0.1.20"
+libraryDependencies += "es.weso" %% "schema" % "0.1.24"
 
+// https://mvnrepository.com/artifact/org.scala-lang/scala-library
+//libraryDependencies += "org.scala-lang" % "scala-library" % "2.13.6"
 // https://mvnrepository.com/artifact/org.scalatest/scalatest
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % Test
 // https://mvnrepository.com/artifact/com.google.guava/guava
@@ -21,7 +23,7 @@ libraryDependencies += "com.google.code.gson" % "gson" % "2.8.5"
 libraryDependencies += "junit" % "junit" % "4.10" % Test
 
 
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.6")
+//addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.6")
 resolvers in Global ++= Seq(
   "Sbt plugins"                   at "https://dl.bintray.com/sbt/sbt-plugin-releases"
 //  "Maven Central Server"          at "http://repo1.maven.org/maven2",
