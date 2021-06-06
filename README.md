@@ -8,6 +8,24 @@ based on the semantics for recursive SHACL shapes defined in
 [*Semantics and validation of recursive SHACL*](https://www.inf.unibz.it/krdb/KRDB%20files/tech-reports/KRDB18-01.pdf).
 
 
+## Syntax of input shapes ##
+
+SHACL2SPARQL is primarily meant to be used with a dedicated JSON syntax for input shapes (documented in `doc/jsonSyntax.pdf`).
+
+Alternatively, it offers a limited support for SHACL's (ttl) syntax, namely the fragment that corresponds to the JSON syntax.
+Among other restrictions, shape constraints are assumed to be in conjunctive normal form, and constraints on SHACL "value nodes" are limited to string equality and xsd datatypes.  
+The SHACL parser is written in Scala, because it relies on ([Shaclex](https://github.com/weso/shaclex)).
+
+
+## Installation ##
+
+A jar is provided with the release.
+
+Alternatively, scripts are provided to build:
+* the validation engine (in Java)
+* the validation engine (in Java) and the parser (in Scala)
+
+
 ## Validate an RDF graph with SHACL2SPARQL ##
 
 To validate a graph with SHACL2SPARQL:
@@ -32,7 +50,7 @@ with:
  
 Java 8 is required.
 
-For instance (from the current directory, after building the source):
+For instance (from the current directory, assuming that the jar is in the `build` directory):
 ```
 java -jar build/valid-1.0-SNAPSHOT.jar -d ./ex/shapes/nonRec/2/ "http://dbpedia.org/sparql"  ./output/
 ```
@@ -40,12 +58,6 @@ java -jar build/valid-1.0-SNAPSHOT.jar -d ./ex/shapes/nonRec/2/ "http://dbpedia.
 Note that the validation results for the above command are incorrect, because the SPARQL endpoint "http://dbpedia.org/sparql" only returns the 10 000 first answers to a query.
 
 
-### Notes about the SHACL parser ###
-
-SHACL2SPARQL is primarily meant to be used with the JSON format for input shapes (documented in `doc/jsonSyntax.pdf`).
-
-The SHACL parser relies on an external library ([Shaclex](https://github.com/weso/shaclex)), and suports only the fragment of SHACL that corresponds to the JSON syntax.
-Among other restrictions, shapes constraints are assumed to be in conjunctive normal form, and constraints on SHACL "value nodes" are limited to string equality and xsd datatypes.  
 
 
 ## Build from source (Linux or Mac OS)
